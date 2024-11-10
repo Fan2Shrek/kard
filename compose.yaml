@@ -21,6 +21,15 @@ services:
       - .:/app
     working_dir: /app
 
+
+  node:
+    image: node:23
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    working_dir: /app
+
   mercure:
     image: dunglas/mercure
     restart: unless-stopped
