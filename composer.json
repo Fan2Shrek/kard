@@ -16,6 +16,8 @@
         "symfony/runtime": "7.1.*",
         "symfony/stimulus-bundle": "^2.21",
         "symfony/twig-bundle": "7.1.*",
+        "symfony/ux-react": "^2.21",
+        "symfony/ux-turbo": "^2.21",
         "symfony/yaml": "7.1.*",
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/twig": "^2.12|^3.0"

@@ -109,6 +109,21 @@
             "templates/base.html.twig"
         ]
     },
+    "symfony/ux-react": {
+        "version": "2.21",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "2.9",
+            "ref": "e970076b31d602ae6e2106cf91a82c7e1f7ddff2"
+        },
+        "files": [
+            "assets/react/controllers/Hello.jsx"
+        ]
+    },
+    "symfony/ux-turbo": {
+        "version": "v2.21.0"
+    },
     "twig/extra-bundle": {
         "version": "v3.13.0"
     }

@@ -2,15 +2,16 @@
 
 namespace App\Controller;
 
+use App\Service\Card\CardGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mercure\HubInterface;
-use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Annotation\Route;
 
 final class HomeController extends AbstractController
 {
     public function __construct(
+        private readonly CardGenerator $cardGenerator,
         private readonly HubInterface $hub,
     ) {
     }
@@ -25,8 +26,10 @@ final class HomeController extends AbstractController
     #[Route('/game', name: 'game')]
     public function game(): Response
     {
-        $this->hub->publish(new Update('http://example.com/game'), 'Game started!');
+        $hands = $this->cardGenerator->generateHands(2);
 
-        return $this->render('home/game.html.twig');
+        return $this->render('home/game.html.twig', [
+            'hands' => $hands,
+        ]);
     }
 }
