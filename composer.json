@@ -7,6 +7,11 @@
         "php": ">=8.2",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "doctrine/dbal": "^3",
+        "doctrine/doctrine-bundle": "^2.13",
+        "doctrine/doctrine-migrations-bundle": "^3.3",
+        "doctrine/orm": "^3.3",
+        "ramsey/uuid-doctrine": "^2.1",
         "symfony/asset": "7.1.*",
         "symfony/asset-mapper": "7.1.*",
         "symfony/console": "7.1.*",
@@ -15,6 +20,7 @@
         "symfony/framework-bundle": "7.1.*",
         "symfony/mercure-bundle": "^0.3.9",
         "symfony/runtime": "7.1.*",
+        "symfony/security-bundle": "7.1.*",
         "symfony/stimulus-bundle": "^2.21",
         "symfony/twig-bundle": "7.1.*",
         "symfony/ux-react": "^2.21",
@@ -73,5 +79,9 @@
             "allow-contrib": false,
             "require": "7.1.*"
         }
+    },
+    "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^3.6",
+        "symfony/maker-bundle": "^1.61"
     }
 }

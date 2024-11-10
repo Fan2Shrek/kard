@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello!{% endblock %}
+
+{% block body %}
+    <h1>Waiting !</h1>
+    <div {{ turbo_stream_listen('waiting') }}></div> 
+    <div id="player-join">
+        {% for player in players %}
+            {% include "components/turbo/player-join.html.twig" with {"player": player} %}
+        {% endfor %}
+    </div>
+{% endblock %}

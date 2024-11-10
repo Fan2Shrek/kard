@@ -7,7 +7,8 @@ use App\Model\Card\Hand;
 final class Player
 {
     public function __construct(
-        private readonly Hand $hand,
+        public readonly string $name, 
+        private ?Hand $hand = null,
     ) {
     }
 }

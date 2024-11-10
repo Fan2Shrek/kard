@@ -2,10 +2,15 @@
 
 namespace App\Controller;
 
+use App\Entity\Room;
+use App\Model\Player;
+use App\Repository\RoomRepository;
+use App\Repository\UserRepository;
 use App\Service\Card\CardGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mercure\HubInterface;
+use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Annotation\Route;
 
 final class HomeController extends AbstractController
@@ -13,14 +18,62 @@ final class HomeController extends AbstractController
     public function __construct(
         private readonly CardGenerator $cardGenerator,
         private readonly HubInterface $hub,
+        private readonly RoomRepository $roomRepository,
+        private readonly UserRepository $userRepository,
     ) {
     }
-
 
     #[Route('/', name: 'home')]
     public function index(): Response
     {
         return $this->render('home/index.html.twig');
+    }
+
+    #[Route('/create', name: 'create')]
+    public function create(): Response
+    {
+        $user = $this->userRepository->findOneBy(['username' => 'admin']);
+        $room = new Room();
+        $room->setOwner($user);
+        $room->addPlayer($user);
+
+        $this->roomRepository->save($room);
+
+        return $this->redirectToRoute('waiting', ['id' => $room->getId()]);
+    }
+
+    #[Route('/waiting/{id}', name: 'waiting')]
+    public function waiting(Room $room): Response
+    {
+        $user = $this->userRepository->findOneBy(['username' => 'user']);
+        $hasJoined = false;
+        foreach ($room->getPlayers() as $player) {
+            if ($player->getUsername() === $user->getUsername()) {
+                $hasJoined = true;
+                break;
+            }
+        }
+
+        if (!$hasJoined) {
+            $room->addPlayer($user);
+            $this->roomRepository->save($room);
+
+            $this->hub->publish(new Update(
+                'waiting',
+                $this->renderView('components/turbo/player-join.html.twig', [
+                    'player' =>  new Player($user->getUsername()),   
+                ])
+            ));
+        }
+
+        $players =  array_map(
+            fn ($player) => new Player($player->getUsername()),
+            $room->getPlayers()->toArray(),
+        );
+
+        return $this->render('home/waiting.html.twig', [
+            'players' => $players,
+        ]);
     }
 
     #[Route('/game', name: 'game')]
