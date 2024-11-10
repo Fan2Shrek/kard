@@ -1,0 +1,3 @@
+react:
+    controllers_path: '%kernel.project_dir%/assets/react/dist'
+

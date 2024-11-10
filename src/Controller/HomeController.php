@@ -26,7 +26,7 @@ final class HomeController extends AbstractController
     #[Route('/game', name: 'game')]
     public function game(): Response
     {
-        $hands = $this->cardGenerator->generateHands(2);
+        $hands = $this->cardGenerator->generateHands(2, 5);
 
         return $this->render('home/game.html.twig', [
             'hands' => $hands,
