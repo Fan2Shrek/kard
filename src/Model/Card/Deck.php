@@ -16,6 +16,15 @@ final class Deck
 
     public function draw(): Card
     {
+        if (empty($this->cards)) {
+            throw new \RuntimeException('Deck is empty');
+        }
+
         return array_shift($this->cards);
+    }
+    
+    public function count(): int
+    {
+        return count($this->cards);
     }
 }

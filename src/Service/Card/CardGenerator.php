@@ -31,15 +31,20 @@ final class CardGenerator
         return $deck;
     }
 
-    public function generateHands(int $count): array
+    public function generateHands(int $handsCount, int $cards = 0): array
     {
-        $hands = [];
         $deck = $this->generateShuffled();
 
-        for ($i = 0; $i < $count; $i++) {
+        if ($cards === 0) {
+            $cards = $deck->count() / $handsCount;
+        }
+
+        $hands = [];
+
+        for ($i = 0; $i < $handsCount; $i++) {
             $hand = new Hand();
 
-            for ($j = 0; $j < 5; $j++) {
+            for ($j = 0; $j < $cards; $j++) {
                 $hand->add($deck->draw());
             }
 

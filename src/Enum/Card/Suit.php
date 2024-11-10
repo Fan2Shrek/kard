@@ -2,10 +2,10 @@
 
 namespace App\Enum\Card;
 
-enum Suit
+enum Suit: string
 {
-    case HEARTS;
-    case DIAMONDS;
-    case CLUBS;
-    case SPADES;
+    case HEARTS = 'h';
+    case DIAMONDS = 'd';
+    case CLUBS = 'c';
+    case SPADES = 's';
 }

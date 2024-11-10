@@ -7,6 +7,7 @@
         "php": ">=8.2",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "symfony/asset": "7.1.*",
         "symfony/asset-mapper": "7.1.*",
         "symfony/console": "7.1.*",
         "symfony/dotenv": "7.1.*",
@@ -19,6 +20,7 @@
         "symfony/ux-react": "^2.21",
         "symfony/ux-turbo": "^2.21",
         "symfony/yaml": "7.1.*",
+        "symfonycasts/sass-bundle": "^0.8.1",
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/twig": "^2.12|^3.0"
     },

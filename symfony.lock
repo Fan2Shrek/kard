@@ -124,6 +124,9 @@
     "symfony/ux-turbo": {
         "version": "v2.21.0"
     },
+    "symfonycasts/sass-bundle": {
+        "version": "v0.8.1"
+    },
     "twig/extra-bundle": {
         "version": "v3.13.0"
     }

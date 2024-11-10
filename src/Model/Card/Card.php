@@ -12,4 +12,9 @@ final readonly class Card
         public readonly Rank $rank,
     ) {
     }
+
+    public function getImg(): string
+    {
+        return sprintf('%s%s.svg', $this->rank->value, $this->suit->value);
+    }
 }

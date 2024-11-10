@@ -4,6 +4,5 @@ export default class extends Controller {
     connect() {
         const url = JSON.parse(document.getElementById("mercure-url").textContent);
         const eventSource = new EventSource(url);
-        this.element.textContent = 'Hello World! en petit';
     }
 }
