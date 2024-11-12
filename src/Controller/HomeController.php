@@ -72,12 +72,29 @@ final class HomeController extends AbstractController
         );
 
         return $this->render('home/waiting.html.twig', [
+            'room' => $room,
             'players' => $players,
         ]);
     }
 
-    #[Route('/game', name: 'game')]
-    public function game(): Response
+    #[Route('/start/{id}', name: 'game_start')]
+    public function start(Room $room): Response
+    {
+        $hands = $this->cardGenerator->generateHands(2, 5);
+        $response = $this->redirectToRoute('game', ['id' => $room->getId()]);
+
+        $this->hub->publish(new Update(
+            sprintf('game-%s', $room->getId()),
+            json_encode([
+                'url' => $response->getTargetUrl(),
+            ])
+        ));
+
+        return $response;
+    }
+
+    #[Route('/game/{id}', name: 'game')]
+    public function game(Room $room): Response
     {
         $hands = $this->cardGenerator->generateHands(2, 5);
 
