@@ -20,7 +20,9 @@ services:
     volumes:
       - .:/app
     working_dir: /app
-
+    
+  redis:
+    image: redis:7
 
   node:
     image: node:23

@@ -20,5 +20,13 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    app.redis_provider:
+        class: \Redis
+        factory: ['Symfony\Component\Cache\Adapter\RedisAdapter', 'createConnection']
+        arguments:
+            - '%env(string:REDIS_URL)%'
+            - { retry_interval: 2, timeout: 10 }
+
+    Symfony\Contracts\Cache\CacheInterface:
+        alias: cache.redis 
+

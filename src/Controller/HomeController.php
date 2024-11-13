@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 final class HomeController extends AbstractController
 {
@@ -20,6 +22,7 @@ final class HomeController extends AbstractController
         private readonly HubInterface $hub,
         private readonly RoomRepository $roomRepository,
         private readonly UserRepository $userRepository,
+        private readonly CacheInterface $cache,
     ) {
     }
 
@@ -83,6 +86,17 @@ final class HomeController extends AbstractController
         $hands = $this->cardGenerator->generateHands(2, 5);
         $response = $this->redirectToRoute('game', ['id' => $room->getId()]);
 
+        foreach ($room->getPlayers() as $k => $player) {
+            $this->cache->get(sprintf('player-%s', $player->getUsername()), function (ItemInterface $item) use ($hands, $k) {
+                $item->expiresAfter(3600);
+
+                return json_encode([
+                    'hand' => $hands[$k],
+                ]);
+            });
+        }
+        
+        return new Response;
         $this->hub->publish(new Update(
             sprintf('game-%s', $room->getId()),
             json_encode([
