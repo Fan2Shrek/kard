@@ -5,9 +5,7 @@
 {% block body %}
     <h1>Hello !</h1>
     <div {{ stimulus_controller('home') }}>
-        {% for hand in hands %}
-            {% include "components/model/_hand.html.twig" %}
-        {% endfor %}
+        {% include "components/model/_hand.html.twig" %}
     </div>
 {% endblock %}
 {% block endscript %}

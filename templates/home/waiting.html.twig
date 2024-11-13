@@ -10,7 +10,7 @@
             {% include "components/turbo/player-join.html.twig" with {"player": player} %}
         {% endfor %}
     </div>
-    {% if 1 %}
+    {% if room.owner == app.user %}
         <a href="{{ path('game_start', {'id': room.id}) }}" class="btn btn-primary">Start</a>
     {% endif %}
     <div {{ stimulus_controller('waiting') }}>

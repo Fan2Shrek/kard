@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Room;
+use App\Entity\User;
 use App\Model\Player;
 use App\Repository\RoomRepository;
 use App\Repository\UserRepository;
@@ -35,7 +36,7 @@ final class HomeController extends AbstractController
     #[Route('/create', name: 'create')]
     public function create(): Response
     {
-        $user = $this->userRepository->findOneBy(['username' => 'admin']);
+        $user = $this->getUser();
         $room = new Room();
         $room->setOwner($user);
         $room->addPlayer($user);
@@ -48,7 +49,7 @@ final class HomeController extends AbstractController
     #[Route('/waiting/{id}', name: 'waiting')]
     public function waiting(Room $room): Response
     {
-        $user = $this->userRepository->findOneBy(['username' => 'user']);
+        $user = $this->getUser();
         $hasJoined = false;
         foreach ($room->getPlayers() as $player) {
             if ($player->getUsername() === $user->getUsername()) {
@@ -90,13 +91,11 @@ final class HomeController extends AbstractController
             $this->cache->get(sprintf('player-%s', $player->getUsername()), function (ItemInterface $item) use ($hands, $k) {
                 $item->expiresAfter(3600);
 
-                return json_encode([
-                    'hand' => $hands[$k],
-                ]);
+
+                return $hands[$k];
             });
         }
         
-        return new Response;
         $this->hub->publish(new Update(
             sprintf('game-%s', $room->getId()),
             json_encode([
@@ -108,12 +107,30 @@ final class HomeController extends AbstractController
     }
 
     #[Route('/game/{id}', name: 'game')]
-    public function game(Room $room): Response
+    public function game(): Response
     {
-        $hands = $this->cardGenerator->generateHands(2, 5);
+        $user = $this->getUser();
+        $hand = $this->cache->get(sprintf('player-%s', $user->getUsername()), function (ItemInterface $item) {
+            $item->expiresAfter(3600);
+
+            return json_encode([
+                'hand' => [],
+            ]);
+        });
 
         return $this->render('home/game.html.twig', [
-            'hands' => $hands,
+            'hand' => $hand,
         ]);
+    }
+
+    protected function getUser(): User
+    {
+        $user = parent::getUser();
+
+        if (!$user instanceof User) {
+            throw new \LogicException('User must be an instance of User');
+        }
+
+        return $user;
     }
 }
