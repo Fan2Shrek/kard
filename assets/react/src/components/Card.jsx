@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function ({ img }) {
+export default ({ img }) => {
     return <div className='card'>
         <img src={ img } />
     </div>;

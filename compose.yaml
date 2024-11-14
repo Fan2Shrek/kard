@@ -29,8 +29,9 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - .:/app
-    working_dir: /app
+      - ./assets/react/:/app
+    working_dir: /app/build
+    command: sh -c "npm i && npm run watch"
 
   mercure:
     image: dunglas/mercure

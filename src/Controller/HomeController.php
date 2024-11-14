@@ -4,10 +4,13 @@ namespace App\Controller;
 
 use App\Entity\Room;
 use App\Entity\User;
+use App\Model\Card\Card;
+use App\Model\Card\Hand;
 use App\Model\Player;
 use App\Repository\RoomRepository;
 use App\Repository\UserRepository;
 use App\Service\Card\CardGenerator;
+use App\Service\GameContextProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mercure\HubInterface;
@@ -91,7 +94,6 @@ final class HomeController extends AbstractController
             $this->cache->get(sprintf('player-%s', $player->getUsername()), function (ItemInterface $item) use ($hands, $k) {
                 $item->expiresAfter(3600);
 
-
                 return $hands[$k];
             });
         }
@@ -107,9 +109,10 @@ final class HomeController extends AbstractController
     }
 
     #[Route('/game/{id}', name: 'game')]
-    public function game(): Response
+    public function game(Room $room, GameContextProvider $gameContextProvider): Response
     {
         $user = $this->getUser();
+        /** @var Hand $hand */
         $hand = $this->cache->get(sprintf('player-%s', $user->getUsername()), function (ItemInterface $item) {
             $item->expiresAfter(3600);
 
@@ -119,7 +122,8 @@ final class HomeController extends AbstractController
         });
 
         return $this->render('home/game.html.twig', [
-            'hand' => $hand,
+            'game' => $gameContextProvider->provide($room),
+            'hand' => $hand->getCards(),
         ]);
     }
 

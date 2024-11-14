@@ -4,12 +4,6 @@
 
 {% block body %}
     <h1>Hello !</h1>
-    <div {{ stimulus_controller('home') }}>
-        {% include "components/model/_hand.html.twig" %}
+    <div {{ react_component('components/Game', {gameContext: game, hand: hand}) }}>
     </div>
-{% endblock %}
-{% block endscript %}
-    <script type="application/json" id="mercure-url">
-        {{ mercure('http://example.com/game')|json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_TAG'))|raw }}
-    </script>
 {% endblock %}

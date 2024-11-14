@@ -2,12 +2,16 @@
     "devDependencies": {
         "@babel/cli": "^7.25.6",
         "@babel/core": "^7.25.2",
-        "@babel/preset-react": "^7.24.7"
+        "@babel/preset-react": "^7.24.7",
+        "sass": "^1.76.0"
     },
     "license": "MIT",
     "private": true,
     "scripts": {
-        "build": "babel ../src/ --out-dir ../dist/ --presets=@babel/preset-react --no-babelrc",
-        "watch": "babel ../src/ --out-dir ../dist/ --presets=@babel/preset-react --no-babelrc --watch"
+        "watch-css": "sass --watch ../src/:../dist/ --no-source-map --style=compressed",
+        "watch-js": "babel ../src/ --out-dir ../dist/ --presets=@babel/preset-react --no-babelrc --watch",
+        "build-css": "sass ../src/:public/css --no-source-map --style=compressed",
+        "build-js": "babel ../src/ --out-dir ../dist/ --presets=@babel/preset-react --no-babelrc",
+        "watch": "npm run watch-css & npm run watch-js"
     }
 }

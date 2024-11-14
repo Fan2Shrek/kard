@@ -2,7 +2,7 @@
 
 namespace App\Model\Card;
 
-final class Hand
+final class Hand implements \Countable, \IteratorAggregate
 {
     public function __construct(
         private array $cards = [],
@@ -38,5 +38,10 @@ final class Hand
     public function getCards(): array
     {
         return $this->cards;
+    }
+
+    public function getIterator(): \ArrayIterator
+    {
+        return new \ArrayIterator($this->cards);
     }
 }
