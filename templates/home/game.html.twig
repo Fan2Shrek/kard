@@ -3,7 +3,6 @@
 {% block title %}Hello!{% endblock %}
 
 {% block body %}
-    <h1>Hello !</h1>
-    <div {{ react_component('components/Game', {gameContext: game, hand: hand}) }}>
+    <div {{ react_component('components/Game', {gameContext: game, hand: hand, currentPlayer: player}) }}>
     </div>
 {% endblock %}

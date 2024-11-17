@@ -21,9 +21,12 @@ final class GameContextProvider
 
     public function provide(Room $room): GameContext
     {
+        $cards = $this->format($this->getDeck($room));
+        $cards['back'] = $this->packages->getUrl('resources/back.svg');
+
         return new GameContext(
             $room,
-            $this->format($this->getDeck($room)),
+            $cards,
         );
     }
 

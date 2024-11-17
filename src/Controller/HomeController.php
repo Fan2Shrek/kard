@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Room;
 use App\Entity\User;
+use App\Enum\Card\Rank;
+use App\Enum\Card\Suit;
 use App\Model\Card\Card;
 use App\Model\Card\Hand;
 use App\Model\Player;
@@ -11,13 +13,17 @@ use App\Repository\RoomRepository;
 use App\Repository\UserRepository;
 use App\Service\Card\CardGenerator;
 use App\Service\GameContextProvider;
+use App\Service\GamePlayer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 final class HomeController extends AbstractController
 {
@@ -27,6 +33,7 @@ final class HomeController extends AbstractController
         private readonly RoomRepository $roomRepository,
         private readonly UserRepository $userRepository,
         private readonly CacheInterface $cache,
+        private readonly SerializerInterface $serializer,
     ) {
     }
 
@@ -92,7 +99,7 @@ final class HomeController extends AbstractController
 
         foreach ($room->getPlayers() as $k => $player) {
             $this->cache->get(sprintf('player-%s', $player->getUsername()), function (ItemInterface $item) use ($hands, $k) {
-                $item->expiresAfter(3600);
+                $item->expiresAfter(60*60*24);
 
                 return $hands[$k];
             });
@@ -106,6 +113,36 @@ final class HomeController extends AbstractController
         ));
 
         return $response;
+    }
+
+    /**
+     * @change for #[MapRequestPayload] Card $card
+     * @see https://github.com/symfony/symfony/issues/58840
+     */
+    #[Route('/api/{id}/play', name: 'play', methods: ['POST'])]
+    public function play(Room $room, Request $request): Response
+    {
+        $data = $request->toArray()['card'];
+        $card = new Card(Suit::from($data['suit']), Rank::from($data['rank']));
+
+        // @todo: check if the card is in the player's hand
+        $this->hub->publish(new Update(
+            sprintf('/room/%s/%s', $room->getId(), $this->getUser()->getId()),
+            $this->renderView('components/turbo/card-played.html.twig', [
+                'card' => $card,
+                'player' => $this->getUser(),
+            ])
+        ));
+
+        $this->hub->publish(new Update(
+            sprintf('/room/%s', $room->getId()),
+            $this->renderView('components/turbo/hidden-card-played.html.twig', [
+                'card' => $card,
+                'player' => $this->getUser(),
+            ])
+        ));
+
+        return new JsonResponse();
     }
 
     #[Route('/game/{id}', name: 'game')]
@@ -122,7 +159,8 @@ final class HomeController extends AbstractController
         });
 
         return $this->render('home/game.html.twig', [
-            'game' => $gameContextProvider->provide($room),
+            'game' => $this->serializer->serialize($gameContextProvider->provide($room), 'json'),
+            'player' => $this->serializer->serialize($this->getUser(), 'json'),
             'hand' => $hand->getCards(),
         ]);
     }

@@ -1,0 +1,16 @@
+.bottom {
+  position:fixed;
+  bottom:0px;
+  width:100%;
+}
+
+#middle {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: space-evenly;
+
+  .played--card {
+    margin-top: 50px;
+  }
+}
