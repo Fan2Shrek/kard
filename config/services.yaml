@@ -20,6 +20,10 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    App\Service\Redis\RedisConnection:
+      arguments:
+          - '@app.redis_provider'
+
     app.redis_provider:
         class: \Redis
         factory: ['Symfony\Component\Cache\Adapter\RedisAdapter', 'createConnection']

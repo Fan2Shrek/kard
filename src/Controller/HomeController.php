@@ -13,7 +13,7 @@ use App\Repository\RoomRepository;
 use App\Repository\UserRepository;
 use App\Service\Card\CardGenerator;
 use App\Service\GameContextProvider;
-use App\Service\GamePlayer;
+use App\Service\Redis\RedisConnection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -120,10 +120,12 @@ final class HomeController extends AbstractController
      * @see https://github.com/symfony/symfony/issues/58840
      */
     #[Route('/api/{id}/play', name: 'play', methods: ['POST'])]
-    public function play(Room $room, Request $request): Response
+    public function play(RedisConnection $redis, Room $room, Request $request): Response
     {
         $data = $request->toArray()['card'];
         $card = new Card(Suit::from($data['suit']), Rank::from($data['rank']));
+
+        $redis->set(sprintf('%s-%s', $room->getId(), $this->getUser()->getUsername()), json_encode($card));
 
         // @todo: check if the card is in the player's hand
         $this->hub->publish(new Update(
@@ -139,6 +141,37 @@ final class HomeController extends AbstractController
             $this->renderView('components/turbo/hidden-card-played.html.twig', [
                 'card' => $card,
                 'player' => $this->getUser(),
+            ])
+        ));
+
+        $cards = $players = [];
+        foreach ($room->getPlayers() as $player) {
+            if (!$card = $redis->get(sprintf('%s-%s', $room->getId(), $player->getUsername()))) {
+                return new JsonResponse();
+            }
+
+            $cards[$player->getId()->toString()] = json_decode($card, true);
+            $players[$player->getId()->toString()] = $player;
+        }
+
+        $bestCard = $winner = null;
+        foreach ($cards as $playerId => $card) {
+            if (null === $bestCard) {
+                $bestCard = $card;
+                $winner = $playerId;
+                continue;
+            }
+
+            if ($card['rank'] > $bestCard['rank']) {
+                $bestCard = $card;
+                $winner = $playerId;
+            }
+        }
+
+        $this->hub->publish(new Update(
+            sprintf('/room/%s', $room->getId()),
+            $this->renderView('components/turbo/winner.html.twig', [
+                'player' => $players[$winner],
             ])
         ));
 
