@@ -37,4 +37,22 @@ return [
     '@symfony/ux-react' => [
         'path' => './vendor/symfony/ux-react/assets/dist/loader.js',
     ],
+    '@react-spring/web' => [
+        'version' => '9.7.5',
+    ],
+    '@react-spring/core' => [
+        'version' => '9.7.5',
+    ],
+    '@react-spring/shared' => [
+        'version' => '9.7.5',
+    ],
+    '@react-spring/animated' => [
+        'version' => '9.7.5',
+    ],
+    '@react-spring/types' => [
+        'version' => '9.7.5',
+    ],
+    '@react-spring/rafz' => [
+        'version' => '9.7.5',
+    ],
 ];
