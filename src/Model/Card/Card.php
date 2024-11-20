@@ -4,6 +4,7 @@ namespace App\Model\Card;
 
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 final readonly class Card
 {
@@ -13,6 +14,7 @@ final readonly class Card
     ) {
     }
 
+    #[Ignore]
     public function getImg(): string
     {
         return sprintf('%s%s.svg', $this->rank->value, $this->suit->value ?? '');

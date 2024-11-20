@@ -6,14 +6,13 @@ use App\Entity\Room;
 use App\Model\Card\Card;
 use App\Model\GameContext;
 use App\Service\Card\CardGenerator;
+use App\Service\Card\HandRepository;
 use Symfony\Component\Asset\Packages;
-use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
 
 final class GameContextProvider
 {
     public function __construct(
-        private readonly CacheInterface $cache,
+        private readonly HandRepository $handRepository,
         private readonly Packages $packages,
         private readonly CardGenerator $cardGenerator,
     ) {
@@ -34,10 +33,7 @@ final class GameContextProvider
     {
         $deck = [];
         foreach ($room->getPlayers() as $player) {
-            $deck = array_merge($deck, $this->cache->get(
-                sprintf('player-%s', $player->getUsername()),
-                fn (ItemInterface $item) => $item->get(),
-            )->getCards());
+            $deck = array_merge($this->handRepository->get($player, $room)->getCards(), $deck);
         }
 
         return $deck;

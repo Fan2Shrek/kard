@@ -7,11 +7,11 @@ use App\Entity\User;
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
 use App\Model\Card\Card;
-use App\Model\Card\Hand;
 use App\Model\Player;
 use App\Repository\RoomRepository;
 use App\Repository\UserRepository;
 use App\Service\Card\CardGenerator;
+use App\Service\Card\HandRepository;
 use App\Service\GameContextProvider;
 use App\Service\Redis\RedisConnection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,7 +22,6 @@ use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 final class HomeController extends AbstractController
@@ -34,6 +33,8 @@ final class HomeController extends AbstractController
         private readonly UserRepository $userRepository,
         private readonly CacheInterface $cache,
         private readonly SerializerInterface $serializer,
+
+        private readonly HandRepository $handRepository,
     ) {
     }
 
@@ -98,11 +99,7 @@ final class HomeController extends AbstractController
         $response = $this->redirectToRoute('game', ['id' => $room->getId()]);
 
         foreach ($room->getPlayers() as $k => $player) {
-            $this->cache->get(sprintf('player-%s', $player->getUsername()), function (ItemInterface $item) use ($hands, $k) {
-                $item->expiresAfter(60*60*24);
-
-                return $hands[$k];
-            });
+            $this->handRepository->save($player, $room, $hands[$k]);
         }
         
         $this->hub->publish(new Update(
@@ -182,19 +179,11 @@ final class HomeController extends AbstractController
     public function game(Room $room, GameContextProvider $gameContextProvider): Response
     {
         $user = $this->getUser();
-        /** @var Hand $hand */
-        $hand = $this->cache->get(sprintf('player-%s', $user->getUsername()), function (ItemInterface $item) {
-            $item->expiresAfter(3600);
-
-            return json_encode([
-                'hand' => [],
-            ]);
-        });
 
         return $this->render('home/game.html.twig', [
             'game' => $this->serializer->serialize($gameContextProvider->provide($room), 'json'),
             'player' => $this->serializer->serialize($this->getUser(), 'json'),
-            'hand' => $hand->getCards(),
+            'hand' => $this->handRepository->get($user, $room)->getCards(),
         ]);
     }
 

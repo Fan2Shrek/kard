@@ -15,6 +15,7 @@ export default ({ hand }) => {
         setHasPlayed(true);
     }
 
+    console.log(getCardAsset(hand[0]));
     return <div className='hand__container'>
         <div className='hand'>
             {hand.map((card, index) => {
