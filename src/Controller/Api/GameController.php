@@ -21,8 +21,7 @@ final class GameController extends AbstractController
 {
     public function __construct(
         private readonly HubInterface $hub,
-    )
-    {
+    ) {
     }
 
     /**
