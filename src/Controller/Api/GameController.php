@@ -87,6 +87,11 @@ final class GameController extends AbstractController
         return new JsonResponse();
     }
 
+    private function todo(): void
+    {
+        /*$this->gameManager->play($this->getUser()->getRoom());*/
+    }
+
     protected function getUser(): User
     {
         $user = parent::getUser();

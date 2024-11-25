@@ -11,6 +11,7 @@
         "doctrine/doctrine-bundle": "^2.13",
         "doctrine/doctrine-migrations-bundle": "^3.3",
         "doctrine/orm": "^3.3",
+        "phpstan/phpdoc-parser": "<2.0",
         "ramsey/uuid-doctrine": "^2.1",
         "symfony/asset": "7.1.*",
         "symfony/asset-mapper": "7.1.*",
@@ -39,7 +40,8 @@
         "allow-plugins": {
             "php-http/discovery": true,
             "symfony/flex": true,
-            "symfony/runtime": true
+            "symfony/runtime": true,
+            "pestphp/pest-plugin": true
         },
         "sort-packages": true
     },
@@ -87,6 +89,7 @@
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.6",
+        "pestphp/pest": "^3.5",
         "symfony/maker-bundle": "^1.61"
     }
 }
