@@ -28,7 +28,7 @@ abstract /* static */ class Arrange
         Act::addContext('gameContext', new GameContext(
             new Room(),
             [],
-            $card
+            [$card],
         ));
     }
 }

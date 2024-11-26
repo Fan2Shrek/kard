@@ -4799,7 +4799,8 @@
                 "psr-4": {
                     "Symfony\\Component\\PropertyAccess\\": ""
                 },
-                "exclude-from-classmap": [
+                "exclude-from-classmap":
+                [
                     "/Tests/"
                 ]
             },

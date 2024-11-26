@@ -11,6 +11,10 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
+    _instanceof:
+      App\Service\GameManager\GameMode\GameModeInterface:
+            tags: ['game_mode']
+
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
@@ -19,6 +23,10 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+
+    App\Service\GameManager\GameManager:
+        arguments:
+            $gameModes: !tagged_iterator game_mode
 
     App\Service\Redis\RedisConnection:
       arguments:

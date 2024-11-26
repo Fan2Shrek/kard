@@ -27,4 +27,9 @@ final class Deck
     {
         return count($this->cards);
     }
+
+    public function getCards(): array
+    {
+        return $this->cards;
+    }
 }
