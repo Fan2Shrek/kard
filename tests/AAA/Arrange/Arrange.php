@@ -20,6 +20,10 @@ abstract /* static */ class Arrange
 
     public static function setCurrentCard(string|int $rank = 2, string $suit = 's'): void
     {
+        if (is_int($rank)) {
+            $rank = (string) $rank;
+        }
+
         $card = new Card(Suit::from($suit), Rank::from($rank));
         Act::addContext('gameContext', new GameContext(
             new Room(),

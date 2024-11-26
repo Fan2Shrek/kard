@@ -1,0 +1,29 @@
+name: PHP tests 
+
+on: [push]
+
+env:
+  COMPOSE: docker compose
+  PHP: docker compose exec php
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Execute Docker-compose
+        run: ${COMPOSE} up -d php
+
+      - name: Vendor install
+        run: ${PHP} composer install --no-scripts
+
+      - name: Run tests
+        run: ${PHP} vendor/bin/pest --parallel
+
+      - name: Run mutation testing
+        run: ${PHP} vendor/bin/pest --mutate --parallel --min=100

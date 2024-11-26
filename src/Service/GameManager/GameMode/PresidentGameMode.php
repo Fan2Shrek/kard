@@ -16,7 +16,7 @@ final class PresidentGameMode implements GameModeInterface
     {
         $currentCard = $gameContext->currentCard;
         
-        if ($card->rank->value <= $currentCard->rank->value) {
+        if ($card->rank->value < $currentCard->rank->value) {
             throw new \Exception('A card with a higher value must be played');
         }
     }

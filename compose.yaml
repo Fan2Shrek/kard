@@ -9,7 +9,6 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     networks:
-      - pma
       - default
 
   php:
@@ -47,10 +46,6 @@ services:
     volumes:
       - mercure_data:/data
       - mercure_config:/config
-
-networks:
-  pma:
-    external: true
 
 volumes:
   db_data:
