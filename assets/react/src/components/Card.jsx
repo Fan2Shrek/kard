@@ -1,11 +1,13 @@
 import React, { useRef, useEffect } from 'react';
 
-export default ({ card, img, onClick = () => '', angle = null }) => {
+export default ({ card, img, onClick = () => '', angle = null, xOffset = null, yOffset = null }) => {
     const containerRef = useRef(null);
 
+    const customCss = angle || xOffset || yOffset;
+        
     useEffect(() => {
-        if (angle && containerRef.current) {
-            containerRef.current.style.transform = `rotate(${angle}deg)`;
+        if (customCss && containerRef.current) {
+            containerRef.current.style.transform = `rotate(${angle ?? 0}deg) translate(${xOffset ?? 0}px, ${yOffset ?? 0}px)`;
         }
     }, [angle]);
 

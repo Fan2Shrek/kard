@@ -7,6 +7,7 @@ use App\Entity\Room;
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
 use App\Model\Card\Card;
+use App\Service\GameManager\GameManager;
 use App\Service\Redis\RedisConnection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,6 +22,7 @@ final class GameController extends AbstractController
 {
     public function __construct(
         private readonly HubInterface $hub,
+        private readonly GameManager $gameManager,
     ) {
     }
 
@@ -34,6 +36,7 @@ final class GameController extends AbstractController
         $data = $request->toArray()['card'];
         $card = new Card(Suit::from($data['suit']), Rank::from($data['rank']));
 
+        $this->gameManager->play($room, $this->getUser(), $card);
         $redis->set(sprintf('%s-%s', $room->getId(), $this->getUser()->getUsername()), json_encode($card));
 
         // @todo: check if the card is in the player's hand

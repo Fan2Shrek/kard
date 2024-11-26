@@ -9,11 +9,11 @@ export const GameContext = createContext({
 
 export const GameContextProvider = ({ children, gameContext, currentPlayer }) => {
     const getCardAsset = useCallback((card) => {
-        return gameContext.deck[card.rank + card.suit];
+        return gameContext.assets[card.rank + card.suit];
     }, [gameContext]);
 
     const getBackAsset = useCallback(() => {
-        return gameContext.deck['back'];
+        return gameContext.assets['back'];
     }, [gameContext]);
 
     return <GameContext.Provider value={{

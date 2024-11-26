@@ -4,8 +4,7 @@ import './game.css';
 import Hand from './Hand/index.js';
 import GameContext from '../Context/GameContext.js';
 import HiddenHand from './Hand/HiddenHand.js';
-import Mercure from './turbo/mercure.js';
-import PlayerChoicePlaceHolder from './PlayerChoicePlaceHolder.js';
+import Stack from './Card/Stack.js';
 
 export default ({ gameContext, hand, currentPlayer: user }) => {
     const ctx = JSON.parse(gameContext); 
@@ -16,14 +15,8 @@ export default ({ gameContext, hand, currentPlayer: user }) => {
             <div className='game'>
                 <HiddenHand count={5} />
                 <div className='middle'>
-                    <Mercure topic={`/room/${ctx.room.id}`} />
-                    <Mercure topic={`/room/${ctx.room.id}/${currentPlayer.id}`} />
                     <div id='middle'>
-                        {ctx.room.players.map((player) => 
-                            <div key={player.id} id={`placeholder-${player.id}`}>
-                                <PlayerChoicePlaceHolder player={player} />
-                            </div>
-                        )}
+                        <Stack cards={ctx.discarded} />
                     </div>
                 </div>
                 <div className='bottom'>
