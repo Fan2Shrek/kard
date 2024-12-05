@@ -57,6 +57,10 @@ final class GameContext
 
     public function setCurrentCards(array $cards): void
     {
+        foreach ($this->currentCards as $card) {
+            $this->addToDiscarded($card);
+        }
+
         $this->currentCards = $cards;
     }
 
