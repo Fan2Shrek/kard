@@ -5,14 +5,16 @@ import Card from '../Card.js';
 import api from '../../lib/api.js';
 import { GameContext } from '../../Context/GameContext.js';
 
+// @todo handle multiple cards
 export default ({ hand }) => {
     const { getCardAsset, gameContext, currentPlayer } = useContext(GameContext);
     const [hasPlayed, setHasPlayed] = useState(false);
 
     const handleCard = (card) => {
         if (hasPlayed) return;
-        api.game.play(gameContext.room.id, { card, player: currentPlayer });
-        setHasPlayed(true);
+        api.game.play(gameContext.room.id, { cards: [card], player: currentPlayer });
+        // @todo uncomment
+        // setHasPlayed(true);
     }
 
     console.log(getCardAsset(hand[0]));

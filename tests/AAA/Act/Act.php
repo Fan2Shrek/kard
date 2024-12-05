@@ -17,8 +17,19 @@ abstract /* static */ class Act
 
     public static function playCard(string $value, string $color): void
     {
-        $card = new Card(Suit::from($color), Rank::from($value));
-        static::get('gamePlayer')->play($card, static::get('gameContext'));
+        $card = self::createCard($value, $color);
+        static::get('gamePlayer')->play([$card], static::get('gameContext'));
+    }
+
+    public static function playCards(array $cards): void
+    {
+        $cards = array_map(fn ($card) => self::createCard($card[0], $card[1]), $cards);
+        static::get('gamePlayer')->play($cards, static::get('gameContext'));
+    }
+
+    private static function createCard(string $value, string $color): Card
+    {
+        return new Card(Suit::from($color), Rank::from($value));
     }
 
     public static function get(string $key)

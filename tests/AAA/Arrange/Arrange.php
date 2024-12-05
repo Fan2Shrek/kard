@@ -31,4 +31,13 @@ abstract /* static */ class Arrange
             [$card],
         ));
     }
+
+    public static function setGameStarted(): void
+    {
+        Act::addContext('gameContext', new GameContext(
+            new Room(),
+            [],
+            [],
+        ));
+    }
 }

@@ -33,10 +33,13 @@ final class GameController extends AbstractController
     #[Route('/{id}/play', name: 'play', methods: ['POST'])]
     public function play(RedisConnection $redis, Room $room, Request $request): Response
     {
-        $data = $request->toArray()['card'];
-        $card = new Card(Suit::from($data['suit']), Rank::from($data['rank']));
+        $data = $request->toArray()['cards'];
+        $cards = array_map(fn ($card) => new Card(Suit::from($card['suit']), Rank::from($card['rank'])), $data);
 
-        $this->gameManager->play($room, $this->getUser(), $card);
+        $this->gameManager->play($room, $this->getUser(), $cards);
+        
+        return new JsonResponse();
+
         $redis->set(sprintf('%s-%s', $room->getId(), $this->getUser()->getUsername()), json_encode($card));
 
         // @todo: check if the card is in the player's hand
