@@ -76,6 +76,14 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
+        ],
+        "test:watch": [
+            "Composer\\Config::disableProcessTimeout",
+            "phpunit-watcher watch < /dev/tty"
+        ],
+        "mutate:watch": [
+            "Composer\\Config::disableProcessTimeout",
+            "phpunit-watcher watch --mutate --parallel < /dev/tty"
         ]
     },
     "conflict": {
@@ -90,6 +98,10 @@
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.6",
         "pestphp/pest": "^3.5",
-        "symfony/maker-bundle": "^1.61"
+        "spatie/phpunit-watcher": "^1.24",
+        "symfony/debug-bundle": "7.1.*",
+        "symfony/maker-bundle": "^1.61",
+        "symfony/stopwatch": "7.1.*",
+        "symfony/web-profiler-bundle": "7.1.*"
     }
 }

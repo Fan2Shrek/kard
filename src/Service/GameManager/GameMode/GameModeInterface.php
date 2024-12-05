@@ -7,6 +7,10 @@ use App\Model\GameContext;
 
 interface GameModeInterface
 {
-    public function play(Card $card, GameContext $gameContext): void;
+    /**
+     * @param array<Card> $cards
+     */
+    public function play(array $cards, GameContext $gameContext): void;
+
     public function getGameMode(): GameModeEnum;
 }
