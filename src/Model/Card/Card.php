@@ -20,6 +20,11 @@ final readonly class Card
         return sprintf('%s%s.svg', $this->rank->value, $this->suit->value ?? '');
     }
 
+    public function isSameAs(Card $card): bool
+    {
+        return $this->rank->value === $card->rank->value && $this->suit->value === $card->suit->value;
+    }
+
     public function __toString(): string
     {
         return sprintf('%s%s', $this->rank->value, $this->suit->value);

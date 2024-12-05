@@ -5,13 +5,14 @@ export default ({ card, img, onClick = () => '', angle = null, xOffset = null, y
     const [toggle, setToggle] = useState(false);
 
     const styles = useSpring({
-        transform: toggle ? 'translate(100px, 100px)' : 'translate(0px, 0px)',
+        transform: toggle ? 'translate(0, 0)' : 'translate(0, 100px)',
         config: { tension: 170, friction: 26 },
     });
 
     const containerRef = useRef(null);
     const handleClick = () => {
         setToggle(!toggle);
+        onClick(card);
     }
 
     const customCss = angle || xOffset || yOffset;
@@ -21,11 +22,6 @@ export default ({ card, img, onClick = () => '', angle = null, xOffset = null, y
             containerRef.current.style.transform = `rotate(${angle ?? 0}deg) translate(${xOffset ?? 0}px, ${yOffset ?? 0}px)`;
         }
     }, [angle]);
-    // useEffect(() => {
-    //     if (angle && containerRef.current) {
-    //         containerRef.current.style.transform = `rotate(${angle}deg)`;
-    //     }
-    // }, [angle]);
 
     return <animated.div onClick={handleClick} style={styles} ref={containerRef} className='card'>
         <img src={img} />

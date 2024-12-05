@@ -28,14 +28,14 @@ final class GameContextProvider
     {
         if ('' === $ctx = $this->redis->get($this->getKey($room))) {
             $ctx = $this->createContext($room);
-            // @todo: remove
-            $ctx->setDiscarded([
-                new Card(Suit::HEARTS, Rank::ACE),
-                new Card(Suit::HEARTS, Rank::KING),
-                new Card(Suit::HEARTS, Rank::QUEEN),
-                new Card(Suit::SPADES, Rank::SEVEN),
-                new Card(Suit::SPADES, Rank::SIX),
-            ]);
+            // @debug
+            /* $ctx->setDiscarded([ */
+            /*     new Card(Suit::HEARTS, Rank::ACE), */
+            /*     new Card(Suit::HEARTS, Rank::KING), */
+            /*     new Card(Suit::HEARTS, Rank::QUEEN), */
+            /*     new Card(Suit::SPADES, Rank::SEVEN), */
+            /*     new Card(Suit::SPADES, Rank::SIX), */
+            /* ]); */
         }
 
         return is_string($ctx) ? $this->serializer->deserialize($ctx, GameContext::class, 'json') : $ctx;
@@ -43,7 +43,7 @@ final class GameContextProvider
     
     public function save(GameContext $ctx): void
     {
-        $this->redis->set($this->getKey($ctx->room), $this->serializer->serialize($ctx, 'json'));
+        $this->redis->set($this->getKey($ctx->getRoom()), $this->serializer->serialize($ctx, 'json'));
     }
 
     private function createContext(Room $room): GameContext
