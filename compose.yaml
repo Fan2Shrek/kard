@@ -14,12 +14,21 @@ services:
   php:
     build:
       context: .
-      dockerfile: .devops/docker/Dockerfile
-    ports:
-      - "8000:80"
+      dockerfile: .devops/docker/php/Dockerfile
+    working_dir: /app
     volumes:
       - .:/app
+  
+  web:
+    build:
+      context: .devops/docker/nginx
     working_dir: /app
+    ports:
+      - "8000:80"
+    depends_on:
+      - php
+    volumes:
+      - ./public/:/app/public
     
   redis:
     image: redis:7
