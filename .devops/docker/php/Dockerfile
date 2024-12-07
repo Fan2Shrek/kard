@@ -3,7 +3,7 @@ FROM php:8.3-fpm-alpine as main
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
-RUN install-php-extensions pdo_mysql redis
+RUN install-php-extensions pdo_mysql redis intl
 
 COPY . /app
 WORKDIR /app
@@ -18,5 +18,17 @@ RUN composer install
 
 
 FROM main as prod
+
+ENV APP_ENV=prod
+
+# Build env
+
+RUN .devops/docker/build-env.sh
+
+# Build assets
+
+RUN bin/console assets:install
+RUN bin/console asset-map:compile
+RUN bin/console sass:build
 
 RUN composer install --no-dev --no-interaction --no-progress
