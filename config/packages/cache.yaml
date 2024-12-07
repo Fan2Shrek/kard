@@ -1,7 +1,7 @@
 framework:
     cache:
         pools:
-            cache.redis:
-                adapter: cache.adapter.redis
-                provider: app.redis_provider
+            # cache.redis:
+            #     adapter: cache.adapter.redis
+            #     provider: app.redis_provider
 
