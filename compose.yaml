@@ -15,6 +15,7 @@ services:
     build:
       context: .
       dockerfile: .devops/docker/php/Dockerfile
+      target: dev
     working_dir: /app
     volumes:
       - .:/app

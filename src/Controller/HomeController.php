@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 final class HomeController extends AbstractController
@@ -25,7 +24,6 @@ final class HomeController extends AbstractController
         private readonly HubInterface $hub,
         private readonly RoomRepository $roomRepository,
         private readonly UserRepository $userRepository,
-        private readonly CacheInterface $cache,
         private readonly SerializerInterface $serializer,
 
         private readonly HandRepository $handRepository,
