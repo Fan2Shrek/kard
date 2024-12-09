@@ -1,35 +1,104 @@
-.login {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f1f1f1;
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
 
-    form {
+.login {
+  font-family: 'Montserrat', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f7f7f7;
+
+  .container {
+    max-width: 32rem;
+    position: relative;
+    padding: 1rem 0;
+
+    .gradient-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, #93c5fd, #2563eb);
+      transform: rotate(6deg);
+      border-radius: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .card {
+      position: relative;
+      background: #fff;
+      border-radius: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      z-index: 1;
+      min-width: 20rem;
+      min-height: 20rem;
+
+      &__content {
+        max-width: 400px;
+        margin: 0 auto;
         display: flex;
         flex-direction: column;
-        gap: 1em;
-        padding: 1em;
-        border: 1px solid #ccc;
-        border-radius: 0.25em;
-        background-color: #fff;
-        box-shadow: 0 0 1em rgba(0, 0, 0, 0.1);
+        justify-content: space-between;
+        gap: 1.5rem;
+        min-height: 16rem;
 
-        label {
-            display: block;
-            font-weight: bold;
+        h1 {
+          font-size: 1.5rem;
+          font-weight: 700;
         }
 
-        input {
-            padding: 0.5em;
-            border: 1px solid #ccc;
-            border-radius: 0.25em;
+        .alert {
+          background: #fee2e2;
+          color: red;
+          border: 1px solid #f87171;
+          border-left-width: 4px;
+          padding: 1rem;
+          border-radius: 0.375rem;
+          margin-top: 1rem;
         }
 
-        .btn__container {
-            display: flex;
-            justify-content: center;
-            gap: 1em;
+        form {
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+
+          input {
+            width: 100%;
+            border: 1px solid #cbd5e0;
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+
+            &:focus {
+              border-color: #3b82f6;
+            }
+
+            &::placeholder {
+              color: transparent;
+              font-family: 'Montserrat', sans-serif;
+              font-size: 0.875rem;
+              color: #a0aec0;
+            }
+          }
         }
+
+        button {
+          background: #3b82f6;
+          color: #fff;
+          border: none;
+          border-radius: 0.375rem;
+          padding: 0.75rem;
+          font-size: 1rem;
+          cursor: pointer;
+          transition: background-color 0.3s;
+          font-family: 'Montserrat', sans-serif;
+
+          &:hover {
+            background: #2563eb;
+          }
+        }
+      }
     }
+  }
 }
