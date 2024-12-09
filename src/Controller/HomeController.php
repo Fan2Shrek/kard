@@ -113,6 +113,7 @@ final class HomeController extends AbstractController
             'game' => $this->serializer->serialize($gameContextProvider->provide($room), 'json'),
             'player' => $this->serializer->serialize($this->getUser(), 'json'),
             'hand' => $this->handRepository->get($user, $room)->getCards(),
+            'playerId' => $user->getId(),
             'room' => $room,
         ]);
     }

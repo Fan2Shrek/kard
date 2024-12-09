@@ -24,14 +24,15 @@ export default ({ hand }) => {
     const handlePlay = () => {
         api.game.play(gameContext.room.id, { cards: selectedCards, player: currentPlayer });
         // @todo uncomment
-        // setHasPlayed(true);
+        setHasPlayed(true);
+        setSelectedCards([]);
     }
 
     return <div className='hand__container'>
-        {selectedCards.length > 0 && <a class="btn" onClick={handlePlay}>Jouer</a> }
+        {selectedCards.length > 0 && <a class="btn" onClick={handlePlay}>Jouer</a>}
         <div className='hand'>
             {hand.map((card, index) => {
-                return <Card onClick={handleCard} key={index} card={card} img={getCardAsset(card)} angle={0}/>
+                return <Card onClick={handleCard} key={index} card={card} img={getCardAsset(card)} angle={0} />
             })}
         </div>
     </div>;
