@@ -12,6 +12,7 @@
         "watch-js": "babel ../src/ --out-dir ../dist/ --presets=@babel/preset-react --no-babelrc --watch",
         "build-css": "sass ../src/:public/css --no-source-map --style=compressed",
         "build-js": "babel ../src/ --out-dir ../dist/ --presets=@babel/preset-react --no-babelrc",
-        "watch": "npm run watch-css & npm run watch-js"
+        "watch": "npm run watch-css & npm run watch-js",
+        "build": "npm run build-css && npm run build-js"
     }
 }

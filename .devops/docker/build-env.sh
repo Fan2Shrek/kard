@@ -1,3 +1,4 @@
+rm -f .env.local
 touch .env.local
 
 echo "APP_ENV=$(echo "${APP_ENV:-dev}")" >> .env.local

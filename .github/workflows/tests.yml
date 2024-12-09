@@ -3,8 +3,7 @@ name: PHP tests
 on: [push]
 
 env:
-  COMPOSE: docker compose
-  PHP: docker compose exec php
+  PHP: php
 
 jobs:
   tests:
@@ -13,14 +12,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
-          submodules: recursive
+          php-version: 8.3
+          extensions: intl
 
-      - name: Execute Docker-compose
-        run: ${COMPOSE} up -d php
-
-      - name: Vendor install
-        run: ${PHP} composer install --no-scripts
+      - name: Install Dependencies
+        run: composer install --no-progress --prefer-dist
 
       - name: Run tests
         run: ${PHP} vendor/bin/pest --parallel
