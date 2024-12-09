@@ -60,7 +60,12 @@ final class GameManager
 
         $this->hub->publish(new Update(
             sprintf('room-%s', $room->getId()),
-            $this->serializer->serialize($ctx, 'json')
+            $this->serializer->serialize($ctx, 'json'),
+        ));
+
+        $this->hub->publish(new Update(
+            sprintf('room-%s-%s', $room->getId(), $player->getId()),
+            $this->serializer->serialize($hand, 'json'),
         ));
     }
 
@@ -85,3 +90,4 @@ final class GameManager
         return $this->twig->render($template, $data);
     }
 }
+
