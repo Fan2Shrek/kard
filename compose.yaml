@@ -15,7 +15,8 @@ services:
     build:
       context: .
       dockerfile: .devops/docker/php/Dockerfile
-      target: dev
+      target: ${BUILD_TARGET:-dev}
+    image: ghcr.io/fan2shrek/kard:${VERSION:-latest}
     working_dir: /app
     volumes:
       - .:/app
@@ -46,6 +47,8 @@ services:
   mercure:
     image: dunglas/mercure
     restart: unless-stopped
+    ports:
+      - "8090:80"
     environment:
       SERVER_NAME: ':80'
       MERCURE_PUBLISHER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
