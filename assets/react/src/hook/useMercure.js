@@ -1,4 +1,4 @@
-import React ,{ useEffect } from 'react'
+import { useEffect } from 'react'
 
 export default (topic, callback) => {
     useEffect(() => {
@@ -10,5 +10,5 @@ export default (topic, callback) => {
         return () => {
             eventSource.close();
         };
-    }, [topic, callback]);
+    }, []);
 }
