@@ -22,19 +22,8 @@
                         <input type="text" value="{{ last_username }}" name="_username" id="username" placeholder="Nom d'utilisateur" autocomplete="username" required autofocus>
                         <input type="password" name="_password" id="password" placeholder="Mot de passe" autocomplete="current-password" required>
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                        <button type="submit">Se connecter</button>
                     </form>
-
-                    {#
-                        Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
-                        See https://symfony.com/doc/current/security/remember_me.html
-
-                        <div class="checkbox mb-3">
-                            <input type="checkbox" name="_remember_me" id="_remember_me">
-                            <label for="_remember_me">Remember me</label>
-                        </div>
-                    #}
-
-                    <button type="submit">Se connecter</button>
                 </div>
             </div>
         </div>
