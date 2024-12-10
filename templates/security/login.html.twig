@@ -18,12 +18,13 @@
                         </div>
                     {% endif %}
 
-                    <form method="post">
+                    <form method="post" id="login-form">
                         <input type="text" value="{{ last_username }}" name="_username" id="username" placeholder="Nom d'utilisateur" autocomplete="username" required autofocus>
                         <input type="password" name="_password" id="password" placeholder="Mot de passe" autocomplete="current-password" required>
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-                        <button type="submit">Se connecter</button>
                     </form>
+
+                    <button type="submit" form="login-form">Se connecter</button>
                 </div>
             </div>
         </div>
