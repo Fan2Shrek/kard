@@ -5,7 +5,7 @@
 {% block body %}
     <main class="waiting">
         <h1>En attente de joueurs !</h1>
-        <div {{ turbo_stream_listen('waiting') }}></div> 
+        <div {{ stimulus_controller('stream', { url: mercure('waiting') }) }}></div> 
         <div id="player-join">
             <h2>Joueurs</h2>
             {% for player in players %}
@@ -23,6 +23,6 @@
 {% endblock %}
 {% block endscript %}
     <script type="application/json" id="mercure-url">
-        {{ mercure('game-'~room.id)|json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_TAG'))|raw }}
+        {{ mercure('game-'~room.id, { subscribe: 'game-'~room.id })|json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_TAG'))|raw }}
     </script>
 {% endblock %}
