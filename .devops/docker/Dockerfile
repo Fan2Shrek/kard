@@ -14,11 +14,17 @@ COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
 RUN install-php-extensions pdo_mysql redis intl
 
+RUN apk add --no-cache \
+    nginx \
+    supervisor
+
+COPY .devops/docker/default.conf /etc/nginx/http.d/default.conf
+COPY .devops/docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
 COPY . /app
 WORKDIR /app
 
-CMD ["php-fpm", "-R", "-F"]
-
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
 FROM main as dev
 
@@ -38,8 +44,7 @@ RUN composer install --no-dev --no-interaction --no-progress
 
 # Build assets
 
-RUN bin/console assets:install
-RUN bin/console asset-map:compile
-RUN bin/console sass:build
-
 COPY --from=compiler /app/dist /app/assets/react/dist
+
+RUN bin/console sass:build
+RUN bin/console asset-map:compile
