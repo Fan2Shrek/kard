@@ -14,24 +14,15 @@ services:
   php:
     build:
       context: .
-      dockerfile: .devops/docker/php/Dockerfile
+      dockerfile: .devops/docker/Dockerfile
       target: ${BUILD_TARGET:-dev}
     image: ghcr.io/fan2shrek/kard:${VERSION:-latest}
+    ports:
+      - "8000:80"
     working_dir: /app
     volumes:
       - .:/app
   
-  web:
-    build:
-      context: .devops/docker/nginx
-    working_dir: /app
-    ports:
-      - "8000:80"
-    depends_on:
-      - php
-    volumes:
-      - ./public/:/app/public
-    
   redis:
     image: redis:7
 
