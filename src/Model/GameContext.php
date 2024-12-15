@@ -109,12 +109,13 @@ final class GameContext
  * @internal
  */
 class PlayersList {
-    private int $currentIndex = 0;
+    private int $currentIndex;
 
     public function __construct(
         private array $players,
         private Player $currentPlayer,
     ) {
+        $this->currentIndex = array_search($currentPlayer, $players);
     }
 
     public function getCurrentPlayer(): Player
@@ -124,6 +125,7 @@ class PlayersList {
 
     public function nextPlayer(): void
     {
+        dump($this->players, $this->currentIndex, count($this->players));
         if ($this->currentIndex === count($this->players) - 1) {
             $this->currentIndex = 0;
         } else {
