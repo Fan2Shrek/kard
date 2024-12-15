@@ -9,6 +9,7 @@ use App\Enum\Card\Suit;
 use App\Enum\Card\Rank;
 use App\Model\Card\Card;
 use App\Model\GameContext;
+use App\Model\Player;
 use App\Tests\AAA\Act\Act;
 
 abstract /* static */ class Arrange
@@ -26,8 +27,11 @@ abstract /* static */ class Arrange
 
         $card = new Card(Suit::from($suit), Rank::from($rank));
         Act::addContext('gameContext', new GameContext(
-            new Room(),
+            'room-id',
+            new Room,
             [],
+            [],
+            new Player('player-id', 'Player 1'),
             [$card],
         ));
     }
@@ -35,8 +39,11 @@ abstract /* static */ class Arrange
     public static function setGameStarted(): void
     {
         Act::addContext('gameContext', new GameContext(
-            new Room(),
+            'room-id',
+            new Room,
             [],
+            [],
+            new Player('player-id', 'Player 1'),
             [],
         ));
     }
