@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
+use Ramsey\Uuid\Rfc4122\UuidV4;
 use Ramsey\Uuid\UuidInterface;
 
 #[ORM\Entity(repositoryClass: RoomRepository::class)]
@@ -16,7 +17,7 @@ class Room
     #[ORM\Column(type: "uuid", unique: true)]
     #[ORM\GeneratedValue(strategy: "CUSTOM")]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    protected UuidInterface $id; 
+    protected UuidInterface $id;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -28,8 +29,16 @@ class Room
     #[ORM\ManyToMany(targetEntity: User::class)]
     private Collection $players;
 
-    public function __construct()
+    public function __construct(UuidInterface|string|null $id = null)
     {
+        if (\is_string($id)) {
+            $id = UuidV4::fromString($id);
+        }
+
+        if ($id !== null) {
+            $this->id = $id;
+        }
+
         $this->players = new ArrayCollection();
     }
 

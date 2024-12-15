@@ -3,7 +3,7 @@
 {% block title %}Hello!{% endblock %}
 
 {% block body %}
-    <div {{ react_component('components/Game', {gameContext: game, hand: hand, currentPlayer: player}) }}></div>
+    <div {{ react_component('components/Game', {gameContext: game, hand: hand, player: player}) }}></div>
 {% endblock %}
 {% block endscript %}
     <script type="application/json" id="mercure-game-url">
