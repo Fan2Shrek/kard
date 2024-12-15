@@ -6,38 +6,43 @@ import useMercure from '../hook/useMercure.js';
 import GameContext from '../Context/GameContext.js';
 import HiddenHand from './Hand/HiddenHand.js';
 import Stack from './Card/Stack.js';
+import PlayerList from './Player/PlayerList.js';
 
-export default ({ gameContext, hand: currentHand, currentPlayer: user }) => {
+export default ({ gameContext, hand: currentHand, player: user }) => {
     const [ctx, setCtx] = useState(JSON.parse(gameContext));
     const [hand, setHand] = useState(currentHand);
-    const currentPlayer = JSON.parse(user);
+    const player = JSON.parse(user);
     const gameUrl = useMemo(() => JSON.parse(document.getElementById('mercure-game-url').textContent), []);
     const playerUrl = useMemo(() => JSON.parse(document.getElementById('mercure-game-player').textContent), []);
 
-    useMercure(gameUrl, (data) => {
-        setCtx(data);
-    });
+    const gameActions = useMemo(() => ({
+        play: (data) => {
+            setCtx(data);
+        },
+    }), []);
+
+    useMercure(gameUrl, gameActions);
 
     useMercure(playerUrl, (data) => {
         setHand(data.cards);
     });
 
     return <>
-        <GameContext gameContext={ctx} currentPlayer={currentPlayer}>
+        <GameContext gameContext={ctx} player={player} currentPlayer={ctx.currentPlayer}>
             <div className='game'>
                 <HiddenHand count={5} />
                 <div className='middle'>
                     <div id='middle'>
-                        // @todo own component 
+                        // @todo own component
                         <Hand hand={ctx.currentCards} />
                         <Stack cards={ctx.discarded} />
                     </div>
                 </div>
+                <PlayerList players={ctx.players} currentPlayer={ctx.currentPlayer} />
                 <div className='bottom'>
-                    <Hand hand={hand} />
+                    <Hand hand={hand} canPlay={ctx.currentPlayer.id === player.id} />
                 </div>
             </div>
         </GameContext>
     </>;
 }
-

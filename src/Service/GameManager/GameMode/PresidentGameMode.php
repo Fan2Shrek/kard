@@ -24,14 +24,18 @@ final class PresidentGameMode implements GameModeInterface
 
         match (\count($currentCards)) {
             0 => $this->handleStart($cards),
-            1 => $this->handleOneCard($cards[0], $currentCards[0]),
+            1 => $this->handleOneCard($cards[0], $currentCards),
             default => throw new RuleException($this->getGameMode(), 'Incorrect number of cards played'),
         };
     }
 
-    private function handleOneCard(Card $card, Card $currentCard): void
+    private function handleOneCard(Card $card, array $currentCard): void
     {
-        if ($card->rank->value < $currentCard->rank->value) {
+        if (count($currentCard) !== 1) {
+            throw new RuleException($this->getGameMode(), 'Incorrect number of cards played');
+        }
+
+        if ($card->rank->value < $currentCard[0]->rank->value) {
             throw new RuleException($this->getGameMode(), 'A card with a higher value must be played');
         }
     }

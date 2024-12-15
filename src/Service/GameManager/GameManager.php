@@ -33,16 +33,21 @@ final class GameManager
      */
     public function play(Room $room, User $player, array $cards): void
     {
+        $ctx = $this->gameContextProvider->provide($room);
+
+        if ($ctx->getCurrentPlayer()->id !== $player->getId()->toString()) {
+            throw new \InvalidArgumentException('Not your turn');
+        }
+
         $hand = $this->handRepository->get($player, $room);
 
         if (!$hand->hasCards($cards)) {
             throw new \InvalidArgumentException('Card not found in player hand');
         }
-        
+
         /* @todo */
         /* $gameMode = $this->getGameMode($room->getGameMode());  */
         $gameMode = $this->getGameMode(GameModeEnum::PRESIDENT);
-        $ctx = $this->gameContextProvider->provide($room);
 
         try {
             $gameMode->play($cards, $ctx);
@@ -53,6 +58,8 @@ final class GameManager
         }
 
         $ctx->setCurrentCards($cards);
+        $ctx->nextPlayer();
+
         $hand->removeCards($cards);
 
         $this->handRepository->save($player, $room, $hand);
@@ -60,7 +67,10 @@ final class GameManager
 
         $this->hub->publish(new Update(
             sprintf('room-%s', $room->getId()),
-            $this->serializer->serialize($ctx, 'json'),
+            $this->serializer->serialize([
+                'action' => 'play',
+                'data' => $ctx,
+            ], 'json'),
         ));
 
         $this->hub->publish(new Update(
@@ -90,4 +100,3 @@ final class GameManager
         return $this->twig->render($template, $data);
     }
 }
-

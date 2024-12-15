@@ -3,14 +3,14 @@
 namespace App\Service;
 
 use App\Entity\Room;
-use App\Enum\Card\Rank;
-use App\Enum\Card\Suit;
 use App\Model\Card\Card;
 use App\Model\GameContext;
+use App\Model\Player;
 use App\Service\Card\CardGenerator;
 use App\Service\Card\HandRepository;
 use App\Service\Redis\RedisConnection;
 use Symfony\Component\Asset\Packages;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 final class GameContextProvider
@@ -28,19 +28,13 @@ final class GameContextProvider
     {
         if ('' === $ctx = $this->redis->get($this->getKey($room))) {
             $ctx = $this->createContext($room);
-            // @debug
-            /* $ctx->setDiscarded([ */
-            /*     new Card(Suit::HEARTS, Rank::ACE), */
-            /*     new Card(Suit::HEARTS, Rank::KING), */
-            /*     new Card(Suit::HEARTS, Rank::QUEEN), */
-            /*     new Card(Suit::SPADES, Rank::SEVEN), */
-            /*     new Card(Suit::SPADES, Rank::SIX), */
-            /* ]); */
         }
 
-        return is_string($ctx) ? $this->serializer->deserialize($ctx, GameContext::class, 'json') : $ctx;
+        return is_string($ctx) ? $this->serializer->deserialize($ctx, GameContext::class, 'json', [
+            AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true,
+        ]) : $ctx;
     }
-    
+
     public function save(GameContext $ctx): void
     {
         $this->redis->set($this->getKey($ctx->getRoom()), $this->serializer->serialize($ctx, 'json'));
@@ -51,9 +45,14 @@ final class GameContextProvider
         $cards = $this->format($this->getDeck($room));
         $cards['back'] = $this->packages->getUrl('resources/back.svg');
 
+        $players = array_map(fn ($u) => Player::fromUser($u),$room->getPlayers()->toArray());
+
         return new GameContext(
+            $room->getId(),
             $room,
             $cards,
+            $players,
+            $players[0],
         );
     }
 

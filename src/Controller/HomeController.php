@@ -68,13 +68,13 @@ final class HomeController extends AbstractController
             $this->hub->publish(new Update(
                 'waiting',
                 $this->renderView('components/turbo/player-join.html.twig', [
-                    'player' =>  new Player($user->getUsername()),   
+                    'player' =>  Player::fromUser($user),
                 ])
             ));
         }
 
         $players =  array_map(
-            fn ($player) => new Player($player->getUsername()),
+            fn ($player) => Player::fromUser($player),
             $room->getPlayers()->toArray(),
         );
 
@@ -93,7 +93,7 @@ final class HomeController extends AbstractController
         foreach ($room->getPlayers() as $k => $player) {
             $this->handRepository->save($player, $room, $hands[$k]);
         }
-        
+
         $this->hub->publish(new Update(
             sprintf('game-%s', $room->getId()),
             json_encode([
