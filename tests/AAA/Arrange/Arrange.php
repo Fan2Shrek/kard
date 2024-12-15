@@ -36,6 +36,18 @@ abstract /* static */ class Arrange
         ));
     }
 
+    public static function setCurrentCards(array $cards): void
+    {
+        Act::addContext('gameContext', new GameContext(
+            'room-id',
+            new Room,
+            [],
+            [],
+            new Player('player-id', 'Player 1'),
+            array_map(fn (int $card) => new Card(Suit::SPADES, Rank::from((string) $card)), $cards),
+        ));
+    }
+
     public static function setGameStarted(): void
     {
         Act::addContext('gameContext', new GameContext(
