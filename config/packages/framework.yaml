@@ -7,7 +7,7 @@ framework:
     session: true
 
     trusted_proxies: '%env(TRUSTED_PROXIES)%'
-    trusted_headers: ['x-forwarded-host']
+    trusted_headers: ['x-forwarded-host', 'x-forwarded-proto']
 
     #esi: true
     #fragments: true
