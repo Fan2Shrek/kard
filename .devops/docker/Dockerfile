@@ -1,4 +1,4 @@
-FROM node:23-alpine as compiler
+FROM node:23-alpine AS compiler
 
 COPY ./assets/react /app
 WORKDIR /app/build
@@ -7,7 +7,7 @@ RUN npm install
 RUN npm run build
 
 
-FROM php:8.3-fpm-alpine as main
+FROM php:8.3-fpm-alpine AS main
 
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
@@ -26,13 +26,13 @@ WORKDIR /app
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
-FROM main as dev
+FROM main AS dev
 
 RUN install-php-extensions pcov
-RUN composer install
+RUN composer install --no-scripts
 
 
-FROM main as prod
+FROM main AS prod
 
 ENV APP_ENV=prod
 
