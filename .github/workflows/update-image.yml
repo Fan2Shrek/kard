@@ -1,9 +1,9 @@
-name: Update image 
+name: Update image
 
 on:
   push:
     branches:
-      - main
+      - master
       - develop
 
 env:
@@ -14,10 +14,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      VERSION: ${{ github.sha }}${{ github.ref_name == 'develop' && '-dev' || '' }}
-      VERSION_LATEST: latest
+      VERSION: ${{ github.ref_name == 'master' && 'latest' || 'dev' }}
       BUILD_TARGET: prod
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -32,10 +31,3 @@ jobs:
 
       - name: Push image
         run: ${COMPOSE} push php
-
-      - name: Tag image as latest
-        if: github.ref == 'refs/heads/master'
-        run: |
-          docker tag ${REGISTRY}:${VERSION} ${REGISTRY}:${VERSION_LATEST}
-          ${COMPOSE} push ${REGISTRY}:${VERSION_LATEST}
-
