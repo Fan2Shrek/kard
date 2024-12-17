@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dd40732b0ea6f6136ba4c7270fbe8709",
+    "content-hash": "04ba781807fa1ce8a11aebc3bc8188df",
     "packages": [
         {
             "name": "brick/math",
@@ -6826,6 +6826,61 @@
             "time": "2024-10-17T10:46:06+00:00"
         },
         {
+            "name": "symfonycasts/tailwind-bundle",
+            "version": "v0.6.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/SymfonyCasts/tailwind-bundle.git",
+                "reference": "28db7cfe23758cffc79f25a7c75cdb2fca52e9d9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/SymfonyCasts/tailwind-bundle/zipball/28db7cfe23758cffc79f25a7c75cdb2fca52e9d9",
+                "reference": "28db7cfe23758cffc79f25a7c75cdb2fca52e9d9",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1",
+                "symfony/asset-mapper": "^6.3|^7.0",
+                "symfony/cache": "^6.3|^7.0",
+                "symfony/console": "^5.4|^6.3|^7.0",
+                "symfony/http-client": "^5.4|^6.3|^7.0",
+                "symfony/process": "^5.4|^6.3|^7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.6",
+                "symfony/filesystem": "^6.3|^7.0",
+                "symfony/framework-bundle": "^6.3|^7.0",
+                "symfony/phpunit-bridge": "^6.3.9|^7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfonycasts\\TailwindBundle\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ryan Weaver",
+                    "homepage": "https://symfonycasts.com"
+                }
+            ],
+            "description": "Delightful Tailwind Support for Symfony + AssetMapper",
+            "keywords": [
+                "asset-mapper",
+                "tailwind"
+            ],
+            "support": {
+                "issues": "https://github.com/SymfonyCasts/tailwind-bundle/issues",
+                "source": "https://github.com/SymfonyCasts/tailwind-bundle/tree/v0.6.1"
+            },
+            "time": "2024-11-06T18:41:22+00:00"
+        },
+        {
             "name": "twig/extra-bundle",
             "version": "v3.13.0",
             "source": {
@@ -10759,7 +10814,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
@@ -10767,6 +10822,6 @@
         "ext-ctype": "*",
         "ext-iconv": "*"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "plugin-api-version": "2.6.0"
 }

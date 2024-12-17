@@ -47,4 +47,6 @@ RUN composer install --no-dev --no-interaction --no-progress
 COPY --from=compiler /app/dist /app/assets/react/dist
 
 RUN bin/console sass:build
+RUN bin/console tailwind:build --minify
+
 RUN bin/console asset-map:compile

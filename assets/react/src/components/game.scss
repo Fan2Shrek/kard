@@ -14,3 +14,19 @@
     margin-top: 50px;
   }
 }
+
+.game {
+  background-color: green;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+
+  &__left {
+    width: 10%;
+  }
+
+  &__right {
+    width: 90%;
+  }
+}
