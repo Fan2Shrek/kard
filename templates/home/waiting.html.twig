@@ -3,20 +3,18 @@
 {% block title %}Hello!{% endblock %}
 
 {% block body %}
-    <main class="waiting">
+    <main class="flex flex-col h-screen justify-between items-center text-3xl font-bold">
         <h1>En attente de joueurs !</h1>
-        <div {{ stimulus_controller('stream', { url: mercure('waiting') }) }}></div> 
-        <div id="player-join">
+        <div {{ stimulus_controller('stream', { url: mercure('waiting') }) }}></div>
+        <div id="player-join" class="flex flex-col items-center gap-4">
             <h2>Joueurs</h2>
             {% for player in players %}
                 {% include "components/turbo/player-join.html.twig" with {"player": player} %}
             {% endfor %}
         </div>
-        
+
         {% if room.owner == app.user %}
-            <div class="btn__container">
-                <a class="btn" href="{{ path('game_start', {'id': room.id}) }}" class="btn btn-primary">Commencer !</a>
-            </div>
+            {% include "components/ux/button.html.twig" with { 'href': path('game_start', {'id': room.id}), 'text': 'Commencer !' } %}
         {% endif %}
         <div {{ stimulus_controller('waiting') }}></div>
     </main>
