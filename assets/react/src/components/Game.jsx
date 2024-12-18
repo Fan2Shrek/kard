@@ -38,7 +38,7 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
                     <div className='middle'>
                         <div id='middle'>
                             // @todo own component
-                            <Hand hand={ctx.currentCards} />
+                            <Hand hand={ctx.currentCards ?? []} />
                             <Stack cards={ctx.discarded} />
                         </div>
                     </div>

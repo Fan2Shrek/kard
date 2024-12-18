@@ -20,6 +20,5 @@ compose.override.yaml
 .phpunit.result.cache
 ###< phpunit/phpunit ###
 
-
-.supervisord.log
-.supervisord.pid
+supervisord.log
+supervisord.pid
