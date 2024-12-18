@@ -9,6 +9,7 @@ use App\Model\Card\Card;
 final class GameContext
 {
     private PlayersList $players;
+    private GameRound $currentRound;
 
     /**
      * @param Card[] $assets
@@ -21,10 +22,11 @@ final class GameContext
         private array $assets,
         array $players,
         Player $currentPlayer,
-        private array $currentCards = [],
+        array $currentCards = [],
         private array $discarded = [],
     ) {
         $this->players = new PlayersList($players, $currentPlayer);
+        $this->currentRound = new GameRound($currentCards);
     }
 
     public function getId(): string
@@ -54,7 +56,17 @@ final class GameContext
 
     public function getCurrentCards(): array
     {
-        return $this->currentCards;
+        return $this->currentRound->getCurrentTurn()?->getCards() ?? [];
+    }
+
+    public function addCurrentCard(Card $card): void
+    {
+        $this->currentRound->getCurrentTurn()->addCard($card);
+    }
+
+    public function getRound(): GameRound
+    {
+        return $this->currentRound;
     }
 
     public function getDiscarded(): array
@@ -67,11 +79,6 @@ final class GameContext
         $this->assets[] = $card;
     }
 
-    public function addCurrentCard(Card $card): void
-    {
-        $this->currentCards[] = $card;
-    }
-
     public function addDiscarded(Card $card): void
     {
         $this->discarded[] = $card;
@@ -82,11 +89,11 @@ final class GameContext
      */
     public function setCurrentCards(array $cards): void
     {
-        foreach ($this->currentCards as $card) {
+        foreach ($this->getCurrentCards() as $card) {
             $this->addDiscarded($card);
         }
 
-        $this->currentCards = $cards;
+        $this->currentRound->addTurn($cards);
     }
 
     public function setDiscarded(array $cards): void
@@ -125,7 +132,6 @@ class PlayersList {
 
     public function nextPlayer(): void
     {
-        dump($this->players, $this->currentIndex, count($this->players));
         if ($this->currentIndex === count($this->players) - 1) {
             $this->currentIndex = 0;
         } else {
