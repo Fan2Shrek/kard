@@ -38,9 +38,18 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
                         <Stack cards={ctx.discarded} />
                     </div>
                 </div>
-                <PlayerList players={ctx.players} currentPlayer={ctx.currentPlayer} />
-                <div className='bottom'>
-                    <Hand hand={hand} canPlay={ctx.currentPlayer.id === player.id} />
+                <div className='game__right'>
+                    <HiddenHand count={5} />
+                    <div className='middle'>
+                        <div id='middle'>
+                            // @todo own component
+                            <Hand hand={ctx.currentCards ?? []} />
+                            <Stack cards={ctx.discarded} />
+                        </div>
+                    </div>
+                    <div className='bottom'>
+                        <Hand hand={hand} canPlay={ctx.currentPlayer.id === player.id} />
+                    </div>
                 </div>
             </div>
         </GameContext>

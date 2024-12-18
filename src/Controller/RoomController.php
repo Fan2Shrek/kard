@@ -102,6 +102,8 @@ final class RoomController extends AbstractController
     {
         $user = $this->getUser();
 
+        /* dd($this->gameContextProvider->provide($room)); */
+
         return $this->render('home/game.html.twig', [
             'game' => $this->serializer->serialize($this->gameContextProvider->provide($room), 'json'),
             'player' => $this->serializer->serialize($this->getUser(), 'json'),
