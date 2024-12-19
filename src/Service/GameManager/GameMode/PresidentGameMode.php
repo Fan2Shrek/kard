@@ -43,10 +43,25 @@ final class PresidentGameMode implements GameModeInterface
             throw new RuleException($this->getGameMode(), 'Incorrect number of cards played');
         }
 
+        $previousTurns = array_reverse($this->gameContext->getRound()->getTurns());
+
         $card = $cards[0];
 
-        if (!$this->isLegacyHigher($card, $currentCard[0]) && !$this->isSameRank($card, $currentCard[0])) {
-            throw new RuleException($this->getGameMode(), 'A card with a higher or same value must be played');
+        [$lastTurn, $beforeLastTurn] = [$previousTurns[0]->getCards() ?? null, ($previousTurns[1] ?? null)?->getCards() ?? null];
+
+        if (null === $beforeLastTurn || null === $lastTurn) {
+            if (!$this->isLegacyHigher($card, $currentCard[0]) && !$this->isSameRank($card, $currentCard[0])) {
+                throw new RuleException($this->getGameMode(), 'A card with a higher or same value must be played');
+            }
+
+            return;
+        }
+
+        // Rank or nothing :p
+        if ($lastTurn[0]->rank === $beforeLastTurn[0]->rank) {
+            if ($card->rank !== $lastTurn[0]->rank) {
+                throw new RuleException($this->getGameMode(), \sprintf('Can not play "%s" when "%s" or nothing.', $card->rank->value, $lastTurn[0]->rank->value));
+            }
         }
     }
 

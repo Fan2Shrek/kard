@@ -10,6 +10,7 @@ use App\Enum\Card\Rank;
 use App\Model\Card\Card;
 use App\Model\GameContext;
 use App\Model\Player;
+use App\Model\Turn;
 use App\Tests\AAA\Act\Act;
 
 abstract /* static */ class Arrange
@@ -32,7 +33,7 @@ abstract /* static */ class Arrange
             [],
             [],
             new Player('player-id', 'Player 1'),
-            [$card],
+            [new Turn([$card])],
         ));
     }
 
@@ -44,7 +45,7 @@ abstract /* static */ class Arrange
             [],
             [],
             new Player('player-id', 'Player 1'),
-            array_map(fn (int $card) => new Card(Suit::SPADES, Rank::from((string) $card)), $cards),
+            [new Turn(array_map(fn (int $card) => new Card(Suit::SPADES, Rank::from((string) $card)), $cards))],
         ));
     }
 
@@ -57,6 +58,25 @@ abstract /* static */ class Arrange
             [],
             new Player('player-id', 'Player 1'),
             [],
+        ));
+    }
+
+    public static function setRound(array $cards): void
+    {
+        Act::addContext('gameContext', new GameContext(
+            'room-id',
+            new Room,
+            [],
+            [],
+            new Player('player-id', 'Player 1'),
+            array_map(
+                fn (array $turns) => new Turn(array_map(
+                    fn (int $value) => new Card(
+                        Suit::SPADES,
+                        Rank::from((string) $value)),
+                    $turns)),
+                $cards
+            ),
         ));
     }
 }
