@@ -11,14 +11,14 @@ final class GameRound
     private array $turns;
 
     public function __construct(
-        array $currentCards,
+        array $turns = [],
     ) {
-        $this->turns = [new Turn($currentCards)];
+        $this->turns = $turns;
     }
 
-    public function addTurn(array $cards): void
+    public function addTurn(Turn $turn): void
     {
-        $this->turns[] = new Turn($cards);
+        $this->turns[] = $turn;
     }
 
     public function getTurn(int $index): ?Turn

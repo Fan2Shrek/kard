@@ -15,7 +15,7 @@ abstract /* static */ class Act
         self::$context[$key] = $value;
     }
 
-    public static function playCard(string $value, string $color): void
+    public static function playCard(string $value, string $color = 's'): void
     {
         $card = self::createCard($value, $color);
         static::get('gamePlayer')->play([$card], static::get('gameContext'));

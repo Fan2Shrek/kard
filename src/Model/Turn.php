@@ -8,7 +8,9 @@ final class Turn
 {
     private array $cards;
 
-    public function __construct(array $cards) {
+    public function __construct(
+        array $cards
+    ) {
         $this->cards = $cards;
     }
 
