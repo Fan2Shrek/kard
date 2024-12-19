@@ -152,3 +152,28 @@ describe('Président: début de partie', function () {
         ]);
     })->throws("Can't play multiple cards with different values");
 });
+
+describe('Président: carte ou rien', function () {
+    test('On peut jouer une carte de la bonne valeur sur un valeur ou rien', function () {
+        Arrange::setRound([[7], [7]]);
+
+        Act::playCard(7, 'h');
+    })->throwsnoexceptions();
+
+    test('On ne peut pas jouer de mauvaise valeur une carte ou rien', function () {
+        Arrange::setRound([[7], [7]]);
+
+        Act::playCard(9, 'h');
+    })->throws('Can not play "9" when "7" or nothing.');
+
+    test("on ne peut pas jouer de mauvaise valeur une carte ou rien au milieu d'un round", function () {
+        arrange::setround([
+            [3],
+            [5],
+            [7],
+            [7]
+        ]);
+
+        act::playcard(9, 'h');
+    })->throws('Can not play "9" when "7" or nothing.');
+});
