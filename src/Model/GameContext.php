@@ -13,7 +13,7 @@ final class GameContext
 
     /**
      * @param Card[] $assets
-     * @param Card[] $currentCards
+     * @param Card[] $turns
      * @param Card[] $discarded
      */
     public function __construct(
@@ -22,11 +22,11 @@ final class GameContext
         private array $assets,
         array $players,
         Player $currentPlayer,
-        array $currentCards = [],
+        array $turns = [],
         private array $discarded = [],
     ) {
         $this->players = new PlayersList($players, $currentPlayer);
-        $this->currentRound = new GameRound($currentCards);
+        $this->currentRound = new GameRound($turns);
     }
 
     public function getId(): string
@@ -93,7 +93,7 @@ final class GameContext
             $this->addDiscarded($card);
         }
 
-        $this->currentRound->addTurn($cards);
+        $this->currentRound->addTurn(new Turn($cards));
     }
 
     public function setDiscarded(array $cards): void
