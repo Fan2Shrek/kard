@@ -69,6 +69,13 @@ final class GameContext
         return $this->currentRound;
     }
 
+    public function setRound(GameRound $round): self
+    {
+        $this->currentRound = $round;
+
+        return $this;
+    }
+
     public function getDiscarded(): array
     {
         return $this->discarded;

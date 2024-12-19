@@ -35,4 +35,11 @@ final class GameRound
     {
         return $this->turns;
     }
+
+    public function setTurns(array $turns): self
+    {
+        $this->turns = $turns;
+
+        return $this;
+    }
 }

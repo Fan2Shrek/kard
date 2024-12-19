@@ -22,6 +22,7 @@ final class PresidentGameMode implements GameModeInterface
 
     public function play(array $cards, GameContext $gameContext): void
     {
+        dump($gameContext);
         $this->gameContext = $gameContext;
         $currentCards = $gameContext->getCurrentCards();
 
