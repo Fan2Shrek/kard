@@ -97,11 +97,13 @@
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.6",
+        "friendsofphp/php-cs-fixer": "^3.65",
         "pestphp/pest": "^3.5",
         "spatie/phpunit-watcher": "^1.24",
         "symfony/debug-bundle": "7.1.*",
         "symfony/maker-bundle": "^1.61",
         "symfony/stopwatch": "7.1.*",
-        "symfony/web-profiler-bundle": "7.1.*"
+        "symfony/web-profiler-bundle": "7.1.*",
+        "vincentlanglet/twig-cs-fixer": "^3.5"
     }
 }
