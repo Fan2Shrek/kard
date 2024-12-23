@@ -14,9 +14,8 @@ export default ({ count }) => {
     return <div className='hand__container'>
         <div className='hand'>
             {cards.map((card, index) => {
-                return <Card key={index} card={card} img={getBackAsset()} angle={180}/>
+                return <Card key={index} clickable={false} card={card} img={getBackAsset()} angle={180}/>
             })}
         </div>
     </div>;
 }
-

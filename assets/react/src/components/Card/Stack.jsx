@@ -11,6 +11,7 @@ export default ({ cards }) => {
         {cards.map((card, i) =>
             <Card
                 key={i}
+                clickable={false}
                 card={card}
                 img={getCardAsset(card)}
                 angle={Math.floor(Math.random() * 181)}
