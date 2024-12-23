@@ -3,13 +3,14 @@
 {% block title %}Accueil !{% endblock %}
 
 {% block body %}
-    <main class='home'>
-        <h1>Bievenue sur Kard.fr (non officiel)</h1>
-        
-        <div class="btn__container">
-            <a class="btn" href='{{ path('app_login') }}'>Se connecter</a>
+    <main>
+        <h1 class="text-center my-4 text-[30px]">Bievenue sur Kard.fr (non officiel)</h1>
+
+        <div class="flex justify-center gap-1">
+            {% include "components/ux/button.html.twig" with { 'href': path('app_login'), 'text': 'Se connecter' } %}
+            <!--<button class="btn" href='{{ path('app_login') }}'><a href='{{ path('app_login') }}'>Se connecter</a></button>-->
             {% if app.user %}
-                <a class="btn" href='{{ path('create') }}'>Lancer une partie</a>
+                {% include "components/ux/button.html.twig" with { 'href': path('create'), 'text': 'Lancer une partie' } %}
             {% endif %}
         </div>
     </main>

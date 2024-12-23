@@ -30,6 +30,9 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
     return <>
         <GameContext gameContext={ctx} player={player} currentPlayer={ctx.currentPlayer}>
             <div className='game'>
+                <div className='game__left'>
+                    <PlayerList players={ctx.players} currentPlayer={ctx.currentPlayer} />
+                </div>
                 <div className='game__right'>
                     <HiddenHand count={5} />
                     <div className='middle'>
