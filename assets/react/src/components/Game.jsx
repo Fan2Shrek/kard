@@ -30,14 +30,6 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
     return <>
         <GameContext gameContext={ctx} player={player} currentPlayer={ctx.currentPlayer}>
             <div className='game'>
-                <HiddenHand count={5} />
-                <div className='middle'>
-                    <div id='middle'>
-                        // @todo own component
-                        <Hand hand={ctx.currentCards} />
-                        <Stack cards={ctx.discarded} />
-                    </div>
-                </div>
                 <div className='game__right'>
                     <HiddenHand count={5} />
                     <div className='middle'>
