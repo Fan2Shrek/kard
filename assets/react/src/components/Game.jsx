@@ -7,10 +7,13 @@ import GameContext from '../Context/GameContext.js';
 import HiddenHand from './Hand/HiddenHand.js';
 import Stack from './Card/Stack.js';
 import PlayerList from './Player/PlayerList.js';
+import Text from './Animation/Text.js';
 
 export default ({ gameContext, hand: currentHand, player: user }) => {
     const [ctx, setCtx] = useState(JSON.parse(gameContext));
     const [hand, setHand] = useState(currentHand);
+    const [text, setText] = useState(null);
+
     const player = JSON.parse(user);
     const gameUrl = useMemo(() => JSON.parse(document.getElementById('mercure-game-url').textContent), []);
     const playerUrl = useMemo(() => JSON.parse(document.getElementById('mercure-game-player').textContent), []);
@@ -18,6 +21,9 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
     const gameActions = useMemo(() => ({
         play: (data) => {
             setCtx(data);
+        },
+        message: (data) => {
+            setText(data.text);
         },
     }), []);
 
@@ -29,6 +35,7 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
 
     return <>
         <GameContext gameContext={ctx} player={player} currentPlayer={ctx.currentPlayer}>
+            { text && <Text text={text} /> }
             <div className='game'>
                 <PlayerList players={ctx.players} currentPlayer={ctx.currentPlayer} />
                 <div className='game__right'>

@@ -5,15 +5,23 @@ namespace App\Service\GameManager\GameMode;
 use App\Domain\Exception\RuleException;
 use App\Enum\Card\Rank;
 use App\Model\GameContext;
+use Symfony\Component\Mercure\HubInterface;
+use Symfony\Component\Mercure\Update;
 
 /**
  * @see https://bicyclecards.com/how-to-play/presidents
+ *
+ * @todo gameData in gameContext ??
  */
 final class PresidentGameMode implements GameModeInterface
 {
     use CardsHelperTrait;
 
     private GameContext $gameContext;
+
+    public function __construct(
+        private HubInterface $hub,
+    ) {}
 
     public function getGameMode(): GameModeEnum
     {
@@ -52,6 +60,10 @@ final class PresidentGameMode implements GameModeInterface
         if (null === $beforeLastTurn || null === $lastTurn) {
             if (!$this->isLegacyHigher($card, $currentCard[0]) && !$this->isSameRank($card, $currentCard[0])) {
                 throw new RuleException($this->getGameMode(), 'A card with a higher or same value must be played');
+            }
+
+            if ($this->isSameRank($card, $currentCard[0])) {
+                $this->dispatchMercureEvent('message', \sprintf("%s ou rien", $card->rank->value));;
             }
 
             return;
@@ -99,5 +111,18 @@ final class PresidentGameMode implements GameModeInterface
             Rank::ACE,
             Rank::TWO,
         ];
+    }
+
+    private function dispatchMercureEvent(string $eventName, string $text): void
+    {
+        $this->hub->publish(new Update(
+            \sprintf('room-%s', $this->gameContext->getRoom()->getId()),
+            \json_encode([
+                'action' => $eventName,
+                'data' => [
+                    'text' => $text,
+                ],
+            ])
+        ));
     }
 }

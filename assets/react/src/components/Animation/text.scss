@@ -1,0 +1,17 @@
+.animated__text {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    color: red;
+    font-size: 10rem;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    pointer-events: none;
+
+    span.space {
+        margin: 0 1rem;
+    }
+}
