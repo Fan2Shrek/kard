@@ -4,6 +4,8 @@ namespace App\Service\GameManager\GameMode;
 
 use App\Domain\Exception\RuleException;
 use App\Enum\Card\Rank;
+use App\Enum\Card\Suit;
+use App\Model\Card\Card;
 use App\Model\GameContext;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
@@ -26,6 +28,21 @@ final class PresidentGameMode implements GameModeInterface
     public function getGameMode(): GameModeEnum
     {
         return GameModeEnum::PRESIDENT;
+    }
+
+    public function getPlayerOrder(array $players): array
+    {
+        $order = [];
+
+        foreach ($players as $id => $hand) {
+            if ($hand->has(new Card(Suit::HEARTS, Rank::QUEEN))) {
+                array_unshift($order, $id);
+            } else {
+                $order[] = $id;
+            }
+        }
+
+        return $order;
     }
 
     public function play(array $cards, GameContext $gameContext): void

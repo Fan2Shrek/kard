@@ -2,16 +2,15 @@
 
 namespace App\Controller;
 
-use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
 use App\Entity\Room;
 use App\Entity\User;
-use App\Model\GameContext;
 use App\Model\Player;
 use App\Repository\RoomRepository;
 use App\Service\Card\CardGenerator;
 use App\Service\Card\HandRepository;
 use App\Service\GameContextProvider;
+use App\Service\GameManager\GameManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mercure\HubInterface;
@@ -28,6 +27,7 @@ final class RoomController extends AbstractController
         private SerializerInterface $serializer,
         private HandRepository $handRepository,
         private GameContextProvider $gameContextProvider,
+        private GameManager $gameManager,
         private HubInterface $hub,
     ) {
     }
@@ -83,12 +83,16 @@ final class RoomController extends AbstractController
     #[Route('/start/{id}', name: 'game_start')]
     public function start(Room $room): Response
     {
-        $hands = $this->cardGenerator->generateHands(2, 5);
+        $playerCount = count($room->getPlayers());
+        $hands = $this->cardGenerator->generateHands($playerCount);
         $response = $this->redirectToRoute('game', ['id' => $room->getId()]);
 
         foreach ($room->getPlayers() as $k => $player) {
             $this->handRepository->save($player, $room, $hands[$k]);
         }
+
+        $gameContext = $this->gameContextProvider->provide($room);
+        $this->gameManager->start($gameContext);
 
         $this->hub->publish(new Update(
             sprintf('game-%s', $room->getId()),
@@ -104,8 +108,6 @@ final class RoomController extends AbstractController
     public function game(Room $room): Response
     {
         $user = $this->getUser();
-
-        /* dd($this->gameContextProvider->provide($room)); */
 
         return $this->render('home/game.html.twig', [
             'game' => $this->serializer->serialize($this->gameContextProvider->provide($room), 'json'),

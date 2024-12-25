@@ -6,6 +6,7 @@ use App\Domain\Exception\RuleException;
 use App\Entity\Room;
 use App\Entity\User;
 use App\Model\Card\Card;
+use App\Model\GameContext;
 use App\Service\Card\HandRepository;
 use App\Service\GameContextProvider;
 use App\Service\GameManager\GameMode\GameModeEnum;
@@ -25,8 +26,7 @@ final class GameManager
         private HandRepository $handRepository,
         private SerializerInterface $serializer,
         private Environment $twig,
-    ) {
-    }
+    ) {}
 
     /**
      * @param array<Card> $cards
@@ -77,6 +77,44 @@ final class GameManager
             sprintf('room-%s-%s', $room->getId(), $player->getId()),
             $this->serializer->serialize($hand, 'json'),
         ));
+    }
+
+    public function start(GameContext $ctx): void
+    {
+        $players = $ctx->getPlayers();
+
+        /* $players = $this->getGameMode($room->getGameMode())->getPlayerOrder($players); */
+        $hands = array_reduce(
+            $players,
+            function ($acc, $player) use ($ctx) {
+                $acc[$player->id] = $this->handRepository->get($player->id, $ctx->getRoom());
+
+                return $acc;
+            },
+            [],
+        );
+
+        $players = array_reduce(
+            $players,
+            function ($acc, $player) use ($ctx) {
+                $acc[$player->id] = $player;
+
+                return $acc;
+            },
+            [],
+        );
+
+        /* $order = $this->getGameMode($ctx->getRoom()->getGameMode())->getPlayerOrder($players); */
+        $order = $this->getGameMode(GameModeEnum::PRESIDENT)->getPlayerOrder($hands);
+
+        $ctx->setPlayerOrder(
+            array_map(
+                function ($id) use ($players) {
+                    return $players[$id];
+                },
+                $order,
+            ),
+        );
     }
 
     public function getGameMode(GameModeEnum $gameModeEnum): GameModeInterface

@@ -3,4 +3,7 @@
 - [ ] phpcs ?
 - [ ] phpstan ?
 - [ ] auto deploy
-- [ ] docker build ?
+- [X] docker build ?
+
+- [ ] fix end turn
+- [ ] data in gameContext

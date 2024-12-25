@@ -27,6 +27,11 @@ abstract /* static */ class Act
         static::get('gamePlayer')->play($cards, static::get('gameContext'));
     }
 
+    public static function orderPlayers(array $players): array
+    {
+        return static::get('gamePlayer')->getPlayerOrder($players);
+    }
+
     private static function createCard(string $value, string $color): Card
     {
         return new Card(Suit::from($color), Rank::from($value));

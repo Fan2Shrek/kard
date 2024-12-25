@@ -34,6 +34,11 @@ final class GameContext
         $this->currentRound = new GameRound();
     }
 
+    public function setPlayerOrder(array $players): void
+    {
+        $this->players = new PlayersList($players, $this->players->getCurrentPlayer());
+    }
+
     public function getId(): string
     {
         return $this->id;

@@ -1,5 +1,9 @@
 <?php
 
+use App\Enum\Card\Rank;
+use App\Enum\Card\Suit;
+use App\Model\Card\Card;
+use App\Model\Card\Hand;
 use App\Service\GameManager\GameMode\PresidentGameMode;
 use App\Tests\AAA\Act\Act;
 use App\Tests\AAA\Arrange\Arrange;
@@ -89,6 +93,27 @@ describe('Président: règle basique', function () {
             [7, 'd'],
         ]);
     })->throws('Invalid number of cards played');
+
+    test('La dame de coeur commence', function () {
+        $hands = [
+            0 => new Hand([
+                new Card(Suit::SPADES, Rank::EIGHT),
+                new Card(Suit::HEARTS, Rank::EIGHT),
+            ]),
+            1 => new Hand([
+                new Card(Suit::SPADES, Rank::EIGHT),
+                new Card(Suit::HEARTS, Rank::QUEEN),
+            ]),
+            2 => new Hand([
+                new Card(Suit::SPADES, Rank::EIGHT),
+                new Card(Suit::HEARTS, Rank::KING),
+            ]),
+        ];
+
+        $players = Act::orderPlayers($hands);
+
+        expect($players)->toBe([1, 0, 2]);
+    });
 });
 
 describe('Président: carte simple', function () {
@@ -233,6 +258,17 @@ describe('Président: carte ou rien', function () {
 });
 
 describe('Président: fin de tour', function () {
+    test('Il est possile de finir un tour en jouant un 2', function () {
+        Arrange::setRound([
+            [7],
+            [8],
+            [9],
+        ]);
+
+        Act::playCard(2, 's');
+        Act::playCard(5, 's');
+    })->throwsNoExceptions();
+
     test('Le tour se termine si un joueur joue un 2', function () {
         Arrange::setRound([
             [7],

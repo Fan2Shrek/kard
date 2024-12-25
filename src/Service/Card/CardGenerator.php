@@ -39,21 +39,6 @@ final class CardGenerator
             $cards = $deck->count() / $handsCount;
         }
 
-        return [
-            new Hand([
-                new Card(Suit::HEARTS, RANK::SEVEN),
-                new Card(Suit::SPADES, RANK::SEVEN),
-                new Card(Suit::HEARTS, RANK::THREE),
-                new Card(Suit::SPADES, RANK::THREE),
-            ]),
-            new Hand([
-                new Card(Suit::DIAMONDS, RANK::SEVEN),
-                new Card(Suit::CLUBS, RANK::SEVEN),
-                new Card(Suit::DIAMONDS, RANK::THREE),
-                new Card(Suit::CLUBS, RANK::THREE),
-            ]),
-        ];
-
         $hands = [];
 
         for ($i = 0; $i < $handsCount; $i++) {

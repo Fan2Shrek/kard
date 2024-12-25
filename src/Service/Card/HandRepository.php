@@ -18,8 +18,12 @@ final class HandRepository
     ) {
     }
 
-    public function get(User $player, Room $room): ?Hand
+    public function get(string|User $player, Room $room): ?Hand
     {
+        if ($player instanceof User) {
+            $player = (string) $player->getId();
+        }
+
         $deck = $this->redisConnection->get($this->getKey($player, $room));
 
         if ('' === $deck) {
@@ -31,6 +35,10 @@ final class HandRepository
 
     public function getRaw(User $player, Room $room): ?string
     {
+        if ($player instanceof User) {
+            $player = (string) $player->getId();
+        }
+
         $deck = $this->redisConnection->get($this->getKey($player, $room));
 
         if ('' === $deck) {
@@ -42,11 +50,15 @@ final class HandRepository
 
     public function save(User $player, Room $room, Hand $hand): void
     {
+        if ($player instanceof User) {
+            $player = (string) $player->getId();
+        }
+
         $this->redisConnection->set($this->getKey($player, $room), $this->serializer->serialize($hand, 'json'));
     }
 
-    private function getKey(User $player, Room $room): string
+    private function getKey(string $player, Room $room): string
     {
-        return sha1(\sprintf('%s:%s', $room->getId(), $player->getId()));
+        return sha1(\sprintf('%s:%s', $room->getId(), $player));
     }
 }
