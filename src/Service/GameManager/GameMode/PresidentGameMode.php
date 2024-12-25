@@ -20,6 +20,7 @@ final class PresidentGameMode implements GameModeInterface
     use CardsHelperTrait;
 
     private GameContext $gameContext;
+    private bool $isTurnFinished;
 
     public function __construct(
         private HubInterface $hub,
@@ -60,6 +61,13 @@ final class PresidentGameMode implements GameModeInterface
             2 => $this->handleTwoCards($cards, $currentCards),
             3 => $this->handleThreeCards($cards, $currentCards),
         };
+
+        if ($this->isTurnFinished ?? false) {
+            return;
+        }
+
+        $gameContext->setCurrentCards($cards);
+        $gameContext->nextPlayer();
     }
 
     private function handleOneCard(array $cards, array $currentCard): void
@@ -159,6 +167,7 @@ final class PresidentGameMode implements GameModeInterface
     {
         $this->gameContext->newRound();
         $this->dispatchMercureEvent('message', 'Fin du tour');
+        $this->isTurnFinished = true;
     }
 
     private function dispatchMercureEvent(string $eventName, string $text): void

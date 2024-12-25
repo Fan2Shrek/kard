@@ -37,8 +37,8 @@ abstract /* static */ class Act
         return new Card(Suit::from($color), Rank::from($value));
     }
 
-    public static function get(string $key)
+    public static function get(string $key) : mixed
     {
-        return self::$context[$key] ?? throw new \Exception("Context $key not found");
+        return self::$context[$key] ?? null;
     }
 }

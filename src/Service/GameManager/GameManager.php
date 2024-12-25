@@ -57,9 +57,6 @@ final class GameManager
             return;
         }
 
-        $ctx->setCurrentCards($cards);
-        $ctx->nextPlayer();
-
         $hand->removeCards($cards);
 
         $this->handRepository->save($player, $room, $hand);

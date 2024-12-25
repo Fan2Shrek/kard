@@ -4,6 +4,7 @@ use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
 use App\Model\Card\Card;
 use App\Model\Card\Hand;
+use App\Model\Player;
 use App\Service\GameManager\GameMode\PresidentGameMode;
 use App\Tests\AAA\Act\Act;
 use App\Tests\AAA\Arrange\Arrange;
@@ -11,19 +12,16 @@ use App\Tests\Resource\HubSpy;
 
 covers(PresidentGameMode::class);
 
-beforeAll(function () {
+beforeEach(function () {
+    HubSpy::reset();
     Act::addContext('gamePlayer', new PresidentGameMode(
         new HubSpy,
     ));
 });
 
-beforeEach(function () {
-    HubSpy::reset();
-});
-
 pest()->group('Président');
 
-describe('Président: règle basique', function () {
+describe('Président: règles basiques', function () {
     test("L'ordre est 3, 4, 5, 6, 7, 8, 9, 10, valet, dame, roi, as, 2", function () {
         Arrange::setCurrentCard(3);
 
@@ -113,6 +111,42 @@ describe('Président: règle basique', function () {
         $players = Act::orderPlayers($hands);
 
         expect($players)->toBe([1, 0, 2]);
+    });
+
+    test("Jouer une carte avance d'un tour", function () {
+        Arrange::setRound([
+            [7],
+            [8],
+            [9],
+        ]);
+
+        Act::playCard(10, 's');
+
+        expect(Act::get('gameContext')->getRound()->getTurns())->toHaveCount(4);
+    });
+
+    test('Jouer une carte pass au prochain joueur', function () {
+        Arrange::setPlayers([
+            new Player('1', 'Player 1'),
+            new Player('2', 'Player 2'),
+        ]);
+        Arrange::setGameStarted();
+
+        Act::playCard(10, 's');
+
+        expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('2');
+    });
+
+    test('Finir un tour ne passe pas au prochain joueur', function () {
+        Arrange::setPlayers([
+            new Player('1', 'Player 1'),
+            new Player('2', 'Player 2'),
+        ]);
+        Arrange::setCurrentCard(3);
+
+        Act::playCard(2, 's');
+
+        expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('1');
     });
 });
 

@@ -27,48 +27,22 @@ abstract /* static */ class Arrange
         }
 
         $card = new Card(Suit::from($suit), Rank::from($rank));
-        Act::addContext('gameContext', new GameContext(
-            'room-id',
-            new Room,
-            [],
-            [],
-            new Player('player-id', 'Player 1'),
-            [new Turn([$card])],
-        ));
+        Act::addContext('gameContext', self::createGameContext([new Turn([$card])]));
     }
 
     public static function setCurrentCards(array $cards): void
     {
-        Act::addContext('gameContext', new GameContext(
-            'room-id',
-            new Room,
-            [],
-            [],
-            new Player('player-id', 'Player 1'),
-            [new Turn(array_map(fn (int $card) => new Card(Suit::SPADES, Rank::from((string) $card)), $cards))],
-        ));
+        Act::addContext('gameContext', self::createGameContext([new Turn(array_map(fn (int $card) => new Card(Suit::SPADES, Rank::from((string) $card)), $cards))]));
     }
 
     public static function setGameStarted(): void
     {
-        Act::addContext('gameContext', new GameContext(
-            'room-id',
-            new Room,
-            [],
-            [],
-            new Player('player-id', 'Player 1'),
-            [],
-        ));
+        Act::addContext('gameContext', static::createGameContext([]));
     }
 
     public static function setRound(array $cards): void
     {
-        Act::addContext('gameContext', new GameContext(
-            'room-id',
-            new Room,
-            [],
-            [],
-            new Player('player-id', 'Player 1'),
+        Act::addContext('gameContext', static::createGameContext(
             array_map(
                 fn (array $turns) => new Turn(array_map(
                     fn (int $value) => new Card(
@@ -78,5 +52,27 @@ abstract /* static */ class Arrange
                 $cards
             ),
         ));
+    }
+
+    public static function setPlayers(array $players): void
+    {
+        Act::addContext('gameContextPlayers', $players);
+    }
+
+    private static function createGameContext($turns): GameContext
+    {
+        if (null === $players = Act::get('gameContextPlayers')) {
+            $players = [new Player('player-id', 'Player 1')];
+        }
+
+
+        return new GameContext(
+            'room-id',
+            new Room,
+            [],
+            $players,
+            current($players),
+            $turns,
+        );
     }
 }
