@@ -24,8 +24,26 @@
 |
 */
 
-expect()->extend('toBeOne', function () {
-    return $this->toBe(1);
+use Pest\Expectation;
+use Symfony\Component\Mercure\Update;
+
+expect()->extend('toBeAction', function (string $type) {
+    if (!\is_array($this->value)) {
+        throw new InvalidArgumentException('The value must be a string');
+    }
+
+    $this->toHaveKey('action');
+    expect($this->value['action'])->toBe($type);
+});
+
+expect()->extend('toBeHaveData', function (string $key, string $expected) {
+    if (!\is_array($this->value)) {
+        throw new InvalidArgumentException('The value must be a string');
+    }
+
+    $this->toHaveKey('data');
+    expect($this->value['data'])->toHaveKey($key);
+    expect($this->value['data'][$key])->toBe($expected);
 });
 
 /*
@@ -39,7 +57,9 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function expectMercureMessage(Update $update): Expectation
 {
-    // ..
+    $data = $update->getData();
+
+    return expect(json_decode($data, true));
 }

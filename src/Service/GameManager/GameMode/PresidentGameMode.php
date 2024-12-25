@@ -116,7 +116,7 @@ final class PresidentGameMode implements GameModeInterface
     private function dispatchMercureEvent(string $eventName, string $text): void
     {
         $this->hub->publish(new Update(
-            \sprintf('room-%s', $this->gameContext->getRoom()->getId()),
+            \sprintf('room-%s', $this->gameContext->getId()),
             \json_encode([
                 'action' => $eventName,
                 'data' => [

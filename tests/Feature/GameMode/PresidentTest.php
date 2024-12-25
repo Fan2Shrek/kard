@@ -3,11 +3,18 @@
 use App\Service\GameManager\GameMode\PresidentGameMode;
 use App\Tests\AAA\Act\Act;
 use App\Tests\AAA\Arrange\Arrange;
+use App\Tests\Resource\HubSpy;
 
 covers(PresidentGameMode::class);
 
 beforeAll(function () {
-    Act::addContext('gamePlayer', new PresidentGameMode);
+    Act::addContext('gamePlayer', new PresidentGameMode(
+        new HubSpy,
+    ));
+});
+
+beforeEach(function () {
+    HubSpy::reset();
 });
 
 pest()->group('Président');
@@ -176,4 +183,32 @@ describe('Président: carte ou rien', function () {
 
         act::playcard(9, 'h');
     })->throws('Can not play "9" when "7" or nothing.');
+});
+
+describe('Président: mercure', function () {
+    describe('Carte ou rien', function () {
+        test("Lors d'une carte ou rien un évenement est envoyé", function () {
+            Arrange::setCurrentCard(7);
+
+            Act::playCard(7, 'h');
+
+            expect(HubSpy::$published)->toHaveCount(1);
+        });
+
+        test("Lors d'une carte ou rien l'évenement envoyé a l'action message", function () {
+            Arrange::setCurrentCard(7);
+
+            Act::playCard(7, 'h');
+
+            expectMercureMessage(current(HubSpy::$published))->toBeAction('message');
+        });
+
+        test("Lors d'une carte ou rien l'évenement envoyé possède un message", function () {
+            Arrange::setCurrentCard(7);
+
+            Act::playCard(7, 'h');
+
+            expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', '7 ou rien');
+        });
+    });
 });
