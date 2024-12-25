@@ -128,6 +128,53 @@ describe('Président: carte simple', function () {
     })->throws('Incorrect number of cards played');
 });
 
+describe('Président: cartes doubles', function () {
+    test('On peut jouer un double plus haut sur un double plus bas', function () {
+        Arrange::setcurrentcards([
+            7,
+            7,
+        ]);
+
+        Act::playcards([[8], [8]]);
+    })->throwsNoExceptions();
+
+    test('On peut jouer un double sur un double de même valeur', function () {
+        Arrange::setcurrentcards([
+            7,
+            7,
+        ]);
+
+        Act::playcards([[7], [7]]);
+    })->throwsNoExceptions();
+
+    test('On peut jouer un double plus bas sur un double plus haut', function () {
+        Arrange::setcurrentcards([
+            7,
+            7,
+        ]);
+
+        Act::playcards([[3], [3]]);
+    })->throws('A card with a higher or same value must be played');
+
+    test('On ne peut pas jouer un double avec deux valeurs différentes', function () {
+        Arrange::setcurrentcards([
+            4,
+            4,
+        ]);
+
+        Act::playcards([[5], [7]]);
+    })->throws("Can't play multiple cards with different values");
+
+    test('On ne peut pas jouer une carte simple sur un double', function () {
+        Arrange::setcurrentcards([
+            7,
+            7,
+        ]);
+
+        Act::playCard(3, 's');
+    })->throws('Incorrect number of cards played');
+});
+
 describe('Président: début de partie', function () {
     beforeEach(function () {
         Arrange::setGameStarted();
@@ -185,6 +232,35 @@ describe('Président: carte ou rien', function () {
     })->throws('Can not play "9" when "7" or nothing.');
 });
 
+describe('Président: fin de tour', function () {
+    test('Le tour se termine si un joueur joue un 2', function () {
+        Arrange::setRound([
+            [7],
+            [8],
+            [9],
+        ]);
+
+        Act::playCard(2, 's');
+
+        expect(Act::get('gameContext')->getRound()->getTurns())->toHaveCount(0);
+    });
+
+    test('Le tour se termine si un joueur joue un double 2', function () {
+        Arrange::setRound([
+            [7, 7],
+            [8, 8],
+            [9, 9],
+        ]);
+
+        Act::playCards([
+            [2, 's'],
+            [2, 'h'],
+        ]);
+
+        expect(Act::get('gameContext')->getRound()->getTurns())->toHaveCount(0);
+    });
+});
+
 describe('Président: mercure', function () {
     describe('Carte ou rien', function () {
         test("Lors d'une carte ou rien un évenement est envoyé", function () {
@@ -209,6 +285,25 @@ describe('Président: mercure', function () {
             Act::playCard(7, 'h');
 
             expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', '7 ou rien');
+        });
+    });
+
+    describe("Fin d'un tour", function () {
+        test("A la fin d'un tour, un événement est envoyé", function () {
+            Arrange::setCurrentCard(7);
+
+            Act::playCard(2, 'h');
+
+            expect(HubSpy::$published)->toHaveCount(1);
+        });
+
+        test("A la fin d'un tour, un événement est envoyé avec un message", function () {
+            Arrange::setCurrentCard(7);
+
+            Act::playCard(2, 'h');
+
+            expectMercureMessage(current(HubSpy::$published))->toBeAction('message');
+            expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'Fin du tour');
         });
     });
 });

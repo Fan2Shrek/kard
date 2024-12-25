@@ -23,7 +23,7 @@ abstract /* static */ class Act
 
     public static function playCards(array $cards): void
     {
-        $cards = array_map(fn ($card) => self::createCard($card[0], $card[1]), $cards);
+        $cards = array_map(fn ($card) => self::createCard($card[0], $card[1] ?? 's'), $cards);
         static::get('gamePlayer')->play($cards, static::get('gameContext'));
     }
 

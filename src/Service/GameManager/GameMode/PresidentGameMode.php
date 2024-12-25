@@ -55,13 +55,17 @@ final class PresidentGameMode implements GameModeInterface
 
         $card = $cards[0];
 
+        if (!$this->isLegacyHigher($card, $currentCard[0]) && !$this->isSameRank($card, $currentCard[0])) {
+            throw new RuleException($this->getGameMode(), 'A card with a higher or same value must be played');
+        }
+
+        if (Rank::TWO === $card->rank) {
+            $this->handleRoundEnd();
+        }
+
         [$lastTurn, $beforeLastTurn] = [$previousTurns[0]->getCards() ?? null, ($previousTurns[1] ?? null)?->getCards() ?? null];
 
         if (null === $beforeLastTurn || null === $lastTurn) {
-            if (!$this->isLegacyHigher($card, $currentCard[0]) && !$this->isSameRank($card, $currentCard[0])) {
-                throw new RuleException($this->getGameMode(), 'A card with a higher or same value must be played');
-            }
-
             if ($this->isSameRank($card, $currentCard[0])) {
                 $this->dispatchMercureEvent('message', \sprintf("%s ou rien", $card->rank->value));;
             }
@@ -86,7 +90,28 @@ final class PresidentGameMode implements GameModeInterface
 
     private function handleTwoCards(array $cards, array $currentCards): void
     {
-        // TODO
+        if (count($cards) !== 2) {
+            throw new RuleException($this->getGameMode(), 'Incorrect number of cards played');
+        }
+
+        if (!$this->allSameRank($cards)) {
+            throw new RuleException($this->getGameMode(), "Can't play multiple cards with different values");
+        }
+
+        [$card] = $cards;
+        [$currentCard] = $currentCards;
+
+        if (Rank::TWO === $card->rank) {
+            $this->handleRoundEnd();
+        }
+
+        if ($this->allSameRank(array_merge($cards, $currentCards))) {
+            return;
+        }
+
+        if (!$this->isLegacyHigher($card, $currentCard)) {
+            throw new RuleException($this->getGameMode(), 'A card with a higher or same value must be played');
+        }
     }
 
     private function handleThreeCards(array $cards, array $currentCards): void
@@ -111,6 +136,12 @@ final class PresidentGameMode implements GameModeInterface
             Rank::ACE,
             Rank::TWO,
         ];
+    }
+
+    private function handleRoundEnd(): void
+    {
+        $this->gameContext->newRound();
+        $this->dispatchMercureEvent('message', 'Fin du tour');
     }
 
     private function dispatchMercureEvent(string $eventName, string $text): void

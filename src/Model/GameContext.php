@@ -29,6 +29,11 @@ final class GameContext
         $this->currentRound = new GameRound($turns);
     }
 
+    public function newRound(): void
+    {
+        $this->currentRound = new GameRound();
+    }
+
     public function getId(): string
     {
         return $this->id;
