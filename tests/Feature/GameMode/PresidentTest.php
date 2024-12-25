@@ -271,7 +271,7 @@ describe('Président: carte ou rien', function () {
         Arrange::setRound([[7], [7]]);
 
         Act::playCard(7, 'h');
-    })->throwsnoexceptions();
+    })->throwsNoExceptions();
 
     test('On ne peut pas jouer de mauvaise valeur une carte ou rien', function () {
         Arrange::setRound([[7], [7]]);
@@ -279,20 +279,20 @@ describe('Président: carte ou rien', function () {
         Act::playCard(9, 'h');
     })->throws('Can not play "9" when "7" or nothing.');
 
-    test("on ne peut pas jouer de mauvaise valeur une carte ou rien au milieu d'un round", function () {
-        arrange::setround([
+    test("On ne peut pas jouer de mauvaise valeur une carte ou rien au milieu d'un round", function () {
+        Arrange::setRound([
             [3],
             [5],
             [7],
             [7]
         ]);
 
-        act::playcard(9, 'h');
+        Act::playCard(9, 'h');
     })->throws('Can not play "9" when "7" or nothing.');
 });
 
 describe('Président: fin de tour', function () {
-    test('Il est possile de finir un tour en jouant un 2', function () {
+    test('Il est possible de finir un tour en jouant un 2', function () {
         Arrange::setRound([
             [7],
             [8],
