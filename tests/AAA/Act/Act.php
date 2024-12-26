@@ -15,10 +15,12 @@ abstract /* static */ class Act
         self::$context[$key] = $value;
     }
 
-    public static function playCard(string $value, string $color = 's'): void
+    public static function playCard(?string $value, string $color = 's'): void
     {
-        $card = self::createCard($value, $color);
-        static::get('gamePlayer')->play([$card], static::get('gameContext'));
+        $play = $value ? [
+            self::createCard($value, $color),
+        ] : [];
+        static::get('gamePlayer')->play($play, static::get('gameContext'));
     }
 
     public static function playCards(array $cards): void

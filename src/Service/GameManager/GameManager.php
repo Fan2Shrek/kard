@@ -41,7 +41,7 @@ final class GameManager
 
         $hand = $this->handRepository->get($player, $room);
 
-        if (!$hand->hasCards($cards)) {
+        if (!empty($cards) && !$hand->hasCards($cards)) {
             throw new \InvalidArgumentException('Card not found in player hand');
         }
 

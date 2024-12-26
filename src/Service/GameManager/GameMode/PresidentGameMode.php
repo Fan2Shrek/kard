@@ -55,6 +55,13 @@ final class PresidentGameMode implements GameModeInterface
             throw new RuleException($this->getGameMode(), 'Invalid number of cards played');
         }
 
+        if (0 === count($cards)) {
+            // skip
+            $gameContext->nextPlayer();
+
+            return;
+        }
+
         match (\count($currentCards)) {
             0 => $this->handleStart($cards),
             1 => $this->handleOneCard($cards, $currentCards),

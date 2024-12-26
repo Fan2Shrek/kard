@@ -148,6 +148,21 @@ describe('Président: règles basiques', function () {
 
         expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('1');
     });
+
+    test('Il est possible de passer son tour', function () {
+        Arrange::setPlayers([
+            new Player('1', 'Player 1'),
+            new Player('2', 'Player 2'),
+        ]);
+        Arrange::setRound([
+            [7],
+        ]);
+
+        Act::playCard(null);
+
+        expect(Act::get('gameContext')->getRound()->getTurns())->toHaveCount(1);
+        expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('2');
+    });
 });
 
 describe('Président: carte simple', function () {
