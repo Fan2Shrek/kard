@@ -56,8 +56,16 @@ final class PresidentGameMode implements GameModeInterface
         }
 
         if (0 === count($cards)) {
+            if (0 === count($currentCards)) {
+                throw new RuleException($this->getGameMode(), 'First turn must have at least one card');
+            }
+
             // skip
             $gameContext->nextPlayer();
+
+            if ($gameContext->getCurrentPlayer() === $gameContext->getData('lastPlayer')) {
+                $this->handleRoundEnd();
+            }
 
             return;
         }
@@ -72,6 +80,8 @@ final class PresidentGameMode implements GameModeInterface
         if ($this->isTurnFinished ?? false) {
             return;
         }
+
+        $gameContext->addData('lastPlayer', $gameContext->getCurrentPlayer());
 
         $gameContext->setCurrentCards($cards);
         $gameContext->nextPlayer();

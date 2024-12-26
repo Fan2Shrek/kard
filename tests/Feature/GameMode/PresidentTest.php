@@ -163,6 +163,25 @@ describe('Président: règles basiques', function () {
         expect(Act::get('gameContext')->getRound()->getTurns())->toHaveCount(1);
         expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('2');
     });
+
+    test('Si tous les joueurs passent, le tour se fini', function () {
+        Arrange::setPlayers([
+            new Player('1', 'Player 1'),
+            new Player('2', 'Player 2'),
+            new Player('3', 'Player 3'),
+            new Player('4', 'Player 4'),
+        ]);
+
+        Arrange::setGameStarted();
+
+        Act::playCard(10);
+        Act::playCard(null);
+        Act::playCard(null);
+        Act::playCard(null);
+
+        expect(Act::get('gameContext')->getRound()->getTurns())->toHaveCount(0);
+        expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('1');
+    });
 });
 
 describe('Président: carte simple', function () {
@@ -170,7 +189,7 @@ describe('Président: carte simple', function () {
         // Arrange
         Arrange::setcurrentcard(7);
 
-        // act
+        // Act
         Act::playcard(8, 's');
     })->throwsNoExceptions();
 
@@ -257,6 +276,10 @@ describe('Président: début de partie', function () {
     test('On peut commencer une partie avec une carte simple', function () {
         Act::playCard(7, 's');
     })->throwsNoExceptions();
+
+    test('On peut pas commencer une partie en jouant rien', function () {
+        Act::playCard(null);
+    })->throws('First turn must have at least one card');
 
     test('On peut commencer une partie avec un double de cartes à la même valeur', function () {
         Act::playCards([

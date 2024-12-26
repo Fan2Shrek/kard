@@ -24,6 +24,7 @@ final class GameContext
         Player $currentPlayer,
         array $turns = [],
         private array $discarded = [],
+        private array $data = [],
     ) {
         $this->players = new PlayersList($players, $currentPlayer);
         $this->currentRound = new GameRound($turns);
@@ -42,6 +43,20 @@ final class GameContext
     public function getId(): string
     {
         return $this->id;
+    }
+
+    public function getData(?string $key = null): mixed
+    {
+        if ($key) {
+            return $this->data[$key] ?? null;
+        }
+
+        return $this->data;
+    }
+
+    public function addData(string $key, $value): void
+    {
+        $this->data[$key] = $value;
     }
 
     public function getRoom(): Room
