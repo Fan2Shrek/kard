@@ -25,8 +25,6 @@ export default ({ hand, canPlay }) => {
         setSelectedCards([]);
     }
 
-    console.log('hand', selectedCards);
-
     return <div className='hand__container'>
         {selectedCards.length > 0 && canPlay && <a class="btn" onClick={handlePlay}>Jouer</a>}
         {selectedCards.length === 0 && canPlay && <a class="btn" onClick={handlePlay}>Passer</a>}

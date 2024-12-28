@@ -5,6 +5,7 @@ import './text.css';
 
 export default ({ text }) => {
     const [visible, setVisible] = useState(true);
+    const [key, setKey] = useState(0);
 
     const letters = text.split('');
     const trail = useTrail(letters.length, {
@@ -23,12 +24,14 @@ export default ({ text }) => {
     });
 
     useEffect(() => {
+        setVisible(true);
+        setKey((key) => key + 1);
         const timer = setTimeout(() => setVisible(false), 7000);
         return () => clearTimeout(timer);
     }, [text]);
 
     return (
-        visible && <animated.div class="animated__text" style={divStyle}>
+        visible && <animated.div key={key} class="animated__text" style={divStyle}>
             {trail.map((style, index) => (
                 <animated.span key={index} style={style} class={' ' === letters[index] ? 'space' : ''}>
                     {letters[index]}

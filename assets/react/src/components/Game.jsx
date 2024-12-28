@@ -14,6 +14,7 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
     const [ctx, setCtx] = useState(JSON.parse(gameContext));
     const [hand, setHand] = useState(currentHand);
     const [text, setText] = useState(null);
+    const [key, setKey] = useState(0);
 
     const player = JSON.parse(user);
     const gameUrl = useMemo(() => JSON.parse(document.getElementById('mercure-game-url').textContent), []);
@@ -24,6 +25,7 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
             setCtx(data);
         },
         message: (data) => {
+            setKey((key) => key + 1);
             setText(data.text);
         },
     }), []);
@@ -36,7 +38,7 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
 
     return <>
         <GameContext gameContext={ctx} player={player} currentPlayer={ctx.currentPlayer}>
-            { text && <Text text={text} /> }
+            { text && <Text key={key} text={text} /> }
             <div className='game'>
                 <PlayerList players={ctx.players} currentPlayer={ctx.currentPlayer} />
                 <div className='game__right'>
