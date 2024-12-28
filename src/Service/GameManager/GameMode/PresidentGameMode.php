@@ -127,18 +127,11 @@ final class PresidentGameMode implements GameModeInterface
 
             // verify if square
             $rank = $lastTurn[0]->rank;
-            $count = 1;
-            foreach ($nonSkippedTurns as $turn) {
-                if ($rank === $turn->getCards()[0]->rank) {
-                    $count++;
-                }
+            $count = array_filter($nonSkippedTurns, fn($turn) => $rank === $turn->getCards()[0]->rank);
 
-                if (4 !== $count && $rank !== $turn->getCards()[0]->rank) {
-                    return;
-                }
+            if (3 === count($count)) {
+                $this->handleRoundEnd();
             }
-
-            $this->handleRoundEnd();
         }
     }
 
@@ -167,6 +160,8 @@ final class PresidentGameMode implements GameModeInterface
         }
 
         if ($this->allSameRank(array_merge($cards, $currentCards))) {
+            $this->handleRoundEnd();
+
             return;
         }
 

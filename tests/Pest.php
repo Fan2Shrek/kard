@@ -24,6 +24,7 @@
 |
 */
 
+use App\Model\GameContext;
 use Pest\Expectation;
 use Symfony\Component\Mercure\Update;
 
@@ -45,6 +46,15 @@ expect()->extend('toBeHaveData', function (string $key, string $expected) {
     expect($this->value['data'])->toHaveKey($key);
     expect($this->value['data'][$key])->toBe($expected);
 });
+
+expect()->extend('toHaveTurns', function (int $count) {
+    expect($this->value->getRound()->getTurns())->toHaveCount($count);
+});
+
+expect()->extend('toHaveNewRound', function () {
+    expect($this->value)->toHaveTurns(0);
+});
+
 
 /*
 |--------------------------------------------------------------------------

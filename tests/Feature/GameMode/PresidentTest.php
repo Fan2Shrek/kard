@@ -122,7 +122,7 @@ describe('Président: règles basiques', function () {
 
         Act::playCard(10, 's');
 
-        expect(Act::get('gameContext')->getRound()->getTurns())->toHaveCount(4);
+        expect(Act::get('gameContext'))->toHaveTurns(4);
     });
 
     test('Jouer une carte pass au prochain joueur', function () {
@@ -160,7 +160,7 @@ describe('Président: règles basiques', function () {
 
         Act::playCard(null);
 
-        expect(Act::get('gameContext')->getRound()->getTurns())->toHaveCount(2);
+        expect(Act::get('gameContext'))->toHaveTurns(2);
         expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('2');
     });
 
@@ -179,7 +179,7 @@ describe('Président: règles basiques', function () {
         Act::playCard(null);
         Act::playCard(null);
 
-        expect(Act::get('gameContext')->getRound()->getTurns())->toHaveCount(0);
+        expect(Act::get('gameContext'))->toHaveNewRound();
         expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('1');
     });
 });
@@ -429,7 +429,7 @@ describe('Président: fin de tour', function () {
 
         Act::playCard(2, 's');
 
-        expect(Act::get('gameContext')->getRound()->getTurns())->toHaveCount(0);
+        expect(Act::get('gameContext'))->toHaveNewRound();
     });
 
     test('Le tour se termine si un joueur joue un double 2', function () {
@@ -444,7 +444,7 @@ describe('Président: fin de tour', function () {
             [2, 'h'],
         ]);
 
-        expect(Act::get('gameContext')->getRound()->getTurns())->toHaveCount(0);
+        expect(Act::get('gameContext'))->toHaveNewRound();
     });
 
     test('Le tour se termine si un joueur joue un triple 2', function () {
@@ -460,10 +460,23 @@ describe('Président: fin de tour', function () {
             [2, 'd'],
         ]);
 
-        expect(Act::get('gameContext')->getRound()->getTurns())->toHaveCount(0);
+        expect(Act::get('gameContext'))->toHaveNewRound();
     });
 
-    test('Un carré fini le tour', function () {
+    test('Un triple ne fini pas le tour', function () {
+        Arrange::setRound([
+            [3],
+            [4],
+            [4],
+            [],
+        ]);
+
+        Act::playCard(4);
+
+        expect(Act::get('gameContext'))->toHaveTurns(5);
+    });
+
+    test('Un carré de simple fini le tour', function () {
         Arrange::setRound([
             [3],
             [4],
@@ -473,7 +486,21 @@ describe('Président: fin de tour', function () {
 
         Act::playCard(4);
 
-        expect(Act::get('gameContext')->getRound()->getTurns())->toHaveCount(0);
+        expect(Act::get('gameContext'))->toHaveNewRound();
+    });
+
+    test('Un carré de double fini le tour', function () {
+        Arrange::setRound([
+            [3, 3],
+            [4, 4],
+        ]);
+
+        Act::playCards([
+            [4],
+            [4],
+        ]);
+
+        expect(Act::get('gameContext'))->toHaveNewRound();
     });
 });
 
