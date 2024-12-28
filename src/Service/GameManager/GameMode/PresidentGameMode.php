@@ -56,11 +56,12 @@ final class PresidentGameMode implements GameModeInterface
         }
 
         if (0 === count($cards)) {
-            if (0 === count($currentCards)) {
+            if (0 === count($gameContext->getRound()->getTurns())) {
                 throw new RuleException($this->getGameMode(), 'First turn must have at least one card');
             }
 
             // skip
+            $gameContext->setCurrentCards([]);
             $gameContext->nextPlayer();
 
             if ($gameContext->getCurrentPlayer() === $gameContext->getData('lastPlayer')) {
@@ -105,7 +106,9 @@ final class PresidentGameMode implements GameModeInterface
             $this->handleRoundEnd();
         }
 
-        [$lastTurn, $beforeLastTurn] = [$previousTurns[0]->getCards() ?? null, ($previousTurns[1] ?? null)?->getCards() ?? null];
+        $nonSkippedTurns = array_values(array_filter($previousTurns, fn($turn) => !empty($turn->getCards())));
+
+        [$lastTurn, $beforeLastTurn] = [$nonSkippedTurns[0]->getCards() ?? null, ($nonSkippedTurns[1] ?? null)?->getCards() ?? null];
 
         if (null === $beforeLastTurn || null === $lastTurn) {
             if ($this->isSameRank($card, $currentCard[0])) {
@@ -117,9 +120,25 @@ final class PresidentGameMode implements GameModeInterface
 
         // Rank or nothing :p
         if ($lastTurn[0]->rank === $beforeLastTurn[0]->rank) {
+            // assert skip turn
             if ($card->rank !== $lastTurn[0]->rank) {
                 throw new RuleException($this->getGameMode(), \sprintf('Can not play "%s" when "%s" or nothing.', $card->rank->value, $lastTurn[0]->rank->value));
             }
+
+            // verify if square
+            $rank = $lastTurn[0]->rank;
+            $count = 1;
+            foreach ($nonSkippedTurns as $turn) {
+                if ($rank === $turn->getCards()[0]->rank) {
+                    $count++;
+                }
+
+                if (4 !== $count && $rank !== $turn->getCards()[0]->rank) {
+                    return;
+                }
+            }
+
+            $this->handleRoundEnd();
         }
     }
 

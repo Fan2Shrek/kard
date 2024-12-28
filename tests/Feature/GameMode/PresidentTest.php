@@ -160,7 +160,7 @@ describe('Président: règles basiques', function () {
 
         Act::playCard(null);
 
-        expect(Act::get('gameContext')->getRound()->getTurns())->toHaveCount(1);
+        expect(Act::get('gameContext')->getRound()->getTurns())->toHaveCount(2);
         expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('2');
     });
 
@@ -364,7 +364,44 @@ describe('Président: carte ou rien', function () {
             [3],
             [5],
             [7],
-            [7]
+            [7],
+        ]);
+
+        Act::playCard(9, 'h');
+    })->throws('Can not play "9" when "7" or nothing.');
+
+    test("Passer son tour annule la carte ou rien", function () {
+        Arrange::setRound([
+            [3],
+            [5],
+            [7],
+            [7],
+            [],
+        ]);
+
+        Act::playCard(9, 'h');
+    })->throwsNoExceptions();
+
+    test("Passer son tour et remmetre la même valeur lance l'effet", function () {
+        Arrange::setRound([
+            [3],
+            [5],
+            [7],
+            [],
+            [7],
+        ]);
+
+        Act::playCard(9, 'h');
+    })->throws('Can not play "9" when "7" or nothing.');
+
+    test("Passer son tour et remmetre la même valeur relance l'effet", function () {
+        Arrange::setRound([
+            [3],
+            [5],
+            [7],
+            [7],
+            [],
+            [7],
         ]);
 
         Act::playCard(9, 'h');
@@ -422,6 +459,19 @@ describe('Président: fin de tour', function () {
             [2, 'h'],
             [2, 'd'],
         ]);
+
+        expect(Act::get('gameContext')->getRound()->getTurns())->toHaveCount(0);
+    });
+
+    test('Un carré fini le tour', function () {
+        Arrange::setRound([
+            [3],
+            [4],
+            [4],
+            [4],
+        ]);
+
+        Act::playCard(4);
 
         expect(Act::get('gameContext')->getRound()->getTurns())->toHaveCount(0);
     });
