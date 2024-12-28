@@ -13,6 +13,7 @@ final class GameContext
 
     /**
      * @param Card[] $assets
+     * @param Player[] $players
      * @param Card[] $turns
      * @param Card[] $discarded
      */
@@ -32,6 +33,10 @@ final class GameContext
 
     public function newRound(): void
     {
+        foreach ($this->currentRound->getTurns() as $turn) {
+            $this->discarded = array_merge($this->discarded, $turn->getCards());
+        }
+
         $this->currentRound = new GameRound();
     }
 
@@ -121,10 +126,6 @@ final class GameContext
      */
     public function setCurrentCards(array $cards): void
     {
-        foreach ($this->getCurrentCards() as $card) {
-            $this->addDiscarded($card);
-        }
-
         $this->currentRound->addTurn(new Turn($cards));
     }
 

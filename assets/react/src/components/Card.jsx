@@ -1,8 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useSpring, animated } from '@react-spring/web'
 
-export default ({ card, img, clickable = true, onClick = () => '', angle = null, xOffset = null, yOffset = null }) => {
-    const [toggle, setToggle] = useState(false);
+export default ({ card, img, selected = false, clickable = true, onClick = () => '', angle = null, xOffset = null, yOffset = null }) => {
+    const [toggle, setToggle] = useState(selected);
 
     const styles = useSpring({
         transform: toggle ? 'translate(0, 0)' : 'translate(0, 100px)',
@@ -18,6 +18,10 @@ export default ({ card, img, clickable = true, onClick = () => '', angle = null,
         setToggle(!toggle);
         onClick(card);
     }
+
+    useEffect(() => {
+        setToggle(selected);
+    }, [selected]);
 
     const customCss = angle || xOffset || yOffset;
 

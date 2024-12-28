@@ -25,7 +25,7 @@ export default ({ text }) => {
     useEffect(() => {
         const timer = setTimeout(() => setVisible(false), 7000);
         return () => clearTimeout(timer);
-    }, []);
+    }, [text]);
 
     return (
         visible && <animated.div class="animated__text" style={divStyle}>

@@ -20,16 +20,19 @@ export default ({ hand, canPlay }) => {
 
     const handlePlay = () => {
         api.game.play(roomId, { cards: selectedCards, player: currentPlayer });
+
         // @todo uncomment
         setSelectedCards([]);
     }
+
+    console.log('hand', selectedCards);
 
     return <div className='hand__container'>
         {selectedCards.length > 0 && canPlay && <a class="btn" onClick={handlePlay}>Jouer</a>}
         {selectedCards.length === 0 && canPlay && <a class="btn" onClick={handlePlay}>Passer</a>}
         <div className='hand'>
-            {hand.map((card, index) => {
-                return <Card onClick={handleCard} key={index} card={card} img={getCardAsset(card)} angle={0} />
+            {hand.map((card) => {
+                return <Card onClick={handleCard} selected={selectedCards.includes(card)} key={`${card.rank}-${card.suit}`} card={card} img={getCardAsset(card)} angle={0} />
             })}
         </div>
     </div>;

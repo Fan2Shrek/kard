@@ -39,15 +39,6 @@ describe('Président: règles basiques', function () {
         Act::playCard(2, 's');
     })->throwsNoExceptions();
 
-    // Les tests de mutations ne passent pas, ce test est obligatoire pour les faire passer
-    test('On peut jouer une carte plus basse sur une carte plus haute', function () {
-        // Arrange
-        Arrange::setCurrentCard(7);
-
-        // Act
-        Act::playCard(9, 's');
-    })->throwsNoExceptions();
-
     test('Il est possible de jouer une carte', function () {
         // Arrange
         Arrange::setCurrentCard(7);
@@ -181,6 +172,18 @@ describe('Président: règles basiques', function () {
 
         expect(Act::get('gameContext'))->toHaveNewRound();
         expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('1');
+    });
+
+    test('Finir un tour ajoute les cartes à la défausse', function () {
+        Arrange::setRound([
+            [7],
+            [8],
+            [9],
+        ]);
+
+        Act::playCard(2, 's');
+
+        expect(Act::get('gameContext')->getDiscarded())->toHaveCount(4);
     });
 });
 
@@ -318,6 +321,12 @@ describe('Président: début de partie', function () {
     test('On peut commencer une partie avec une carte simple', function () {
         Act::playCard(7, 's');
     })->throwsNoExceptions();
+
+    test('Commencer avec un deux finit le tour', function () {
+        Act::playCard(2, 's');
+
+        expect(Act::get('gameContext'))->toHaveNewRound();
+    });
 
     test('On peut pas commencer une partie en jouant rien', function () {
         Act::playCard(null);

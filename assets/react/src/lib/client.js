@@ -6,14 +6,21 @@ export default class {
     }
 
     async post(url, data) {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        });
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
 
-        return response.json();
+            if (!response.ok) {
+                throw new Error(response.statusText);
+            }
+
+            return response.json();
+        } catch (e) {
+        };
     }
 }

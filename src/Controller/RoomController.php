@@ -87,11 +87,19 @@ final class RoomController extends AbstractController
         $hands = $this->cardGenerator->generateHands($playerCount);
         $response = $this->redirectToRoute('game', ['id' => $room->getId()]);
 
+        $gameContext = $this->gameContextProvider->provide($room);
+        $players = array_reduce($gameContext->getPlayers(), function (array $carry, Player $player) {
+            $carry[$player->id] = $player;
+
+            return $carry;
+        }, []);
+
         foreach ($room->getPlayers() as $k => $player) {
             $this->handRepository->save($player, $room, $hands[$k]);
+            $players[$player->getId()->toString()]->cardsCount = count($hands[$k]);
         }
 
-        $gameContext = $this->gameContextProvider->provide($room);
+        $this->gameContextProvider->save($gameContext);
         $this->gameManager->start($gameContext);
 
         $this->hub->publish(new Update(

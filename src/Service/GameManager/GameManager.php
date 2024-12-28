@@ -58,6 +58,8 @@ final class GameManager
         }
 
         $hand->removeCards($cards);
+        $p = $ctx->getCurrentPlayer();
+        $p->cardsCount = count($hand);
 
         $this->handRepository->save($player, $room, $hand);
         $this->gameContextProvider->save($ctx);

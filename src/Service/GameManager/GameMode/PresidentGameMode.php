@@ -20,6 +20,8 @@ final class PresidentGameMode implements GameModeInterface
     use CardsHelperTrait;
 
     private GameContext $gameContext;
+    /** @var Card[] */
+    private array $cards;
     private bool $isTurnFinished;
 
     public function __construct(
@@ -48,6 +50,7 @@ final class PresidentGameMode implements GameModeInterface
 
     public function play(array $cards, GameContext $gameContext): void
     {
+        $this->cards = $cards;
         $this->gameContext = $gameContext;
         $currentCards = $gameContext->getCurrentCards();
 
@@ -64,7 +67,7 @@ final class PresidentGameMode implements GameModeInterface
             $gameContext->setCurrentCards([]);
             $gameContext->nextPlayer();
 
-            if ($gameContext->getCurrentPlayer() === $gameContext->getData('lastPlayer')) {
+            if ($gameContext->getCurrentPlayer()->id === $gameContext->getData('lastPlayer')) {
                 $this->handleRoundEnd();
             }
 
@@ -82,9 +85,8 @@ final class PresidentGameMode implements GameModeInterface
             return;
         }
 
-        $gameContext->addData('lastPlayer', $gameContext->getCurrentPlayer());
-
         $gameContext->setCurrentCards($cards);
+        $gameContext->addData('lastPlayer', $gameContext->getCurrentPlayer()->id);
         $gameContext->nextPlayer();
     }
 
@@ -139,6 +141,12 @@ final class PresidentGameMode implements GameModeInterface
     {
         if (!$this->allSameRank($cards)) {
             throw new RuleException($this->getGameMode(), "Can't play multiple cards with different values");
+        }
+
+        [$card] = $cards;
+
+        if (Rank::TWO === $card->rank) {
+            $this->handleRoundEnd();
         }
     }
 
@@ -217,6 +225,7 @@ final class PresidentGameMode implements GameModeInterface
 
     private function handleRoundEnd(): void
     {
+        $this->gameContext->setCurrentCards($this->cards);
         $this->gameContext->newRound();
         $this->dispatchMercureEvent('message', 'Fin du tour');
         $this->isTurnFinished = true;

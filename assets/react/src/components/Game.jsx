@@ -6,6 +6,7 @@ import useMercure from '../hook/useMercure.js';
 import GameContext from '../Context/GameContext.js';
 import HiddenHand from './Hand/HiddenHand.js';
 import Stack from './Card/Stack.js';
+import PlayedCard from './Card/PlayedCard.js';
 import PlayerList from './Player/PlayerList.js';
 import Text from './Animation/Text.js';
 
@@ -42,8 +43,7 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
                     <HiddenHand count={5} />
                     <div className='middle'>
                         <div id='middle'>
-                            // @todo own component
-                            <Hand hand={ctx.currentCards} />
+                            <PlayedCard cards={ctx.round.turns.map(t => t.cards).flat()} />
                             <Stack cards={ctx.discarded} />
                         </div>
                     </div>

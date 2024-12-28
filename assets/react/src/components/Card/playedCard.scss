@@ -1,0 +1,15 @@
+.played_card {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+
+    .card {
+        margin-inline: 10px;
+        width: 100px;
+
+        img {
+              object-fit: contain;
+              width: 173px;
+        }
+    }
+}
