@@ -240,14 +240,14 @@ describe('Président: cartes doubles', function () {
         Act::playcards([[7], [7]]);
     })->throwsNoExceptions();
 
-    test('On peut jouer un double plus bas sur un double plus haut', function () {
+    test('On ne peut pas jouer un double plus bas sur un double plus haut', function () {
         Arrange::setcurrentcards([
             7,
             7,
         ]);
 
         Act::playcards([[3], [3]]);
-    })->throws('A card with a higher or same value must be played');
+    })->throws('Cards with a higher or same value must be played');
 
     test('On ne peut pas jouer un double avec deux valeurs différentes', function () {
         Arrange::setcurrentcards([
@@ -260,6 +260,48 @@ describe('Président: cartes doubles', function () {
 
     test('On ne peut pas jouer une carte simple sur un double', function () {
         Arrange::setcurrentcards([
+            7,
+            7,
+        ]);
+
+        Act::playCard(3, 's');
+    })->throws('Incorrect number of cards played');
+});
+
+describe('Président: cartes triples', function () {
+    test('On peut jouer un triple plus haut sur un triple plus bas', function () {
+        Arrange::setcurrentcards([
+            7,
+            7,
+            7,
+        ]);
+
+        Act::playcards([[8], [8], [8]]);
+    })->throwsNoExceptions();
+
+    test('On ne peut pas jouer un triple plus bas sur un triple plus haut', function () {
+        Arrange::setcurrentcards([
+            7,
+            7,
+            7,
+        ]);
+
+        Act::playcards([[3], [3], [3]]);
+    })->throws('Cards with a higher or same value must be played');
+
+    test('On ne peut pas jouer un triple avec des valeurs différentes', function () {
+        Arrange::setcurrentcards([
+            4,
+            4,
+            4,
+        ]);
+
+        Act::playcards([[5], [6], [7]]);
+    })->throws("Can't play multiple cards with different values");
+
+    test('On ne peut pas jouer une carte simple sur un triple', function () {
+        Arrange::setcurrentcards([
+            7,
             7,
             7,
         ]);
@@ -363,6 +405,22 @@ describe('Président: fin de tour', function () {
         Act::playCards([
             [2, 's'],
             [2, 'h'],
+        ]);
+
+        expect(Act::get('gameContext')->getRound()->getTurns())->toHaveCount(0);
+    });
+
+    test('Le tour se termine si un joueur joue un triple 2', function () {
+        Arrange::setRound([
+            [7, 7, 7],
+            [8, 8, 8],
+            [9, 9, 9],
+        ]);
+
+        Act::playCards([
+            [2, 's'],
+            [2, 'h'],
+            [2, 'd'],
         ]);
 
         expect(Act::get('gameContext')->getRound()->getTurns())->toHaveCount(0);

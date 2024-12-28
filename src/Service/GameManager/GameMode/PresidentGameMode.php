@@ -152,13 +152,34 @@ final class PresidentGameMode implements GameModeInterface
         }
 
         if (!$this->isLegacyHigher($card, $currentCard)) {
-            throw new RuleException($this->getGameMode(), 'A card with a higher or same value must be played');
+            throw new RuleException($this->getGameMode(), 'Cards with a higher or same value must be played');
         }
     }
 
     private function handleThreeCards(array $cards, array $currentCards): void
     {
-        // TODO
+        if (count($cards) !== 3) {
+            throw new RuleException($this->getGameMode(), 'Incorrect number of cards played');
+        }
+
+        if (!$this->allSameRank($cards)) {
+            throw new RuleException($this->getGameMode(), "Can't play multiple cards with different values");
+        }
+
+        [$card] = $cards;
+        [$currentCard] = $currentCards;
+
+        if (Rank::TWO === $card->rank) {
+            $this->handleRoundEnd();
+        }
+
+        if ($this->allSameRank(array_merge($cards, $currentCards))) {
+            return;
+        }
+
+        if (!$this->isLegacyHigher($card, $currentCard)) {
+            throw new RuleException($this->getGameMode(), 'Cards with a higher or same value must be played');
+        }
     }
 
     protected function getRanks(): array

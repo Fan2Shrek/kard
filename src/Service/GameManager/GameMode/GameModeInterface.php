@@ -3,8 +3,8 @@
 namespace App\Service\GameManager\GameMode;
 
 use App\Model\Card\Card;
+use App\Model\Card\Hand;
 use App\Model\GameContext;
-use App\Model\Player;
 
 interface GameModeInterface
 {
@@ -16,7 +16,7 @@ interface GameModeInterface
     public function getGameMode(): GameModeEnum;
 
     /**
-     * @param array<Player> $players
+     * @param array<string, Hand> $players
      */
     public function getPlayerOrder(array $players): array;
 }
