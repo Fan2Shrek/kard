@@ -112,11 +112,11 @@ final class PresidentGameMode implements GameModeInterface
 
         [$lastTurn, $beforeLastTurn] = [$nonSkippedTurns[0]->getCards() ?? null, ($nonSkippedTurns[1] ?? null)?->getCards() ?? null];
 
-        if (null === $beforeLastTurn || null === $lastTurn) {
-            if ($this->isSameRank($card, $currentCard[0])) {
-                $this->dispatchMercureEvent('message', \sprintf("%s ou rien", $card->rank->value));;
-            }
+        if ($this->isSameRank($card, $currentCard[0])) {
+            $this->dispatchMercureEvent('message', \sprintf("%s ou rien", $card->rank->value));;
+        }
 
+        if (null === $beforeLastTurn) {
             return;
         }
 

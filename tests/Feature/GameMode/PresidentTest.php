@@ -538,6 +538,18 @@ describe('Président: mercure', function () {
 
             expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', '7 ou rien');
         });
+
+        test("Lors d'une carte ou rien l'évenement envoyé possède un message même au milieu d'un round", function () {
+            Arrange::setRound([
+                [6],
+                [8],
+                [9],
+            ]);
+
+            Act::playCard(9, 'h');
+
+            expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', '9 ou rien');
+        });
     });
 
     describe("Fin d'un tour", function () {
