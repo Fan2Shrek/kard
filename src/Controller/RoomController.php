@@ -99,8 +99,8 @@ final class RoomController extends AbstractController
             $players[$player->getId()->toString()]->cardsCount = count($hands[$k]);
         }
 
-        $this->gameContextProvider->save($gameContext);
         $this->gameManager->start($gameContext);
+        $this->gameContextProvider->save($gameContext);
 
         $this->hub->publish(new Update(
             sprintf('game-%s', $room->getId()),
