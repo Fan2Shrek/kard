@@ -2,6 +2,9 @@ name: Code style
 
 on: [push]
 
+env:
+  WITH_DOCKER: 0
+
 jobs:
   tests:
     runs-on: ubuntu-latest
