@@ -1,8 +1,11 @@
 COMPOSE=docker compose
-EXEC=$(COMPOSE) exec php
-CONSOLE=$(EXEC) php bin/console
+PHP=$(COMPOSE) exec php
+CONSOLE=$(PHP) php bin/console
 
-.PHONY: start up composer db fixtures cc stop rm perm php-lint twig-lint
+.PHONY: start up vendor db fixtures cc stop rm perm php-lint twig-lint
+
+PHP_FIXER=$(PHP) vendor/bin/php-cs-fixer fix --config=./.devops/.php-cs-fixer.php
+TWIG_FIXER=$(PHP) vendor/bin/twig-cs-fixer --config=./.devops/.twig-cs-fixer.php
 
 start: up composer db cc perm
 
@@ -18,8 +21,8 @@ rm:
 	make stop
 	$(COMPOSE) rm
 
-composer:
-	$(EXEC) composer install -n
+vendor:
+	$(PHP) composer install -n
 	make perm
 
 php:
@@ -40,13 +43,22 @@ assets:
 	$(CONSOLE) asset-map:compile
 
 perm:
-	sudo chown -R $(USER):$(USER) .
+	sudo chown -R $(USER):$(USER) ./
 	mkdir -p ./var ./public/
 	sudo chown -R www-data:$(USER) ./var ./public/
 	sudo chmod -R g+rwx .
 
+sh:
+	$(PHP) sh
+
 php-lint:
-	sh -c "COMPOSE_INTERACTIVE_NO_CLI=1 $(EXEC) vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php"
+	$(PHP_FIXER)
+
+php-lint-dry:
+	$(PHP_FIXER) --dry-run
 
 twig-lint:
-	sh -c "COMPOSE_INTERACTIVE_NO_CLI=1 $(EXEC) vendor/bin/twig-cs-fixer lint --fix --config=.twig-cs-fixer.php"
+	$(TWIG_FIXER) --fix
+
+twig-lint-dry:
+	$(TWIG_FIXER) --report=github
