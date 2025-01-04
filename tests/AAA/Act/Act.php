@@ -39,7 +39,7 @@ abstract /* static */ class Act
         return new Card(Suit::from($color), Rank::from($value));
     }
 
-    public static function get(string $key) : mixed
+    public static function get(string $key): mixed
     {
         return self::$context[$key] ?? null;
     }

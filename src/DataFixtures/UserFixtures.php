@@ -11,7 +11,8 @@ class UserFixtures extends AbstractFixtures
 
     public function __construct(
         private UserPasswordHasherInterface $passwordHasher,
-    ) {}
+    ) {
+    }
 
     public function getEntityClass(): string
     {

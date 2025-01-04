@@ -9,16 +9,18 @@ final class Turn
     private array $cards;
 
     public function __construct(
-        array $cards
+        array $cards,
     ) {
         $this->cards = $cards;
     }
 
-    public function getCards(): array {
+    public function getCards(): array
+    {
         return $this->cards;
     }
 
-    public function addCard(Card $card): void {
+    public function addCard(Card $card): void
+    {
         $this->cards[] = $card;
     }
 }

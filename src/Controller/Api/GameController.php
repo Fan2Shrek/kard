@@ -2,8 +2,8 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\User;
 use App\Entity\Room;
+use App\Entity\User;
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
 use App\Model\Card\Card;
@@ -21,10 +21,12 @@ final class GameController extends AbstractController
     public function __construct(
         private readonly HubInterface $hub,
         private readonly GameManager $gameManager,
-    ) {}
+    ) {
+    }
 
     /**
      * @change for #[MapRequestPayload] Card $card
+     *
      * @see https://github.com/symfony/symfony/issues/58840
      */
     #[Route('/{id}/play', name: 'play', methods: ['POST'])]
@@ -32,7 +34,7 @@ final class GameController extends AbstractController
     {
         $user = $this->getUser();
         $data = $request->toArray()['cards'];
-        $cards = array_map(fn($card) => new Card(Suit::from($card['suit']), Rank::from($card['rank'])), $data);
+        $cards = array_map(fn ($card) => new Card(Suit::from($card['suit']), Rank::from($card['rank'])), $data);
 
         $this->gameManager->play($room, $user, $cards);
 

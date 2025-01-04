@@ -1,5 +1,5 @@
 <div class="hand">
     {% for card in hand.cards %}
-        {% include "components/model/_card.html.twig" %}
+        {{ include('components/model/_card.html.twig') }}
     {% endfor %}
 </div>

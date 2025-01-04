@@ -26,7 +26,8 @@ final class PresidentGameMode implements GameModeInterface
 
     public function __construct(
         private HubInterface $hub,
-    ) {}
+    ) {
+    }
 
     public function getGameMode(): GameModeEnum
     {
@@ -92,7 +93,7 @@ final class PresidentGameMode implements GameModeInterface
 
     private function handleOneCard(array $cards, array $currentCard): void
     {
-        if (count($cards) !== 1) {
+        if (1 !== count($cards)) {
             throw new RuleException($this->getGameMode(), 'Incorrect number of cards played');
         }
 
@@ -108,12 +109,12 @@ final class PresidentGameMode implements GameModeInterface
             $this->handleRoundEnd();
         }
 
-        $nonSkippedTurns = array_values(array_filter($previousTurns, fn($turn) => !empty($turn->getCards())));
+        $nonSkippedTurns = array_values(array_filter($previousTurns, fn ($turn) => !empty($turn->getCards())));
 
         [$lastTurn, $beforeLastTurn] = [$nonSkippedTurns[0]->getCards() ?? null, ($nonSkippedTurns[1] ?? null)?->getCards() ?? null];
 
         if ($this->isSameRank($card, $currentCard[0])) {
-            $this->dispatchMercureEvent('message', \sprintf("%s ou rien", $card->rank->value));;
+            $this->dispatchMercureEvent('message', \sprintf('%s ou rien', $card->rank->value));
         }
 
         if (null === $beforeLastTurn) {
@@ -129,7 +130,7 @@ final class PresidentGameMode implements GameModeInterface
 
             // verify if square
             $rank = $lastTurn[0]->rank;
-            $count = array_filter($nonSkippedTurns, fn($turn) => $rank === $turn->getCards()[0]->rank);
+            $count = array_filter($nonSkippedTurns, fn ($turn) => $rank === $turn->getCards()[0]->rank);
 
             if (3 === count($count)) {
                 $this->handleRoundEnd();
@@ -152,7 +153,7 @@ final class PresidentGameMode implements GameModeInterface
 
     private function handleTwoCards(array $cards, array $currentCards): void
     {
-        if (count($cards) !== 2) {
+        if (2 !== count($cards)) {
             throw new RuleException($this->getGameMode(), 'Incorrect number of cards played');
         }
 
@@ -180,7 +181,7 @@ final class PresidentGameMode implements GameModeInterface
 
     private function handleThreeCards(array $cards, array $currentCards): void
     {
-        if (count($cards) !== 3) {
+        if (3 !== count($cards)) {
             throw new RuleException($this->getGameMode(), 'Incorrect number of cards played');
         }
 

@@ -5,17 +5,16 @@ namespace App\Model;
 use App\Entity\Room;
 use App\Model\Card\Card;
 
-
 final class GameContext
 {
     private PlayersList $players;
     private GameRound $currentRound;
 
     /**
-     * @param Card[] $assets
+     * @param Card[]   $assets
      * @param Player[] $players
-     * @param Card[] $turns
-     * @param Card[] $discarded
+     * @param Card[]   $turns
+     * @param Card[]   $discarded
      */
     public function __construct(
         private string $id,
@@ -148,7 +147,8 @@ final class GameContext
 /**
  * @internal
  */
-class PlayersList {
+class PlayersList
+{
     private int $currentIndex;
 
     public function __construct(
@@ -168,7 +168,7 @@ class PlayersList {
         if ($this->currentIndex === count($this->players) - 1) {
             $this->currentIndex = 0;
         } else {
-            $this->currentIndex++;
+            ++$this->currentIndex;
         }
 
         $this->currentPlayer = $this->players[$this->currentIndex];

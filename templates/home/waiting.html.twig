@@ -5,17 +5,17 @@
 {% block body %}
     <main class="waiting">
         <h1>En attente de joueurs !</h1>
-        <div {{ stimulus_controller('stream', { url: mercure('waiting') }) }}></div> 
+        <div {{ stimulus_controller('stream', {url: mercure('waiting')}) }}></div>
         <div id="player-join">
             <h2>Joueurs</h2>
             {% for player in players %}
-                {% include "components/turbo/player-join.html.twig" with {"player": player} %}
+                {{ include('components/turbo/player-join.html.twig', {player: player}) }}
             {% endfor %}
         </div>
-        
+
         {% if room.owner == app.user %}
             <div class="btn__container">
-                <a class="btn" href="{{ path('game_start', {'id': room.id}) }}" class="btn btn-primary">Commencer !</a>
+                <a class="btn" href="{{ path('game_start', {id: room.id}) }}" class="btn btn-primary">Commencer !</a>
             </div>
         {% endif %}
         <div {{ stimulus_controller('waiting') }}></div>
@@ -23,6 +23,6 @@
 {% endblock %}
 {% block endscript %}
     <script type="application/json" id="mercure-url">
-        {{ mercure('game-'~room.id, { subscribe: 'game-'~room.id })|json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_TAG'))|raw }}
+        {{ mercure('game-' ~ room.id, {subscribe: 'game-' ~ room.id})|json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_TAG'))|raw }}
     </script>
 {% endblock %}

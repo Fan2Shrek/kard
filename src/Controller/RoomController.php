@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-
 use App\Entity\Room;
 use App\Entity\User;
 use App\Model\Player;
@@ -64,12 +63,12 @@ final class RoomController extends AbstractController
             $this->hub->publish(new Update(
                 'waiting',
                 $this->renderView('components/turbo/player-join.html.twig', [
-                    'player' =>  Player::fromUser($user),
+                    'player' => Player::fromUser($user),
                 ])
             ));
         }
 
-        $players =  array_map(
+        $players = array_map(
             fn ($player) => Player::fromUser($player),
             $room->getPlayers()->toArray(),
         );

@@ -8,7 +8,7 @@ final class Deck
         private array $cards,
     ) {
     }
-    
+
     public function shuffle(): void
     {
         shuffle($this->cards);
@@ -22,7 +22,7 @@ final class Deck
 
         return array_shift($this->cards);
     }
-    
+
     public function count(): int
     {
         return count($this->cards);

@@ -15,7 +15,7 @@ covers(PresidentGameMode::class);
 beforeEach(function () {
     HubSpy::reset();
     Act::addContext('gamePlayer', new PresidentGameMode(
-        new HubSpy,
+        new HubSpy(),
     ));
 });
 
@@ -379,7 +379,7 @@ describe('Président: carte ou rien', function () {
         Act::playCard(9, 'h');
     })->throws('Can not play "9" when "7" or nothing.');
 
-    test("Passer son tour annule la carte ou rien", function () {
+    test('Passer son tour annule la carte ou rien', function () {
         Arrange::setRound([
             [3],
             [5],

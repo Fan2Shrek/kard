@@ -27,7 +27,8 @@ final class GameManager
         private HandRepository $handRepository,
         private SerializerInterface $serializer,
         private Environment $twig,
-    ) {}
+    ) {
+    }
 
     /**
      * @param array<Card> $cards
@@ -47,14 +48,15 @@ final class GameManager
         }
 
         /* @todo */
-        /* $gameMode = $this->getGameMode($room->getGameMode());  */
+        /* $gameMode = $this->getGameMode($room->getGameMode()); */
         $gameMode = $this->getGameMode(GameModeEnum::PRESIDENT);
 
         try {
             $gameMode->play($cards, $ctx);
         } catch (RuleException $e) {
-            /** @todo do something */
+            /* @todo do something */
             throw $e;
+
             return;
         }
 
@@ -100,7 +102,7 @@ final class GameManager
 
         $players = array_reduce(
             $players,
-            function ($acc, $player) use ($ctx) {
+            function ($acc, $player) {
                 $acc[$player->id] = $player;
 
                 return $acc;

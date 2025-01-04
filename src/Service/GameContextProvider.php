@@ -45,7 +45,7 @@ final class GameContextProvider
         $cards = $this->format($this->getDeck($room));
         $cards['back'] = $this->packages->getUrl('resources/back.svg');
 
-        $players = array_map(fn ($u) => Player::fromUser($u),$room->getPlayers()->toArray());
+        $players = array_map(fn ($u) => Player::fromUser($u), $room->getPlayers()->toArray());
 
         return new GameContext(
             $room->getId(),

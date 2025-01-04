@@ -14,8 +14,8 @@ use Ramsey\Uuid\UuidInterface;
 class Room
 {
     #[ORM\Id]
-    #[ORM\Column(type: "uuid", unique: true)]
-    #[ORM\GeneratedValue(strategy: "CUSTOM")]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     protected UuidInterface $id;
 
@@ -35,7 +35,7 @@ class Room
             $id = UuidV4::fromString($id);
         }
 
-        if ($id !== null) {
+        if (null !== $id) {
             $this->id = $id;
         }
 

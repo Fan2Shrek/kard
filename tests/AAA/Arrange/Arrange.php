@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Tests\AAA\Arrange;
 
 use App\Entity\Room;
-use App\Enum\Card\Suit;
 use App\Enum\Card\Rank;
+use App\Enum\Card\Suit;
 use App\Model\Card\Card;
 use App\Model\GameContext;
 use App\Model\Player;
@@ -65,10 +65,9 @@ abstract /* static */ class Arrange
             $players = [new Player('player-id', 'Player 1')];
         }
 
-
         return new GameContext(
             'room-id',
-            new Room,
+            new Room(),
             [],
             $players,
             current($players),
