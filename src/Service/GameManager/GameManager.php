@@ -7,6 +7,7 @@ use App\Entity\Room;
 use App\Entity\User;
 use App\Model\Card\Card;
 use App\Model\GameContext;
+use App\Model\Player;
 use App\Service\Card\HandRepository;
 use App\Service\GameContextProvider;
 use App\Service\GameManager\GameMode\GameModeEnum;
@@ -58,10 +59,14 @@ final class GameManager
         }
 
         $hand->removeCards($cards);
-        $p = $ctx->getCurrentPlayer();
-        $p->cardsCount = count($hand);
-
         $this->handRepository->save($player, $room, $hand);
+
+        $player = current(array_filter(
+            $ctx->getPlayers(),
+            fn (Player $p) => $p->id === $player->getId()->toString(),
+        ));
+        $player->cardsCount = count($hand);
+
         $this->gameContextProvider->save($ctx);
 
         $this->hub->publish(new Update(
@@ -73,7 +78,7 @@ final class GameManager
         ));
 
         $this->hub->publish(new Update(
-            sprintf('room-%s-%s', $room->getId(), $player->getId()),
+            sprintf('room-%s-%s', $room->getId(), $player->id),
             $this->serializer->serialize($hand, 'json'),
         ));
     }
