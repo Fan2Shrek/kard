@@ -1,5 +1,12 @@
-COMPOSE=docker compose
-PHP=$(COMPOSE) exec php
+WITH_DOCKER?=1
+COMPOSE=$(shell which docker) compose
+
+ifeq ($(WITH_DOCKER), 1)
+	PHP=$(COMPOSE) exec php
+else
+	PHP=
+endif
+
 CONSOLE=$(PHP) php bin/console
 
 .PHONY: start up vendor db fixtures cc stop rm perm php-lint twig-lint
@@ -25,6 +32,9 @@ vendor:
 	$(PHP) composer install -n
 	make perm
 
+fixtures:
+	$(CONSOLE) d:f:l -n
+
 php:
 	$(EXEC) $(c)
 
@@ -32,7 +42,7 @@ db:
 	$(CONSOLE) d:d:d --if-exists --force
 	$(CONSOLE) d:d:c --if-not-exists
 	$(CONSOLE) d:s:u --force --complete
-	$(CONSOLE) d:f:l -n
+	$(MAKE) fixtures
 
 cc:
 	$(CONSOLE) c:cl --no-warmup
