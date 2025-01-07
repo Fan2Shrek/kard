@@ -19,4 +19,6 @@ interface GameModeInterface
      * @param array<string, Hand> $players
      */
     public function getPlayerOrder(array $players): array;
+
+    public function isGameFinished(GameContext $gameContext): bool;
 }

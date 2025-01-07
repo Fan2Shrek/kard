@@ -24,6 +24,7 @@
 |
 */
 
+use App\Model\Player;
 use Pest\Expectation;
 use Symfony\Component\Mercure\Update;
 
@@ -52,6 +53,14 @@ expect()->extend('toHaveTurns', function (int $count) {
 
 expect()->extend('toHaveNewRound', function () {
     expect($this->value)->toHaveTurns(0);
+});
+
+expect()->extend('toHaveWinner', function (Player|string $player) {
+    if ($player instanceof Player) {
+        $player = $player->username;
+    }
+
+    expect($this->value->getWinner()->username)->toBe($player);
 });
 
 /*

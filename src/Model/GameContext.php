@@ -9,6 +9,7 @@ final class GameContext
 {
     private PlayersList $players;
     private GameRound $currentRound;
+    private ?Player $winner = null;
 
     /**
      * @param Card[]   $assets
@@ -73,6 +74,9 @@ final class GameContext
         return $this->assets;
     }
 
+    /**
+     * @return Player[]
+     */
     public function getPlayers(): array
     {
         return $this->players->toArray();
@@ -131,6 +135,16 @@ final class GameContext
     public function setDiscarded(array $cards): void
     {
         $this->discarded = $cards;
+    }
+
+    public function getWinner(): ?Player
+    {
+        return $this->winner;
+    }
+
+    public function setWinner(Player $winner): void
+    {
+        $this->winner = $winner;
     }
 
     public function addPlayer(Player $player): void

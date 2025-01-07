@@ -49,6 +49,19 @@ final class PresidentGameMode implements GameModeInterface
         return $order;
     }
 
+    public function isGameFinished(GameContext $gameContext): bool
+    {
+        foreach ($gameContext->getPlayers() as $player) {
+            if (0 === $player->cardsCount) {
+                $gameContext->setWinner($player);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function play(array $cards, GameContext $gameContext): void
     {
         $this->cards = $cards;

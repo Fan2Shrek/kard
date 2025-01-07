@@ -34,6 +34,11 @@ abstract /* static */ class Act
         return static::get('gamePlayer')->getPlayerOrder($players);
     }
 
+    public static function isGameFinished(): bool
+    {
+        return static::get('gamePlayer')->isGameFinished(static::get('gameContext'));
+    }
+
     private static function createCard(string $value, string $color): Card
     {
         return new Card(Suit::from($color), Rank::from($value));

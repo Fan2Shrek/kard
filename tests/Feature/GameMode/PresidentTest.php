@@ -185,6 +185,32 @@ describe('Président: règles basiques', function () {
 
         expect(Act::get('gameContext')->getDiscarded())->toHaveCount(4);
     });
+
+    test('Un joueur sans carte est déclaré vainqueur', function () {
+        Arrange::setPlayers([
+            new Player('1', 'Player 1', 3),
+            new Player('2', 'Player 2', 0),
+        ]);
+        Arrange::setGameStarted();
+
+        $result = Act::isGameFinished();
+
+        expect($result)->toBeTrue();
+        expect(Act::get('gameContext'))->toHaveWinner('Player 2');
+    });
+
+    test("Si tous les joueurs ont encore des cartes, il n'y a pas de vainqueur", function () {
+        Arrange::setPlayers([
+            new Player('1', 'Player 1', 21),
+            new Player('2', 'Player 2', 13),
+        ]);
+        Arrange::setGameStarted();
+
+        $result = Act::isGameFinished();
+
+        expect($result)->toBeFalse();
+        expect(Act::get('gameContext')->getWinner())->toBeNull();
+    });
 });
 
 describe('Président: carte simple', function () {

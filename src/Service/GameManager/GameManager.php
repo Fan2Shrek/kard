@@ -71,6 +71,19 @@ final class GameManager
 
         $this->gameContextProvider->save($ctx);
 
+        if ($gameMode->isGameFinished($ctx)) {
+            $this->hub->publish(new Update(
+                sprintf('room-%s', $room->getId()),
+                $this->serializer->serialize([
+                    'action' => 'end',
+                    'data' => $ctx,
+                ], 'json'),
+            ));
+
+            // @todo handle win
+            return;
+        }
+
         $this->hub->publish(new Update(
             sprintf('room-%s', $room->getId()),
             $this->serializer->serialize([
