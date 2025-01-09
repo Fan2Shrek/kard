@@ -8,16 +8,17 @@ use App\Service\GameManager\GameMode\GameModeInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
-* This is use for debug
-*
-* Probably unnecessary, but it's a still a good flex :p
-*/
+ * This is use for debug.
+ *
+ * Probably unnecessary, but it's a still a good flex :p
+ */
 final class TraceableGameMode implements GameModeInterface
 {
     public function __construct(
         private GameModeInterface $gameMode,
         private Stopwatch $stopwatch,
-    ) {}
+    ) {
+    }
 
     public function play(array $cards, GameContext $gameContext): void
     {

@@ -13,8 +13,6 @@ class Kernel extends BaseKernel
 
     protected function build(ContainerBuilder $container): void
     {
-        $container
-            ->addCompilerPass(new TraceGameModePass());
-        ;
+        $container->addCompilerPass(new TraceGameModePass());
     }
 }

@@ -1,16 +1,16 @@
 # TODO
 
-- [X] phpcs
-- [ ] phpstan ?
-- [ ] auto deploy
-- [X] docker build ?
+- [X] Phpcs
+- [ ] Phpstan ?
+- [ ] Auto deploy
+- [X] Docker build ?
 
 - [ ] AbstractGameMode
 
 - [ ] Display Rule Exception on React
 - [ ] Display winner on React
-- [X] fix end turn
-- [X] data in gameContext
+- [X] Fix end turn
+- [X] Data in gameContext
 
 
 ## Requirements for a 15/20
@@ -35,7 +35,7 @@ AND .... DOCS :(
 
 ## Requirements for a 20/20
 
-- [ ] One custom command
+- [X] One custom command
 - [ ] Async
 - [X] Real time
 - [X] TDD
