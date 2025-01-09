@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service\GameManager\GameMode;
 
-enum GameModeEnum
+enum GameModeEnum: string
 {
-    case PRESIDENT;
+    case PRESIDENT = 'president';
 }

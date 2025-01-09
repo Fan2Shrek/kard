@@ -5,11 +5,13 @@ namespace App\Controller;
 use App\Entity\Room;
 use App\Entity\User;
 use App\Model\Player;
+use App\Repository\GameModeRepository;
 use App\Repository\RoomRepository;
 use App\Service\Card\CardGenerator;
 use App\Service\Card\HandRepository;
 use App\Service\GameContextProvider;
 use App\Service\GameManager\GameManager;
+use App\Service\GameManager\GameMode\GameModeEnum;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mercure\HubInterface;
@@ -17,6 +19,7 @@ use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
+/** @todo serviceSubscriber for perfomance optimisation */
 #[Route('/room')]
 final class RoomController extends AbstractController
 {
@@ -28,14 +31,18 @@ final class RoomController extends AbstractController
         private GameContextProvider $gameContextProvider,
         private GameManager $gameManager,
         private HubInterface $hub,
+        private GameModeRepository $gameModeRepository,
     ) {
     }
 
     #[Route('/create', name: 'create')]
     public function create(): Response
     {
+        /* @todo handle multiple game mode */
+        $gameMode = $this->gameModeRepository->findByGameMode(GameModeEnum::PRESIDENT);
+
         $user = $this->getUser();
-        $room = new Room();
+        $room = new Room($gameMode);
         $room->setOwner($user);
         $room->addPlayer($user);
 

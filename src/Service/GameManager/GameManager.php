@@ -47,9 +47,7 @@ final class GameManager
             throw new \InvalidArgumentException('Card not found in player hand');
         }
 
-        /* @todo */
-        /* $gameMode = $this->getGameMode($room->getGameMode()); */
-        $gameMode = $this->getGameMode(GameModeEnum::PRESIDENT);
+        $gameMode = $this->getGameMode($room->getGameMode()->getValue());
 
         try {
             $gameMode->play($cards, $ctx);

@@ -29,7 +29,11 @@ class Room
     #[ORM\ManyToMany(targetEntity: User::class)]
     private Collection $players;
 
-    public function __construct(UuidInterface|string|null $id = null)
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private GameMode $gameMode;
+
+    public function __construct(GameMode $gameMode, UuidInterface|string|null $id = null)
     {
         if (\is_string($id)) {
             $id = UuidV4::fromString($id);
@@ -40,6 +44,7 @@ class Room
         }
 
         $this->players = new ArrayCollection();
+        $this->gameMode = $gameMode;
     }
 
     public function getId(): ?UuidInterface
@@ -81,5 +86,10 @@ class Room
         $this->players->removeElement($player);
 
         return $this;
+    }
+
+    public function getGameMode(): ?GameMode
+    {
+        return $this->gameMode;
     }
 }

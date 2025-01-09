@@ -9,7 +9,7 @@ endif
 
 CONSOLE=$(PHP) php bin/console
 
-.PHONY: start up vendor db fixtures cc stop rm perm php-lint twig-lint
+.PHONY: start up vendor db fixtures cc stop rm perm php-lint twig-lint migration sh
 
 PHP_FIXER=$(PHP) vendor/bin/php-cs-fixer fix --config=./.devops/.php-cs-fixer.php
 TWIG_FIXER=$(PHP) vendor/bin/twig-cs-fixer --config=./.devops/.twig-cs-fixer.php
@@ -43,6 +43,9 @@ db:
 	$(CONSOLE) d:d:c --if-not-exists
 	$(CONSOLE) d:s:u --force --complete
 	$(MAKE) fixtures
+
+migration:
+	$(CONSOLE) d:m:m --allow-no-migration -n
 
 cc:
 	$(CONSOLE) c:cl --no-warmup
