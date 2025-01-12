@@ -1,10 +1,12 @@
 <?php
 
+use App\Entity\GameMode;
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
 use App\Model\Card\Card;
 use App\Model\Card\Hand;
 use App\Model\Player;
+use App\Service\GameManager\GameMode\GameModeEnum;
 use App\Service\GameManager\GameMode\PresidentGameMode;
 use App\Tests\AAA\Act\Act;
 use App\Tests\AAA\Arrange\Arrange;
@@ -17,6 +19,7 @@ beforeEach(function () {
     Act::addContext('gamePlayer', new PresidentGameMode(
         new HubSpy(),
     ));
+    Act::addContext('gameMode', new GameMode(GameModeEnum::PRESIDENT));
 });
 
 pest()->group('Président');

@@ -67,7 +67,9 @@ abstract /* static */ class Arrange
 
         return new GameContext(
             'room-id',
-            new Room(),
+            new Room(
+                Act::get('gameMode'),
+            ),
             [],
             $players,
             current($players),
