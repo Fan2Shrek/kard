@@ -17,7 +17,7 @@
             {% if room.owner == app.user %}
                 <a class="btn" href="{{ path('game_start', {id: room.id}) }}" class="btn btn-primary">Commencer !</a>
             {% endif %}
-            <a class="btn" onClick={copyLink()} class="btn btn-primary">Copier le lien</a>
+            <btn class="btn" onClick={copyLink()} class="btn btn-primary">Copier le lien</btn>
         </div>
         <div {{ stimulus_controller('waiting') }}></div>
     </main>
@@ -27,7 +27,7 @@
         {{ mercure('game-' ~ room.id, {subscribe: 'game-' ~ room.id})|json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_TAG'))|raw }}
     </script>
     <script>
-        function copyLink() {
+        const copyLink = () => {
             navigator.clipboard.writeText(window.location.href);
         }
     </script>

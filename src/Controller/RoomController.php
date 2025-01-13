@@ -13,6 +13,7 @@ use App\Service\GameContextProvider;
 use App\Service\GameManager\GameManager;
 use App\Service\GameManager\GameMode\GameModeEnum;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
@@ -36,19 +37,28 @@ final class RoomController extends AbstractController
     }
 
     #[Route('/create', name: 'create')]
-    public function create(): Response
+    public function create(Request $request): Response
     {
-        /* @todo handle multiple game mode */
-        $gameMode = $this->gameModeRepository->findByGameMode(GameModeEnum::PRESIDENT);
+        if (Request::METHOD_POST === $request->getMethod()) {
+            $gameMode = $request->getPayload()->get('gameMode');
+            $gameMode = $this->gameModeRepository->findByGameMode(GameModeEnum::from($gameMode));
 
-        $user = $this->getUser();
-        $room = new Room($gameMode);
-        $room->setOwner($user);
-        $room->addPlayer($user);
+            $user = $this->getUser();
+            $room = new Room($gameMode);
+            $room->setOwner($user);
+            $room->addPlayer($user);
 
-        $this->roomRepository->save($room);
+            $this->roomRepository->save($room);
 
-        return $this->redirectToRoute('waiting', ['id' => $room->getId()]);
+            // @todo fix mais la je suis fatigué
+            return $this->redirectToRoute('waiting', ['id' => $room->getId()]);
+        }
+
+        $gameModes = $this->gameModeRepository->findAll();
+
+        return $this->render('home/create.html.twig', [
+            'gameModes' => $gameModes,
+        ]);
     }
 
     #[Route('/waiting/{id}', name: 'waiting')]

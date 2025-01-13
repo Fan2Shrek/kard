@@ -4,6 +4,20 @@
 
 {% block body %}
     <h1>Création !</h1>
+
+    <p>Choissiser un mode de jeu</p>
+
+    {% for mode in gameModes %}
+        <a onClick="handleClick('{{ mode.value.value }}')">{{ mode.value.value|capitalize }}</a>
+    {% endfor %}
 {% endblock %}
 {% block endscript %}
+    <script>
+        const handleClick = (mode) => {
+           fetch("{{ path('create') }}", {
+               method: 'POST',
+               body: JSON.stringify({ gameMode: mode }),
+           }).then(response => response.json());
+        }
+    </script>
 {% endblock %}
