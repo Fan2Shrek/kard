@@ -11,7 +11,7 @@ abstract class AbstractFixtures extends Fixture
     {
         $r = new \ReflectionClass($this->getEntityClass());
 
-        foreach ($this->getData() as $data) {
+        foreach ($this->getData() as $key => $data) {
             $entity = $r->newInstanceWithoutConstructor();
 
             foreach ($data as $property => $value) {
@@ -24,6 +24,8 @@ abstract class AbstractFixtures extends Fixture
 
             $this->postInstantiate($entity);
             $manager->persist($entity);
+            ++$key;
+            $this->addReference($r->getShortName().'_'.$key, $entity);
         }
 
         $manager->flush();

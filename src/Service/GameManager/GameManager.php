@@ -3,6 +3,7 @@
 namespace App\Service\GameManager;
 
 use App\Domain\Exception\RuleException;
+use App\Entity\Result;
 use App\Entity\Room;
 use App\Entity\User;
 use App\Model\Card\Card;
@@ -77,7 +78,13 @@ final class GameManager
                 ], 'json'),
             ));
 
-            // @todo handle win
+            // TODO once we know the winner and loser
+            // $result = (new Result())
+            //     ->setWinner($player)
+            //     ->setGameMode($room->getGameMode())
+            //     ->setDate(new \DateTimeImmutable())
+            // ;
+
             return;
         }
 
