@@ -93,6 +93,7 @@ final class PresidentGameMode implements GameModeInterface
             1 => $this->handleOneCard($cards, $currentCards),
             2 => $this->handleTwoCards($cards, $currentCards),
             3 => $this->handleThreeCards($cards, $currentCards),
+            default => throw new \LogicException('Invalid number of cards played'),
         };
 
         if ($this->isTurnFinished ?? false) {
@@ -104,6 +105,10 @@ final class PresidentGameMode implements GameModeInterface
         $gameContext->nextPlayer();
     }
 
+    /**
+     * @param Card[] $cards
+     * @param Card[] $currentCard
+     */
     private function handleOneCard(array $cards, array $currentCard): void
     {
         if (1 !== count($cards)) {
@@ -124,7 +129,7 @@ final class PresidentGameMode implements GameModeInterface
 
         $nonSkippedTurns = array_values(array_filter($previousTurns, fn ($turn) => !empty($turn->getCards())));
 
-        [$lastTurn, $beforeLastTurn] = [$nonSkippedTurns[0]->getCards() ?? null, ($nonSkippedTurns[1] ?? null)?->getCards() ?? null];
+        [$lastTurn, $beforeLastTurn] = [$nonSkippedTurns[0]->getCards() ?? null, ($nonSkippedTurns[1] ?? null)?->getCards() ?? null]; // @phpstan-ignore-line
 
         if ($this->isSameRank($card, $currentCard[0])) {
             $this->dispatchMercureEvent('message', \sprintf('%s ou rien', $card->rank->value));
@@ -151,6 +156,9 @@ final class PresidentGameMode implements GameModeInterface
         }
     }
 
+    /**
+     * @param Card[] $cards
+     */
     private function handleStart(array $cards): void
     {
         if (!$this->allSameRank($cards)) {
@@ -164,6 +172,10 @@ final class PresidentGameMode implements GameModeInterface
         }
     }
 
+    /**
+     * @param Card[] $cards
+     * @param Card[] $currentCards
+     */
     private function handleTwoCards(array $cards, array $currentCards): void
     {
         if (2 !== count($cards)) {
@@ -192,6 +204,10 @@ final class PresidentGameMode implements GameModeInterface
         }
     }
 
+    /**
+     * @param Card[] $cards
+     * @param Card[] $currentCards
+     */
     private function handleThreeCards(array $cards, array $currentCards): void
     {
         if (3 !== count($cards)) {
@@ -218,6 +234,9 @@ final class PresidentGameMode implements GameModeInterface
         }
     }
 
+    /**
+     * @return array<int, Rank>
+     */
     protected function getRanks(): array
     {
         return [

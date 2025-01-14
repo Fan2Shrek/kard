@@ -9,7 +9,7 @@ endif
 
 CONSOLE=$(PHP) php bin/console
 
-.PHONY: start up vendor db fixtures cc stop rm perm php-lint twig-lint migration sh
+.PHONY: start up vendor db fixtures cc stop rm perm php-lint twig-lint migration sh phpstan
 
 PHP_FIXER=$(PHP) vendor/bin/php-cs-fixer fix --config=./.devops/.php-cs-fixer.php
 TWIG_FIXER=$(PHP) vendor/bin/twig-cs-fixer --config=./.devops/.twig-cs-fixer.php
@@ -27,6 +27,9 @@ stop:
 rm:
 	make stop
 	$(COMPOSE) rm
+
+phpstan:
+	$(PHP) vendor/bin/phpstan
 
 vendor:
 	$(PHP) composer install -n

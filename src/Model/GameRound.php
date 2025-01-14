@@ -5,14 +5,11 @@ namespace App\Model;
 final class GameRound
 {
     /**
-     * @var Turn[]
+     * @param Turn[] $turns
      */
-    private array $turns;
-
     public function __construct(
-        array $turns = [],
+        private array $turns = [],
     ) {
-        $this->turns = $turns;
     }
 
     public function addTurn(Turn $turn): void
@@ -30,11 +27,17 @@ final class GameRound
         return end($this->turns) ?: null;
     }
 
+    /**
+     * @return Turn[]
+     */
     public function getTurns(): array
     {
         return $this->turns;
     }
 
+    /**
+     * @param Turn[] $turns
+     */
     public function setTurns(array $turns): self
     {
         $this->turns = $turns;

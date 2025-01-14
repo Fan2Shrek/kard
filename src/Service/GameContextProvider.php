@@ -7,7 +7,6 @@ use App\Model\Card\Card;
 use App\Model\GameContext;
 use App\Model\Player;
 use App\Service\Card\CardGenerator;
-use App\Service\Card\HandRepository;
 use App\Service\Redis\RedisConnection;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
@@ -16,7 +15,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 final class GameContextProvider
 {
     public function __construct(
-        private readonly HandRepository $handRepository,
+        /* private readonly HandRepository $handRepository, */
         private readonly Packages $packages,
         private readonly CardGenerator $cardGenerator,
         private readonly RedisConnection $redis,
@@ -42,7 +41,7 @@ final class GameContextProvider
 
     private function createContext(Room $room): GameContext
     {
-        $cards = $this->format($this->getDeck($room));
+        $cards = $this->format($this->getDeck());
         $cards['back'] = $this->packages->getUrl('resources/back.svg');
 
         $players = array_map(fn ($u) => Player::fromUser($u), $room->getPlayers()->toArray());
@@ -56,18 +55,20 @@ final class GameContextProvider
         );
     }
 
-    private function getDeck(Room $room): array
+    /**
+     * @return Card[]
+     */
+    private function getDeck(): array
     {
-        // @todo:
+        // Generate all cards prevents players to see the cards of the other players
         return $this->cardGenerator->generate()->getCards();
-        $deck = [];
-        foreach ($room->getPlayers() as $player) {
-            $deck = array_merge($this->handRepository->get($player, $room)->getCards(), $deck);
-        }
-
-        return $deck;
     }
 
+    /**
+     * @param Card[] $deck
+     *
+     * @return array<string>
+     */
     private function format(array $deck): array
     {
         return array_reduce(

@@ -31,6 +31,9 @@ final class CardGenerator
         return $deck;
     }
 
+    /**
+     * @return Hand[]
+     */
     public function generateHands(int $handsCount, int $cards = 0): array
     {
         $deck = $this->generateShuffled();

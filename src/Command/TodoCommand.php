@@ -26,7 +26,6 @@ final class TodoCommand extends Command
         $metadataList = $this->entityManager->getMetadataFactory()->getAllMetadata();
 
         foreach ($metadataList as $metadata) {
-            /** @var ClassMetadata $metadata */
             foreach ($metadata->associationMappings as $association) {
                 switch ($association['type']) {
                     case ClassMetadata::MANY_TO_ONE:

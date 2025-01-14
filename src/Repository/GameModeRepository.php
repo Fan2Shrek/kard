@@ -17,6 +17,9 @@ class GameModeRepository extends ServiceEntityRepository
         parent::__construct($registry, GameMode::class);
     }
 
+    /**
+     * @return GameMode[]
+     */
     public function findActiveGameModes(): array
     {
         return $this->createQueryBuilder('gm')

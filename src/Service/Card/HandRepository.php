@@ -35,9 +35,7 @@ final class HandRepository
 
     public function getRaw(User $player, Room $room): ?string
     {
-        if ($player instanceof User) {
-            $player = (string) $player->getId();
-        }
+        $player = (string) $player->getId();
 
         $deck = $this->redisConnection->get($this->getKey($player, $room));
 
@@ -50,9 +48,7 @@ final class HandRepository
 
     public function save(User $player, Room $room, Hand $hand): void
     {
-        if ($player instanceof User) {
-            $player = (string) $player->getId();
-        }
+        $player = (string) $player->getId();
 
         $this->redisConnection->set($this->getKey($player, $room), $this->serializer->serialize($hand, 'json'));
     }

@@ -4,6 +4,9 @@ namespace App\Model\Card;
 
 final class Hand implements \Countable
 {
+    /**
+     * @param Card[] $cards
+     */
     public function __construct(
         private array $cards = [],
     ) {
@@ -51,6 +54,9 @@ final class Hand implements \Countable
         return false;
     }
 
+    /**
+     * @param Card[] $cards
+     */
     public function hasCards(array $cards): bool
     {
         foreach ($cards as $card) {
@@ -62,6 +68,9 @@ final class Hand implements \Countable
         return false;
     }
 
+    /**
+     * @param Card[] $cards
+     */
     public function removeCards(array $cards): void
     {
         foreach ($cards as $card) {
@@ -71,6 +80,9 @@ final class Hand implements \Countable
         }
     }
 
+    /**
+     * @return Card[] $cards
+     */
     public function getCards(): array
     {
         return $this->cards;

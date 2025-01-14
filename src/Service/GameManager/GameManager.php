@@ -15,18 +15,18 @@ use App\Service\GameManager\GameMode\GameModeInterface;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Serializer\SerializerInterface;
-use Twig\Environment;
 
 final class GameManager
 {
-    // @param iterable<GameModeInterface> $gameModes
+    /**
+     * @param iterable<GameModeInterface> $gameModes
+     */
     public function __construct(
         private iterable $gameModes,
         private HubInterface $hub,
         private GameContextProvider $gameContextProvider,
         private HandRepository $handRepository,
         private SerializerInterface $serializer,
-        private Environment $twig,
     ) {
     }
 
@@ -54,8 +54,7 @@ final class GameManager
         } catch (RuleException $e) {
             /* @todo do something */
             throw $e;
-
-            return;
+            /* return; */
         }
 
         $hand->removeCards($cards);
@@ -143,15 +142,5 @@ final class GameManager
         }
 
         throw new \InvalidArgumentException('Game mode not found');
-    }
-
-    public function getGameModes(): iterable
-    {
-        return $this->gameModes;
-    }
-
-    private function renderView(string $template, array $data): string
-    {
-        return $this->twig->render($template, $data);
     }
 }

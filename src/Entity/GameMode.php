@@ -12,7 +12,7 @@ class GameMode
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private int $id;
 
     #[ORM\Column(enumType: GameModeEnum::class)]
     private ?GameModeEnum $value = null;
@@ -25,7 +25,7 @@ class GameMode
         $this->value = $value;
     }
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }

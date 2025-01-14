@@ -12,10 +12,11 @@ final class GameContext
     private ?Player $winner = null;
 
     /**
-     * @param Card[]   $assets
+     * @param string[] $assets
      * @param Player[] $players
-     * @param Card[]   $turns
+     * @param Turn[]   $turns
      * @param Card[]   $discarded
+     * @param mixed[]  $data
      */
     public function __construct(
         private string $id,
@@ -40,6 +41,9 @@ final class GameContext
         $this->currentRound = new GameRound();
     }
 
+    /**
+     * @param Player[] $players
+     */
     public function setPlayerOrder(array $players): void
     {
         $this->players = new PlayersList($players, $this->players->getCurrentPlayer());
@@ -59,7 +63,7 @@ final class GameContext
         return $this->data;
     }
 
-    public function addData(string $key, $value): void
+    public function addData(string $key, mixed $value): void
     {
         $this->data[$key] = $value;
     }
@@ -69,6 +73,9 @@ final class GameContext
         return $this->room;
     }
 
+    /**
+     * @return string[]
+     */
     public function getAssets(): array
     {
         return $this->assets;
@@ -87,6 +94,9 @@ final class GameContext
         return $this->players->getCurrentPlayer();
     }
 
+    /**
+     * @return Card[]
+     */
     public function getCurrentCards(): array
     {
         return $this->currentRound->getCurrentTurn()?->getCards() ?? [];
@@ -109,6 +119,9 @@ final class GameContext
         return $this;
     }
 
+    /**
+     * @return Card[]
+     */
     public function getDiscarded(): array
     {
         return $this->discarded;
@@ -132,6 +145,9 @@ final class GameContext
         $this->currentRound->addTurn(new Turn($cards));
     }
 
+    /**
+     * @param Card[] $cards
+     */
     public function setDiscarded(array $cards): void
     {
         $this->discarded = $cards;
@@ -165,6 +181,9 @@ class PlayersList
 {
     private int $currentIndex;
 
+    /**
+     * @param Player[] $players
+     */
     public function __construct(
         private array $players,
         private Player $currentPlayer,
@@ -188,6 +207,9 @@ class PlayersList
         $this->currentPlayer = $this->players[$this->currentIndex];
     }
 
+    /**
+     * @return Player[]
+     */
     public function toArray(): array
     {
         return $this->players;

@@ -6,7 +6,7 @@ env:
   WITH_DOCKER: 0
 
 jobs:
-  tests:
+  lint:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,3 +26,6 @@ jobs:
 
       - name: Run twig lint
         run: make twig-lint-dry
+
+      - name: Run phpstan
+        run: make phpstan

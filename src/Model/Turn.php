@@ -6,14 +6,17 @@ use App\Model\Card\Card;
 
 final class Turn
 {
-    private array $cards;
-
+    /**
+     * @param Card[] $cards
+     */
     public function __construct(
-        array $cards,
+        private array $cards,
     ) {
-        $this->cards = $cards;
     }
 
+    /**
+     * @return Card[]
+     */
     public function getCards(): array
     {
         return $this->cards;

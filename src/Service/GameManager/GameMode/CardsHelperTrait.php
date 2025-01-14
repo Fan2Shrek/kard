@@ -32,6 +32,9 @@ trait CardsHelperTrait
         return $card->rank->value === $currentCard->rank->value;
     }
 
+    /**
+     * @param Card[] $cards
+     */
     private function allSameRank(array $cards): bool
     {
         $rank = $cards[0]->rank->value;
@@ -44,6 +47,9 @@ trait CardsHelperTrait
         return true;
     }
 
+    /**
+     * @return array<int, Rank>
+     */
     protected function getRanks(): array
     {
         return Rank::cases();

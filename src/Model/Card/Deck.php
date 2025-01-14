@@ -4,6 +4,9 @@ namespace App\Model\Card;
 
 final class Deck
 {
+    /**
+     * @param Card[] $cards
+     */
     public function __construct(
         private array $cards,
     ) {
@@ -28,6 +31,9 @@ final class Deck
         return count($this->cards);
     }
 
+    /**
+     * @return Card[] $cards
+     */
     public function getCards(): array
     {
         return $this->cards;

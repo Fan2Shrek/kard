@@ -17,6 +17,8 @@ interface GameModeInterface
 
     /**
      * @param array<string, Hand> $players
+     *
+     * @return array<string>
      */
     public function getPlayerOrder(array $players): array;
 
