@@ -7,9 +7,11 @@
         <h1>Bievenue sur Kard.fr (non officiel)</h1>
 
         <div class="btn__container">
-            <a class="btn" href='{{ path('app_login') }}'>Se connecter</a>
             {% if app.user %}
                 <a class="btn" href='{{ path('create') }}'>Lancer une partie</a>
+                <a class="btn" href='{{ path('app_logout') }}'>Se déconnecter</a>
+            {% else %}
+                <a class="btn" href='{{ path('app_login') }}'>Se connecter</a>
             {% endif %}
         </div>
     </main>

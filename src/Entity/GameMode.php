@@ -35,6 +35,13 @@ class GameMode
         return $this->value;
     }
 
+    public function setValue(GameModeEnum $value): static
+    {
+        $this->value = $value;
+
+        return $this;
+    }
+
     public function isActive(): bool
     {
         return $this->active;
