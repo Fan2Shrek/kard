@@ -25,7 +25,7 @@ stop:
 	$(COMPOSE) stop
 
 phpstan:
-	$(PHP) vendor/bin/phpstan
+	$(PHP) vendor/bin/phpstan --memory-limit=-1
 
 vendor:
 	$(PHP) composer install -n

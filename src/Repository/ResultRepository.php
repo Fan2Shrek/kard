@@ -16,6 +16,12 @@ class ResultRepository extends ServiceEntityRepository
         parent::__construct($registry, Result::class);
     }
 
+    /**
+     * @return array{
+     *      user: string,
+     *      wins: int
+     * }|null
+     */
     public function findYesterdayBestPlayer(): ?array
     {
         return $this->createQueryBuilder('r')
