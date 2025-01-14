@@ -10,10 +10,12 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Scheduler\Attribute\AsCronTask;
 
+#[AsCronTask('0 0 * * *')] // Run every day at midnight
 #[AsCommand(
     name: 'app:generate-leaderboard',
-    description: 'Generate a leaderboard of the day',
+    description: 'Generate a leaderboard of the previous day',
 )]
 final class GenerateLeaderboardCommand extends Command
 {
