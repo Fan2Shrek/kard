@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Entity\Leaderboard;
+use App\Repository\ResultRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -21,6 +22,7 @@ final class GenerateLeaderboardCommand extends Command
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
+        private ResultRepository $resultRepository,
         private UserRepository $userRepository,
     ) {
         parent::__construct();
@@ -30,16 +32,15 @@ final class GenerateLeaderboardCommand extends Command
     {
         $style = new SymfonyStyle($input, $output);
 
-        $data = $this->userRepository->findYesterdayBestPlayer();
+        $data = $this->resultRepository->findYesterdayBestPlayer();
         if (null === $data) {
             $style->warning('No data found.');
 
             return self::SUCCESS;
         }
+        $user = $this->userRepository->find($data['user']);
 
-        $leaderboard = (new Leaderboard())
-            ->setPlayer($data['user'])
-            ->setWinsNumber($data['wins']);
+        $leaderboard = new Leaderboard(player: $user, winsNumber: $data['wins']);
 
         $this->entityManager->persist($leaderboard);
         $this->entityManager->flush();

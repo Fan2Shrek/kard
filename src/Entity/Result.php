@@ -16,7 +16,7 @@ class Result
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     protected UuidInterface $id;
 
-    #[ORM\ManyToOne(inversedBy: 'results')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $winner = null;
 
@@ -26,6 +26,13 @@ class Result
 
     #[ORM\Column(type: 'datetime')]
     private \DateTimeInterface $date;
+
+    public function __construct(User $winner, GameMode $gameMode, \DateTimeInterface $date)
+    {
+        $this->winner = $winner;
+        $this->gameMode = $gameMode;
+        $this->date = $date;
+    }
 
     public function getId(): ?UuidInterface
     {
@@ -37,34 +44,13 @@ class Result
         return $this->winner;
     }
 
-    public function setWinner(?User $winner): static
-    {
-        $this->winner = $winner;
-
-        return $this;
-    }
-
     public function getGameMode(): ?GameMode
     {
         return $this->gameMode;
     }
 
-    public function setGameMode(GameMode $gameMode): static
-    {
-        $this->gameMode = $gameMode;
-
-        return $this;
-    }
-
     public function getDate(): \DateTimeInterface
     {
         return $this->date;
-    }
-
-    public function setDate(\DateTimeInterface $date): static
-    {
-        $this->date = $date;
-
-        return $this;
     }
 }

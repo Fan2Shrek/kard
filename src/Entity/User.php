@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\UuidInterface;
@@ -38,12 +36,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\OneToMany(targetEntity: Result::class, mappedBy: 'winner')]
-    private Collection $results;
-
     public function __construct(string $username)
     {
-        $this->results = new ArrayCollection();
         $this->username = $username;
     }
 
@@ -123,31 +117,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
-    }
-
-    public function getResults(): Collection
-    {
-        return $this->results;
-    }
-
-    public function addResult(Result $result): static
-    {
-        if (!$this->results->contains($result)) {
-            $this->results->add($result);
-            $result->setWinner($this);
-        }
-
-        return $this;
-    }
-
-    public function removeResult(Result $result): static
-    {
-        if ($this->results->removeElement($result)) {
-            if ($result->getWinner() === $this) {
-                $result->setWinner(null);
-            }
-        }
-
-        return $this;
     }
 }

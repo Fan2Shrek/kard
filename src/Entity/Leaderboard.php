@@ -23,6 +23,12 @@ class Leaderboard
     #[ORM\Column(type: 'integer')]
     private int $winsNumber;
 
+    public function __construct(?User $player = null, int $winsNumber = 0)
+    {
+        $this->player = $player;
+        $this->winsNumber = $winsNumber;
+    }
+
     public function getId(): ?UuidInterface
     {
         return $this->id;
@@ -33,22 +39,8 @@ class Leaderboard
         return $this->player;
     }
 
-    public function setPlayer(?User $player): static
-    {
-        $this->player = $player;
-
-        return $this;
-    }
-
     public function getWinsNumber(): ?int
     {
         return $this->winsNumber;
-    }
-
-    public function setWinsNumber(int $winsNumber): static
-    {
-        $this->winsNumber = $winsNumber;
-
-        return $this;
     }
 }

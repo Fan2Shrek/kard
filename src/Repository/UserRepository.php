@@ -32,19 +32,4 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
     }
-
-    public function findYesterdayBestPlayer(): ?array
-    {
-        return $this->createQueryBuilder('u')
-            ->select('u as user, COUNT(r.id) as wins')
-            ->leftJoin('u.results', 'r')
-            ->where('r.date >= :yesterday')
-            ->andWhere('r.winner = u')
-            ->setParameter('yesterday', new \DateTime('yesterday'))
-            ->groupBy('u')
-            ->orderBy('wins', 'DESC')
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getOneOrNullResult();
-    }
 }
