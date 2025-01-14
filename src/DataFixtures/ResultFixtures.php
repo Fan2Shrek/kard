@@ -12,8 +12,11 @@ class ResultFixtures extends AbstractFixtures implements DependentFixtureInterfa
         return Result::class;
     }
 
+    // TODO : Fix
     public function getData(): iterable
     {
+        return [];
+
         for ($i = 0; $i < 10; ++$i) {
             yield [
                 'winner' => $this->getReference('User_1'),
