@@ -18,7 +18,7 @@ class Result
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $winner = null;
+    private User $winner;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -27,11 +27,11 @@ class Result
     #[ORM\Column(type: 'datetime')]
     private \DateTimeInterface $date;
 
-    public function __construct(User $winner, GameMode $gameMode, \DateTimeInterface $date)
+    public function __construct(User $winner, GameMode $gameMode)
     {
         $this->winner = $winner;
         $this->gameMode = $gameMode;
-        $this->date = $date;
+        $this->date = new \DateTimeImmutable();
     }
 
     public function getId(): ?UuidInterface
