@@ -12,7 +12,16 @@ abstract class AbstractFixtures extends Fixture
         $r = new \ReflectionClass($this->getEntityClass());
 
         foreach ($this->getData() as $key => $data) {
-            $entity = $r->newInstanceWithoutConstructor();
+            $constructor = $r->getConstructor();
+            $args = [];
+
+            foreach ($constructor->getParameters() as $parameter) {
+                if (isset($data[$parameter->getName()])) {
+                    $args[$parameter->getName()] = $data[$parameter->getName()];
+                }
+            }
+
+            $entity = $r->newInstanceArgs($args);
 
             foreach ($data as $property => $value) {
                 $setter = 'set'.ucfirst($property);

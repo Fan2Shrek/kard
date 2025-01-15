@@ -12,11 +12,8 @@ class GameModeFixtures extends AbstractFixtures
         return GameMode::class;
     }
 
-    // TODO : Fix
     public function getData(): iterable
     {
-        return [];
-
         yield [
             'name' => 'President',
             'value' => GameModeEnum::PRESIDENT,

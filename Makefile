@@ -42,6 +42,7 @@ db:
 	$(CONSOLE) d:d:c --if-not-exists
 	$(CONSOLE) d:s:u --force --complete
 	$(MAKE) fixtures
+	$(CONSOLE) app:data:init
 
 migration:
 	$(CONSOLE) d:m:m --allow-no-migration -n

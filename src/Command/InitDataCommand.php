@@ -23,7 +23,7 @@ final class InitDataCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $count = 1;
+        $count = 0;
         foreach (GameModeEnum::cases() as $gm) {
             if ($this->gameModeRepository->findByGameMode($gm)) {
                 continue;
