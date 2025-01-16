@@ -58,6 +58,7 @@ final class TodoCommand extends Command
                 ['Many-to-One', $manyToOneCount, 8, sprintf('%.2f%%', $manyToOneCount / 8 * 100)],
                 ['Many-to-Many', $manyToManyCount, 2, sprintf('%.2f%%', $manyToManyCount / 2 * 100)],
                 ['Inheritance', $inheritanceCount, 1, sprintf('%.2f%%', $inheritanceCount / 1 * 100)],
+                ['Entity', count($metadataList), 10, sprintf('%.2f%%', count($metadataList) / 10 * 100)],
             ])
         ;
         $table->render();

@@ -36,6 +36,7 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
         setHand(data.cards);
     });
 
+    // @todo display one hand per player
     return <>
         <GameContext gameContext={ctx} player={player} currentPlayer={ctx.currentPlayer}>
             { text && <Text key={key} text={text} /> }
