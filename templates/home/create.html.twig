@@ -7,17 +7,19 @@
 
     <p>Choissiser un mode de jeu</p>
 
-    {% for mode in gameModes %}
-        <a onClick="handleClick('{{ mode.value.value }}')">{{ mode.value.value|capitalize }}</a>
-    {% endfor %}
+    <form method="POST" id="gameModeForm">
+        <input type="hidden" name="gameMode" id="selectedMode" value="" />
+        {% for mode in gameModes %}
+            <a onClick="handleClick('{{ mode.value.value }}')">{{ mode.value.value|capitalize }}</a>
+        {% endfor %}
+    </form>
 {% endblock %}
 {% block endscript %}
     <script>
-        const handleClick = (mode) => {
-           fetch("{{ path('create') }}", {
-               method: 'POST',
-               body: JSON.stringify({ gameMode: mode }),
-           }).then(response => response.json());
+        const handleClick = (modeValue) => {
+            const hiddenInput = document.getElementById('selectedMode');
+            hiddenInput.value = modeValue;
+            document.getElementById('gameModeForm').submit();
         }
     </script>
 {% endblock %}

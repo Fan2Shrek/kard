@@ -50,7 +50,6 @@ final class RoomController extends AbstractController
 
             $this->roomRepository->save($room);
 
-            // @todo fix mais la je suis fatigué
             return $this->redirectToRoute('waiting', ['id' => $room->getId()]);
         }
 
