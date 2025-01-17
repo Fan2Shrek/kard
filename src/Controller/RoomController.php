@@ -53,7 +53,7 @@ final class RoomController extends AbstractController
             return $this->redirectToRoute('waiting', ['id' => $room->getId()]);
         }
 
-        $gameModes = $this->gameModeRepository->findAll();
+        $gameModes = $this->gameModeRepository->findActiveGameModes();
 
         return $this->render('home/create.html.twig', [
             'gameModes' => $gameModes,

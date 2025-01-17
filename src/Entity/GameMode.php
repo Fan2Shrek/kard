@@ -17,7 +17,7 @@ class GameMode
     #[ORM\Column(enumType: GameModeEnum::class)]
     private ?GameModeEnum $value = null;
 
-    #[ORM\Column(options: ['default' => false])]
+    #[ORM\Column(options: ['default' => true])]
     private bool $active = true;
 
     public function __construct(GameModeEnum $value)

@@ -18,5 +18,11 @@ class GameModeFixtures extends AbstractFixtures
             'name' => 'President',
             'value' => GameModeEnum::PRESIDENT,
         ];
+
+        yield [
+            'name' => 'AMERICAN_EIGHT',
+            'value' => GameModeEnum::AMERICAN_EIGHT,
+            'active' => false
+        ];
     }
 }
