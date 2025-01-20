@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\GameModeDescription;
 use App\Entity\Room;
 use App\Entity\User;
 use App\Model\Player;
+use App\Repository\GameModeDescriptionRepository;
 use App\Repository\GameModeRepository;
 use App\Repository\RoomRepository;
 use App\Service\Card\CardGenerator;
@@ -33,6 +35,7 @@ final class RoomController extends AbstractController
         private GameManager $gameManager,
         private HubInterface $hub,
         private GameModeRepository $gameModeRepository,
+        private GameModeDescriptionRepository $gameModeDescriptionRepository,
     ) {
     }
 
@@ -54,9 +57,15 @@ final class RoomController extends AbstractController
         }
 
         $gameModes = $this->gameModeRepository->findActiveGameModes();
+        $descriptions = $this->gameModeDescriptionRepository->findAllByGameMode($gameModes);
 
         return $this->render('home/create.html.twig', [
             'gameModes' => $gameModes,
+            'descriptions' => array_reduce($descriptions, function (array $acc, GameModeDescription $description) {
+                $acc[$description->getGameMode()->getId()] = $description;
+
+                return $acc;
+            }, []),
         ]);
     }
 
