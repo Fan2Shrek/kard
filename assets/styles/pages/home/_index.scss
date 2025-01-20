@@ -1,3 +1,9 @@
+// Merci ChatGPT
+$primary-color: #009879;
+$secondary-color: #f3f3f3;
+$hover-color: #f1f1f1;
+$text-light: #ffffff;
+
 .home {
     h1 {
         text-align: center;
@@ -8,5 +14,59 @@
         display: flex;
         justify-content: center;
         gap: 1em;
+    }
+
+    .home {
+        &__content {
+            margin-top: 32px;
+            text-align: center;
+
+            &-games {
+                margin-top: 32px;
+                display: flex;
+                justify-content: center;
+
+                table {
+                    width: 75%;
+                    border-collapse: collapse;
+                    margin: 20px 0;
+                    font-size: 16px;
+                    text-align: left;
+
+                    thead {
+                        tr {
+                            background-color: $primary-color;
+                            color: $text-light;
+                            font-weight: bold;
+                        }
+                    }
+
+                    th, td {
+                        border: 1px solid #dddddd;
+                        padding: 12px 15px;
+                        text-align: center;
+                    }
+
+                    tbody {
+                        tr {
+                            border-bottom: 1px solid #dddddd;
+
+                            &:nth-of-type(even) {
+                                background-color: $secondary-color;
+                            }
+
+                            &:last-of-type {
+                                border-bottom: 2px solid $primary-color;
+                            }
+
+                            &:hover {
+                                background-color: $hover-color;
+                                cursor: pointer;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

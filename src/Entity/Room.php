@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\GameStatusEnum;
 use App\Repository\RoomRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -33,7 +34,10 @@ class Room
     #[ORM\JoinColumn(nullable: false)]
     private GameMode $gameMode;
 
-    public function __construct(GameMode $gameMode, UuidInterface|string|null $id = null)
+    #[ORM\Column(enumType: GameStatusEnum::class)]
+    private GameStatusEnum $status;
+
+    public function __construct(GameMode $gameMode, UuidInterface|string|null $id = null, ?GameStatusEnum $status = null)
     {
         if (\is_string($id)) {
             $id = UuidV4::fromString($id);
@@ -45,6 +49,7 @@ class Room
 
         $this->players = new ArrayCollection();
         $this->gameMode = $gameMode;
+        $this->status = $status ?? GameStatusEnum::WAITING;
     }
 
     public function getId(): ?UuidInterface
@@ -91,5 +96,17 @@ class Room
     public function getGameMode(): ?GameMode
     {
         return $this->gameMode;
+    }
+
+    public function getStatus(): ?GameStatusEnum
+    {
+        return $this->status;
+    }
+
+    public function setStatus(GameStatusEnum $status): static
+    {
+        $this->status = $status;
+
+        return $this;
     }
 }

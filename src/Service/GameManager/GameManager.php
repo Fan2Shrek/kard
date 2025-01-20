@@ -6,6 +6,7 @@ use App\Domain\Exception\RuleException;
 use App\Entity\Result;
 use App\Entity\Room;
 use App\Entity\User;
+use App\Enum\GameStatusEnum;
 use App\Model\Card\Card;
 use App\Model\GameContext;
 use App\Model\Player;
@@ -36,6 +37,7 @@ final class GameManager
      */
     public function play(Room $room, User $player, array $cards): void
     {
+        $room->setStatus(GameStatusEnum::PLAYING);
         $ctx = $this->gameContextProvider->provide($room);
 
         if ($ctx->getCurrentPlayer()->id !== $player->getId()->toString()) {
@@ -77,6 +79,8 @@ final class GameManager
                     'data' => $ctx,
                 ], 'json'),
             ));
+
+            $room->setStatus(GameStatusEnum::FINISHED);
 
             // TODO once we know the winner and loser
             // $result = (new Result())

@@ -115,6 +115,7 @@ final class RoomController extends AbstractController
         }
 
         $this->gameManager->start($gameContext);
+        $this->roomRepository->save($room);
         $this->gameContextProvider->save($gameContext);
 
         $this->hub->publish(new Update(

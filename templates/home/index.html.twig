@@ -14,5 +14,36 @@
                 <a class="btn" href='{{ path('app_login') }}'>Se connecter</a>
             {% endif %}
         </div>
+
+        <div class="home__content">
+            <h2>Parties en cours</h2>
+
+            <div class="home__content-games">
+                {% if currentGames is not empty %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Mode de jeu</th>
+                                <th scope="col">Propriétaire</th>
+                                <th scope="col">Nombre de joueur</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for game in currentGames %}
+                                <tr>
+                                    <td>{{ game.gameMode.value.value|capitalize }}</td>
+                                    <td>{{ game.owner.username }}</td>
+                                    <td>{{ game.players.count }}</td>
+                                    <td><btn><a class="btn" href="{{ path('waiting', {id: game.id}) }}">Rejoindre</a></btn></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>Il n'y a aucune partie en cours</p>
+                {% endif %}
+            </div>
+        </div>
     </main>
 {% endblock %}
