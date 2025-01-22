@@ -1,7 +1,7 @@
 # TODO
 
 - [X] Phpcs
-- [ ] Phpstan ?
+- [X] Phpstan ?
 - [ ] Auto deploy
 - [X] Docker build ?
 
@@ -19,7 +19,7 @@
 - [ ] 8 One2Many (1/8)
 - [ ] 2 Many2Many (1/2)
 - [ ] Admin
-- [ ] Send mail
+- [X] Send mail
 - [ ] One custom voter
 - [ ] 3 role (2/3)
 - [ ] Custom SQL queries
@@ -36,7 +36,7 @@ AND .... DOCS :(
 ## Requirements for a 20/20
 
 - [X] One custom command
-- [ ] Async
+- [X] Async
 - [X] Real time
 - [X] TDD
 - [X] Mutations
