@@ -10,6 +10,7 @@ use App\Enum\GameStatusEnum;
 use App\Model\Card\Card;
 use App\Model\GameContext;
 use App\Model\Player;
+use App\Repository\ResultRepository;
 use App\Service\Card\HandRepository;
 use App\Service\GameContextProvider;
 use App\Service\GameManager\GameMode\GameModeEnum;
@@ -29,22 +30,23 @@ final class GameManager
         private GameContextProvider $gameContextProvider,
         private HandRepository $handRepository,
         private SerializerInterface $serializer,
+        private ResultRepository $resultRepository,
     ) {
     }
 
     /**
      * @param array<Card> $cards
      */
-    public function play(Room $room, User $player, array $cards): void
+    public function play(Room $room, User $user, array $cards): void
     {
         $room->setStatus(GameStatusEnum::PLAYING);
         $ctx = $this->gameContextProvider->provide($room);
 
-        if ($ctx->getCurrentPlayer()->id !== $player->getId()->toString()) {
+        if ($ctx->getCurrentPlayer()->id !== $user->getId()->toString()) {
             throw new \InvalidArgumentException('Not your turn');
         }
 
-        $hand = $this->handRepository->get($player, $room);
+        $hand = $this->handRepository->get($user, $room);
 
         if (!empty($cards) && !$hand->hasCards($cards)) {
             throw new \InvalidArgumentException('Card not found in player hand');
@@ -61,11 +63,11 @@ final class GameManager
         }
 
         $hand->removeCards($cards);
-        $this->handRepository->save($player, $room, $hand);
+        $this->handRepository->save($user, $room, $hand);
 
         $player = current(array_filter(
             $ctx->getPlayers(),
-            fn (Player $p) => $p->id === $player->getId()->toString(),
+            fn (Player $p) => $p->id === $user->getId()->toString(),
         ));
         $player->cardsCount = count($hand);
 
@@ -82,12 +84,8 @@ final class GameManager
 
             $room->setStatus(GameStatusEnum::FINISHED);
 
-            // TODO once we know the winner and loser
-            // $result = (new Result())
-            //     ->setWinner($player)
-            //     ->setGameMode($room->getGameMode())
-            //     ->setDate(new \DateTimeImmutable())
-            // ;
+            $result = new Result($user, $room->getGameMode());
+            $this->resultRepository->save($result);
 
             return;
         }

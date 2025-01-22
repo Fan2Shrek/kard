@@ -24,6 +24,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180)]
     private ?string $username = null;
 
+    #[ORM\Column(length: 180)]
+    private ?string $email = null;
+
     /**
      * @var list<string> The user roles
      */
@@ -36,9 +39,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    public function __construct(string $username)
+    public function __construct(string $username, string $email)
     {
         $this->username = $username;
+        $this->email = $email;
     }
 
     public function getId(): ?UuidInterface
@@ -56,6 +60,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->username = $username;
 
         return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
     }
 
     /**

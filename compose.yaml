@@ -22,7 +22,7 @@ services:
     working_dir: /app
     volumes:
       - .:/app
-  
+
   redis:
     image: redis:7
 
@@ -50,6 +50,27 @@ services:
     volumes:
       - mercure_data:/data
       - mercure_config:/config
+
+  mailer:
+    image: axllent/mailpit
+    ports:
+      - "8025:8025"
+
+  rabbitmq:
+    image: rabbitmq:3.12.4-management
+    ports:
+      - "15672:15672"
+
+  worker:
+    build:
+      context: .
+      dockerfile: .devops/docker/Dockerfile
+      target: ${BUILD_TARGET:-dev}
+    image: ghcr.io/fan2shrek/kard:${VERSION:-latest}
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: "php -d memory_limit=-1 bin/console messenger:consume async"
 
 volumes:
   db_data:

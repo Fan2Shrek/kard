@@ -35,4 +35,10 @@ class ResultRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    public function save(Result $result): void
+    {
+        $this->getEntityManager()->persist($result);
+        $this->getEntityManager()->flush();
+    }
 }
