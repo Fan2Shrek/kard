@@ -1,4 +1,18 @@
-Devoir en symfony pour l'esgi et @BaptisteVasseur (https://github.com/BaptisteVasseur/cours-symfony/blob/main/sujet-projet-symfony.md)
+# Kard
 
+# Description
+Devoir en symfony pour l'ESGI et [@BaptisteVasseur](https://github.com/BaptisteVasseur/cours-symfony/blob/main/sujet-projet-symfony.md)
 
-Fait avec Symfony/ux
+# Installation
+```bash
+boncourage
+```
+
+# Usage
+```bash
+bonnechance
+```
+
+# Contributing
+[@Fan2Shrek](https://www.github.com/Fan2Shrek)
+[@NASSIMLEBG](https://www.github.com/nassimlnd)
