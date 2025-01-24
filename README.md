@@ -14,5 +14,5 @@ bonnechance
 ```
 
 # Contributing
-[@Fan2ShrekLeBg](https://www.github.com/Fan2Shrek)
+[@Fan2Shrek](https://www.github.com/Fan2Shrek)
 [@NASSIMLEBG](https://www.github.com/nassimlnd)
