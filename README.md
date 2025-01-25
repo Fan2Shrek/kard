@@ -5,7 +5,7 @@ Devoir en symfony pour l'Ecole Supérieur de Génie Informatique (ESGI) et [@Bap
 
 # Installation
 ```bash
-boncourage
+./.devops/install.sh
 ```
 
 # Usage
