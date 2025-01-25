@@ -1,7 +1,7 @@
 # Kard
 
 # Description
-Devoir en symfony pour l'ESGI et [@BaptisteVasseur](https://github.com/BaptisteVasseur/cours-symfony/blob/main/sujet-projet-symfony.md)
+Devoir en symfony pour l'Ecole Supérieur de Génie Informatique (ESGI) et [@BaptisteVasseur](https://github.com/BaptisteVasseur/cours-symfony/blob/main/sujet-projet-symfony.md)
 
 # Installation
 ```bash
