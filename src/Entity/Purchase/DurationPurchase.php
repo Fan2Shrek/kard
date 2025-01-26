@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity\Purchase;
 
-use App\Repository\DurationPurchaseRepository;
+use App\Repository\Purchase\DurationPurchaseRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DurationPurchaseRepository::class)]

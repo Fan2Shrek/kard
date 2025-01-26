@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\Purchase;
 
 use App\Entity\Purchase\OneTimePurchase;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
