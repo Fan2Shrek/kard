@@ -1,12 +1,14 @@
 // Components
-@use 'components/ui/button';
+@use 'components/entity/purchase';
 @use 'components/model/hand';
 @use 'components/turbo/player-join';
+@use 'components/ui/button';
 
 // Pages
 @use 'pages/home/index';
 @use 'pages/home/create';
 @use 'pages/home/waiting';
+@use 'pages/purchase/index' as p;
 @use 'pages/security/login';
 
 // Layout

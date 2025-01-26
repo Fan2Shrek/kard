@@ -15,15 +15,15 @@
 
 ## Requirements for a 15/20
 
-- [ ] 10 entities (2/10)
-- [ ] 8 One2Many (1/8)
-- [ ] 2 Many2Many (1/2)
+- [X] 10 entities
+- [ ] 8 One2Many (6/8)
+- [X] 2 Many2Many
 - [ ] Admin
 - [X] Send mail
-- [ ] One custom voter
-- [ ] 3 role (2/3)
-- [ ] Custom SQL queries
-- [ ] External API
+- [X] One custom voter
+- [X] 3 roles
+- [X] Custom SQL queries
+- [X] External API
 - [ ] Dynamic form
 
 AND .... DOCS :(

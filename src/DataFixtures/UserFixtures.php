@@ -25,6 +25,7 @@ class UserFixtures extends AbstractFixtures
             'username' => 'admin',
             'email' => 'admin@kard.fr',
             'password' => self::USER_PASSWORD,
+            'roles' => ['ROLE_ADMIN'],
         ];
 
         yield [
