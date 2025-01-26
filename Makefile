@@ -40,7 +40,7 @@ php:
 db:
 	$(CONSOLE) d:d:d --if-exists --force
 	$(CONSOLE) d:d:c --if-not-exists
-	$(CONSOLE) d:s:u --force --complete
+	$(CONSOLE) d:m:m --allow-no-migration -n
 	$(MAKE) fixtures
 	$(CONSOLE) app:data:init
 
