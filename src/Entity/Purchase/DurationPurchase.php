@@ -8,7 +8,7 @@ use App\Repository\Purchase\DurationPurchaseRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DurationPurchaseRepository::class)]
-final class DurationPurchase extends Purchase
+class DurationPurchase extends Purchase
 {
     #[ORM\Column]
     private int $duration;

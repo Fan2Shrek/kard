@@ -8,6 +8,6 @@ use App\Repository\Purchase\OneTimePurchaseRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: OneTimePurchaseRepository::class)]
-final class OneTimePurchase extends Purchase
+class OneTimePurchase extends Purchase
 {
 }
