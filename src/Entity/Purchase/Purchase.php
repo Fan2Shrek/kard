@@ -7,19 +7,19 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 #[ORM\InheritanceType('SINGLE_TABLE')]
 #[ORM\DiscriminatorColumn(name: 'discr', type: 'string')]
-#[ORM\DiscriminatorMap(['oneTime' => OneTimePurchase::class])]
+#[ORM\DiscriminatorMap(['oneTime' => OneTimePurchase::class, 'duration' => DurationPurchase::class])]
 abstract class Purchase
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private int $id;
 
     #[ORM\Column]
-    private ?int $price = null;
+    private int $price;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private string $name;
 
     public function __construct(string $name, int $price)
     {
@@ -27,12 +27,12 @@ abstract class Purchase
         $this->price = $price;
     }
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getPrice(): ?int
+    public function getPrice(): int
     {
         return $this->price;
     }
@@ -44,7 +44,7 @@ abstract class Purchase
         return $this;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
