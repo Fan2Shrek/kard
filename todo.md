@@ -18,7 +18,7 @@
 - [X] 10 entities
 - [ ] 8 One2Many (6/8)
 - [X] 2 Many2Many
-- [ ] Admin
+- [X] Admin
 - [X] Send mail
 - [X] One custom voter
 - [X] 3 roles
