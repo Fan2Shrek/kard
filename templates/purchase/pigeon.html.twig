@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <main class="pigeon">
+        <h1>Hall of pigeons</h1>
+        <p>Spammer les de mails! :)</p>
+
+        {% for pigeon in pigeons %}
+            <article>
+                <h2>{{ pigeon.username }}</h2>
+                <h2>{{ pigeon.email }}</h2>
+            </article>
+        {% endfor %}
+    </main>
+{% endblock %}

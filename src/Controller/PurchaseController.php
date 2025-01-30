@@ -46,15 +46,12 @@ final class PurchaseController extends AbstractController
         return $this->redirectToRoute('purchase_index');
     }
 
-    #[Route('/pigeon', name: 'pay_purchase', methods: ['GET'])]
+    #[Route('/pigeon', name: 'pigeon_purchase', methods: ['GET'])]
     #[IsGranted('pigeon')]
     public function pigeon(): Response
     {
-        $this->userRepository->findAllPigeon();
-        // TODO: display
-
-        $this->em->flush();
-
-        return $this->redirectToRoute('purchase_index');
+        return $this->render('purchase/pigeon.html.twig', [
+            'pigeons' => $this->userRepository->findAllPigeon(),
+        ]);
     }
 }
