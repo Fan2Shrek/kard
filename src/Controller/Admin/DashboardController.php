@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\GameMode;
+use App\Entity\GameModeDescription;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -30,6 +31,7 @@ class DashboardController extends AbstractDashboardController
     {
         // yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
         yield MenuItem::linkToCrud('Modes de jeu', 'fas fa-list', GameMode::class);
+        yield MenuItem::linkToCrud('Descriptions modes de jeu', 'fas fa-file-lines', GameModeDescription::class);
         yield MenuItem::linkToCrud('Utilisateurs', 'fas fa-user', User::class);
     }
 }
