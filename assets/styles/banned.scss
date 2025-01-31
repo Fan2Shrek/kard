@@ -1,0 +1,15 @@
+// Components
+@use 'components/ui/button';
+
+// Pages
+@use 'pages/home/banned';
+
+// Layout
+@use 'layout/layers';
+@use 'layout/utilities';
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}

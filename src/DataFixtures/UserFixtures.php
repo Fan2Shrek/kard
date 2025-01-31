@@ -33,6 +33,13 @@ class UserFixtures extends AbstractFixtures
             'email' => 'user@gmail.fr',
             'password' => self::USER_PASSWORD,
         ];
+
+        yield [
+            'username' => 'banned',
+            'email' => 'banned@kard.fr',
+            'password' => self::USER_PASSWORD,
+            'roles' => ['ROLE_BANNED'],
+        ];
     }
 
     protected function postInstantiate($entity): void
