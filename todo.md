@@ -12,7 +12,6 @@
 - [X] Fix end turn
 - [X] Data in gameContext
 
-
 ## Requirements for a 15/20
 
 - [X] 10 entities
@@ -29,9 +28,9 @@
 AND .... DOCS :(
 
 - [ ] Specifications
-- [ ] UML
+- [X] UML (Check if it's up to date before sending)
 - [X] Fixtures (to maintains)
-- [ ] How to setup the project (See if `.devops/install.sh` is enough)
+- [X] How to setup the project (`make start`)
 
 ## Requirements for a 20/20
 

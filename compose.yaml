@@ -6,6 +6,12 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: app
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 20s
+      timeout: 20s
+      retries: 5
+      start_period: 60s
     volumes:
       - db_data:/var/lib/mysql
     networks:
@@ -71,6 +77,17 @@ services:
     volumes:
       - .:/app
     command: "php -d memory_limit=-1 bin/console messenger:consume async"
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    environment:
+      UPLOAD_LIMIT: 512M
+      MAX_EXECUTION_TIME: 300
 
 volumes:
   db_data:
