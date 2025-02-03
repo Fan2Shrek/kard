@@ -1,72 +1,126 @@
-// Merci ChatGPT
-$primary-color: #009879;
-$secondary-color: #f3f3f3;
-$hover-color: #f1f1f1;
-$text-light: #ffffff;
-
 .home {
-    h1 {
-        text-align: center;
-        margin-bottom: 1em;
+  min-height: 100vh;
+  padding-top: 10rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  background-image: url(https://images.unsplash.com/photo-1511193311914-0346f16efe90?auto=format&fit=crop&w=1920);
+  background-size: cover;
+  background-position: center;
+
+  & * {
+    font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  }
+
+  & header {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+
+    & > * {
+      position: absolute;
+      width: 6rem;
+      height: 6rem;
+      opacity: 0.2;
     }
 
-    .btn__container {
-        display: flex;
-        justify-content: center;
-        gap: 1em;
+    & .spade {
+      top: 2.5rem;
+      left: 20%;
     }
 
-    .home {
-        &__content {
-            margin-top: 32px;
-            text-align: center;
-
-            &-games {
-                margin-top: 32px;
-                display: flex;
-                justify-content: center;
-
-                table {
-                    width: 75%;
-                    border-collapse: collapse;
-                    margin: 20px 0;
-                    font-size: 16px;
-                    text-align: left;
-
-                    thead {
-                        tr {
-                            background-color: $primary-color;
-                            color: $text-light;
-                            font-weight: bold;
-                        }
-                    }
-
-                    th, td {
-                        border: 1px solid #dddddd;
-                        padding: 12px 15px;
-                        text-align: center;
-                    }
-
-                    tbody {
-                        tr {
-                            border-bottom: 1px solid #dddddd;
-
-                            &:nth-of-type(even) {
-                                background-color: $secondary-color;
-                            }
-
-                            &:last-of-type {
-                                border-bottom: 2px solid $primary-color;
-                            }
-
-                            &:hover {
-                                background-color: $hover-color;
-                                cursor: pointer;
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    & .heart {
+      top: 5rem;
+      right: 33.3%;
     }
+
+    & .diamond {
+      bottom: 5rem;
+      left: 33.3%;
+    }
+
+    & .club {
+      bottom: 10rem;
+      right: 25%;
+    }
+  }
+
+  & main {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    z-index: 10;
+    width: 100%;
+    max-width: 56rem;
+    padding: 3rem;
+    border-radius: 1rem;
+    background: rgb(0 0 0 / 0.8);
+    backdrop-filter: blur(4px);
+    color: white;
+    text-align: center;
+
+    & .card-colors {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      list-style: none;
+
+      & svg {
+        width: 2rem;
+        height: 2rem;
+      }
+    }
+
+    & h1 {
+      font-size: 3.75rem;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    & p {
+      color: #d1d5db;
+      font-size: 1.25rem;
+      line-height: 1.625;
+    }
+
+    & .links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+    }
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow 8s ease-in-out infinite;
+}
+
+.animate-float-medium {
+  animation: float-medium 6s ease-in-out infinite;
+}
+
+.animate-float-fast {
+  animation: float-fast 4s ease-in-out infinite;
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(10px, -10px) rotate(5deg); }
+  50% { transform: translate(-5px, -20px) rotate(-5deg); }
+  75% { transform: translate(-10px, -10px) rotate(5deg); }
+}
+
+@keyframes float-medium {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(15px, -15px) rotate(10deg); }
+  66% { transform: translate(-15px, -25px) rotate(-10deg); }
+}
+
+@keyframes float-fast {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(20px, -20px) rotate(15deg); }
 }

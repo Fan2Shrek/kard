@@ -9,7 +9,7 @@ endif
 
 CONSOLE=$(PHP) php bin/console
 
-.PHONY: start up vendor db fixtures cc stop perm php-lint twig-lint migration sh phpstan
+.PHONY: start up vendor db fixtures cc assets assets-watch stop perm php-lint twig-lint migration sh phpstan
 
 PHP_FIXER=$(PHP) vendor/bin/php-cs-fixer fix --config=./.devops/.php-cs-fixer.php
 TWIG_FIXER=$(PHP) vendor/bin/twig-cs-fixer --config=./.devops/.twig-cs-fixer.php
@@ -54,6 +54,10 @@ cc:
 assets:
 	rm -rf ./public/assets
 	$(CONSOLE) asset-map:compile
+
+assets-watch:
+	rm -rf ./public/assets
+	$(CONSOLE) sass:build --watch
 
 perm:
 	sudo chown -R $(USER):$(USER) ./
