@@ -5,6 +5,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 3rem;
   position: relative;
   overflow: hidden;
   background-image: url(https://images.unsplash.com/photo-1511193311914-0346f16efe90?auto=format&fit=crop&w=1920);
@@ -91,6 +92,59 @@
       display: flex;
       justify-content: center;
       gap: 1.5rem;
+    }
+  }
+
+  & footer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    max-width: 52rem;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    background: rgb(0 0 0 / 0.8);
+    backdrop-filter: blur(4px);
+    color: white;
+    text-align: center;
+
+    & .footer-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: white;
+
+      & h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+
+      & svg {
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+    }
+
+    & table {
+      overflow: hidden;
+      width: 100%;
+      text-indent: 0;
+      border-color: inherit;
+      border-collapse: collapse;
+
+      & th, & td {
+        padding: 0.75rem 1rem;
+        text-align: left;
+      }
+
+      & thead tr {
+        border-color: rgb(255 255 255 / 0.1);
+        border-bottom: 1px solid rgb(255 255 255 / 0.1);
+
+        & th {
+          color: #9ca3af;
+        }
+      }
     }
   }
 }
