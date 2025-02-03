@@ -18,10 +18,10 @@ class GameModeDescription
     #[ORM\JoinColumn(nullable: false)]
     private GameMode $gameMode;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $img = null;
 
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
     public function __construct(GameMode $gameMode)

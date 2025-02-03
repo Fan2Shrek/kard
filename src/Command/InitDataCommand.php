@@ -54,6 +54,8 @@ final class InitDataCommand extends Command
         }
         ++$this->descriptionCount;
 
-        return new GameModeDescription($gameMode);
+        $this->entityManager->persist($gm = new GameModeDescription($gameMode));
+
+        return $gm;
     }
 }
