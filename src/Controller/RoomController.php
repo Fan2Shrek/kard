@@ -108,7 +108,7 @@ final class RoomController extends AbstractController
     public function start(Room $room): Response
     {
         $playerCount = count($room->getPlayers());
-        $hands = $this->cardGenerator->generateHands($playerCount, 2);
+        $hands = $this->cardGenerator->generateHands($playerCount);
         $response = $this->redirectToRoute('game', ['id' => $room->getId()]);
 
         $gameContext = $this->gameContextProvider->provide($room);

@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\GameMode;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 
 class GameModeCrudController extends AbstractCrudController
@@ -17,6 +18,7 @@ class GameModeCrudController extends AbstractCrudController
     {
         return [
             ChoiceField::new('value'),
+            BooleanField::new('active'),
         ];
     }
 }
