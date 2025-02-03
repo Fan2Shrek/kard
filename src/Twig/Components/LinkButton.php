@@ -26,6 +26,11 @@ class LinkButton
 
     public ?string $iconRight = null;
 
+    /**
+     * @param array<string, mixed> $data
+     *
+     * @return array<string, mixed>
+     */
     #[PreMount(priority: 1)]
     public function preMount(array $data): array
     {
