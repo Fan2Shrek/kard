@@ -6,12 +6,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: app
-    healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      interval: 20s
-      timeout: 20s
-      retries: 5
-      start_period: 60s
     volumes:
       - db_data:/var/lib/mysql
     networks:
@@ -81,8 +75,7 @@ services:
   phpmyadmin:
     image: phpmyadmin:latest
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     ports:
       - "8080:80"
     environment:
