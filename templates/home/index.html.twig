@@ -44,40 +44,53 @@
                         variant="danger"
                     />
                 {% else %}
-                    <twig:LinkButton :href="path('app_logout')" text="Se déconnecter" />
+                    <twig:LinkButton
+                        :href="path('app_login')"
+                        text="Se connecter"
+                        iconLeft="ic:outline-login"
+                        variant="success"
+                    />
                 {% endif %}
             </div>
         </main>
 
-        <div class="home__content">
-            <h2>Parties en cours</h2>
-
-            <div class="home__content-games">
-                {% if currentGames is not empty %}
-                    <table>
-                        <thead>
-                            <tr>
-                                <th scope="col">Mode de jeu</th>
-                                <th scope="col">Propriétaire</th>
-                                <th scope="col">Nombre de joueur</th>
-                                <th scope="col">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for game in currentGames %}
-                                <tr>
-                                    <td>{{ game.gameMode.value.value|capitalize }}</td>
-                                    <td>{{ game.owner.username }}</td>
-                                    <td>{{ game.players.count }}</td>
-                                    <td><btn><a class="btn" href="{{ path('waiting', {id: game.id}) }}">Rejoindre</a></btn></td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                {% else %}
-                    <p>Il n'y a aucune partie en cours</p>
-                {% endif %}
+        <footer>
+            <div class="footer-title">
+                <twig:UX:Icon name="lucide:users" color="white" />
+                <h2>Parties en cours</h2>
             </div>
-        </div>
+
+            {% if currentGames is not empty %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mode de jeu</th>
+                            <th>Propriétaire</th>
+                            <th>Joueurs</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for game in currentGames %}
+                            <tr>
+                                <td>{{ game.gameMode.value.value|capitalize }}</td>
+                                <td>{{ game.owner.username }}</td>
+                                <td>{{ game.players.count }}</td>
+                                <td>
+                                    <twig:LinkButton
+                                        :href="path('waiting', {id: game.id})"
+                                        text="Rejoindre"
+                                        iconLeft="ri:arrow-right-s-line"
+                                        size="small"
+                                    />
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Il n'y a aucune partie en cours</p>
+            {% endif %}
+        </footer>
     </article>
 {% endblock %}
