@@ -3,17 +3,51 @@
 {% block title %}Accueil !{% endblock %}
 
 {% block body %}
-    <main class='home'>
-        <h1>Bievenue sur Kard.fr (non officiel)</h1>
+    <article class='home'>
+        {# Background icons #}
+        <header>
+            <twig:UX:Icon name="ri:poker-spades-line" class="animate-float-slow spade" color="white" />
+            <twig:UX:Icon name="ri:heart-line" class="animate-float-medium heart" color="white" />
+            <twig:UX:Icon name="ri:poker-diamonds-line" class="animate-float-fast diamond" color="white" />
+            <twig:UX:Icon name="ph:club" class="animate-float-medium club" color="white" />
+        </header>
 
-        <div class="btn__container">
-            {% if app.user %}
-                <a class="btn" href='{{ path('create') }}'>Lancer une partie</a>
-                <a class="btn" href='{{ path('app_logout') }}'>Se déconnecter</a>
-            {% else %}
-                <a class="btn" href='{{ path('app_login') }}'>Se connecter</a>
-            {% endif %}
-        </div>
+        <main>
+            <ul class="card-colors">
+                <li>
+                    <twig:UX:Icon name="ri:poker-spades-line" color="#ef4444" />
+                </li>
+                <li>
+                    <twig:UX:Icon name="ri:heart-line" color="white" />
+                </li>
+                <li>
+                    <twig:UX:Icon name="ri:poker-diamonds-line" color="#ef4444" />
+                </li>
+                <li>
+                    <twig:UX:Icon name="ph:club" color="white" />
+                </li>
+            </ul>
+            <h1>Bienvenue sur Kard</h1>
+            <p>Le jeu de cartes en ligne</p>
+            <div class="links">
+                {% if app.user %}
+                    <twig:LinkButton
+                        :href="path('create')"
+                        text="Lancer une partie"
+                        iconLeft="ri:play-circle-line"
+                        variant="success"
+                    />
+                    <twig:LinkButton
+                        :href="path('app_logout')"
+                        text="Se déconnecter"
+                        iconLeft="ic:outline-logout"
+                        variant="danger"
+                    />
+                {% else %}
+                    <twig:LinkButton :href="path('app_logout')" text="Se déconnecter" />
+                {% endif %}
+            </div>
+        </main>
 
         <div class="home__content">
             <h2>Parties en cours</h2>
@@ -45,5 +79,5 @@
                 {% endif %}
             </div>
         </div>
-    </main>
+    </article>
 {% endblock %}

@@ -1,0 +1,11 @@
+<a href="{{ href }}" class="{{ linkButton.apply({size, unstyled, variant}, attributes.render('class')) }}">
+    {% if iconLeft is not null %}
+        <twig:UX:Icon name="{{ iconLeft }}" />
+    {% endif %}
+
+    <span>{{ text }}</span>
+
+    {% if iconRight is not null %}
+        <twig:UX:Icon name="{{ iconRight }}" />
+    {% endif %}
+</a>
