@@ -3,17 +3,11 @@
 {% block title %}Accueil !{% endblock %}
 
 {% block body %}
-    <article class='home'>
-        {# Background icons #}
-        <header>
-            <twig:UX:Icon name="ri:poker-spades-line" class="animate-float-slow spade" color="white" />
-            <twig:UX:Icon name="ri:heart-line" class="animate-float-medium heart" color="white" />
-            <twig:UX:Icon name="ri:poker-diamonds-line" class="animate-float-fast diamond" color="white" />
-            <twig:UX:Icon name="ph:club" class="animate-float-medium club" color="white" />
-        </header>
+    <article class='home bg-card-image'>
+        <twig:FloatingBackground />
 
         <main>
-            <twig:ui:ColorsHeader />
+            <twig:ColorsHeader />
             <h1>Bienvenue sur Kard</h1>
             <p>Le jeu de cartes en ligne</p>
             <div class="links">
@@ -27,14 +21,14 @@
                     <twig:LinkButton
                         :href="path('app_logout')"
                         text="Se déconnecter"
-                        iconLeft="ic:outline-logout"
+                        iconLeft="lucide:log-out"
                         variant="danger"
                     />
                 {% else %}
                     <twig:LinkButton
                         :href="path('app_login')"
                         text="Se connecter"
-                        iconLeft="ic:outline-login"
+                        iconLeft="lucide:log-in"
                         variant="success"
                     />
                 {% endif %}

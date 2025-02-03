@@ -1,0 +1,32 @@
+.floating-background {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+
+  & > * {
+    position: absolute;
+    width: 6rem;
+    height: 6rem;
+    opacity: 0.2;
+  }
+
+  & .spade {
+    top: 2.5rem;
+    left: 15%;
+  }
+
+  & .heart {
+    top: 5rem;
+    right: 25%;
+  }
+
+  & .diamond {
+    bottom: 5rem;
+    left: 20%;
+  }
+
+  & .club {
+    bottom: 10rem;
+    right: 15%;
+  }
+}
