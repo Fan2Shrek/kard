@@ -12,7 +12,8 @@
 
             {% if error %}
                 <div class="alert">
-                    <p>Identifiants invalides</p>
+                    <twig:UX:Icon name="ri:error-warning-line" />
+                    <p>Identifiants incorrects. Veuillez vérifier vos nom d'utilisateur et mot de passe.</p>
                 </div>
             {% endif %}
 
@@ -36,6 +37,7 @@
 
             <twig:Button
                 type="submit"
+                form="login-form"
                 text="Se connecter"
                 iconLeft="lucide:log-in"
                 variant="success"

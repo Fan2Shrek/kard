@@ -1,9 +1,16 @@
 {% if href is not null %}
-    <a href="{{ href }}" class="{{ button.apply({size, unstyled, variant}, attributes.render('class')) }}">
+    <a
+        href="{{ href }}"
+        class="{{ button.apply({size, unstyled, variant}, attributes.render('class')) }}"
+    >
         {{ _self.button_content(text, iconLeft, iconRight) }}
     </a>
 {% else %}
-    <button type="{{ type }}" class="{{ button.apply({size, unstyled, variant}, attributes.render('class')) }}">
+    <button
+        type="{{ type }}"
+        form="{{ form }}"
+        class="{{ button.apply({size, unstyled, variant}, attributes.render('class')) }}"
+    >
         {{ _self.button_content(text, iconLeft, iconRight) }}
     </button>
 {% endif %}
