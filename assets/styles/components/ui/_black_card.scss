@@ -1,0 +1,13 @@
+.black-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  width: 100%;
+  padding: 2rem;
+  border-radius: 1rem;
+  background: rgb(0 0 0 / 0.8);
+  backdrop-filter: blur(4px);
+  color: white;
+  text-align: center;
+}

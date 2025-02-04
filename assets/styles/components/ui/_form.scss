@@ -1,0 +1,17 @@
+.alert {
+  color: var(--text-red);
+  background-color: rgb(239 68 68 / 0.1);
+  border: 1px solid rgb(239 68 68 / 0.2);
+  border-radius: 0.5rem;
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem;
+  font-size: 0.875rem;
+
+  & svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--text-red);
+    flex: none;
+  }
+}
