@@ -51,7 +51,7 @@
         }
 
         & input {
-          color: var(--text-gray-accent);
+          color: var(--text-gray);
           width: 100%;
           padding: 0.75rem 1rem 0.75rem 3rem;
           border: 1px solid rgb(255 255 255 / 0.1);
@@ -59,11 +59,15 @@
           background-color: rgb(0 0 0 / 0.5);
           border-color: transparent;
           font-size: 1rem;
-        }
 
-        & input:focus {
-          outline: 2px solid var(--text-green);
-          outline-offset: 1px;
+          &:focus {
+            outline: 2px solid var(--text-green);
+            outline-offset: 1px;
+          }
+
+          &::placeholder {
+            color: var(--text-gray-accent);
+          }
         }
       }
     }
