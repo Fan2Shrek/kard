@@ -3,10 +3,10 @@
 {% block title %}Accueil !{% endblock %}
 
 {% block body %}
-    <article class='home bg-card-image'>
+    <main class='home bg-card-image'>
         <twig:FloatingBackground />
 
-        <main>
+        <twig:BlackCard>
             <twig:ColorsHeader />
             <h1>Bienvenue sur Kard</h1>
             <p>Le jeu de cartes en ligne</p>
@@ -33,10 +33,10 @@
                     />
                 {% endif %}
             </div>
-        </main>
+        </twig:BlackCard>
 
-        <footer>
-            <div class="footer-title">
+        <section class="games">
+            <div class="games-title">
                 <twig:UX:Icon name="lucide:users" color="white" />
                 <h2>Parties en cours</h2>
             </div>
@@ -72,6 +72,6 @@
             {% else %}
                 <p>Il n'y a aucune partie en cours</p>
             {% endif %}
-        </footer>
-    </article>
+        </section>
+    </main>
 {% endblock %}

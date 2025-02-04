@@ -10,24 +10,9 @@
   position: relative;
   overflow: hidden;
 
-  & * {
-    font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  }
-
-  & main {
-    position: relative;
-    display: flex;
-    flex-direction: column;
+  & .black-card {
     gap: 2rem;
-    z-index: 10;
-    width: 100%;
     max-width: 56rem;
-    padding: 3rem;
-    border-radius: 1rem;
-    background: rgb(0 0 0 / 0.8);
-    backdrop-filter: blur(4px);
-    color: white;
-    text-align: center;
 
     & h1 {
       font-size: 3.75rem;
@@ -48,7 +33,7 @@
     }
   }
 
-  & footer {
+  & .games {
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -61,7 +46,7 @@
     color: white;
     text-align: center;
 
-    & .footer-title {
+    & .games-title {
       display: flex;
       align-items: center;
       gap: 0.5rem;

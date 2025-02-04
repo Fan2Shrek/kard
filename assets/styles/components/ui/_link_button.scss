@@ -31,7 +31,7 @@
   }
 
   &--success {
-    background: #22c55e;
+    background: var(--text-green);
     color: white;
 
     &:hover {
