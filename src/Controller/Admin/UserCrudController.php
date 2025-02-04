@@ -35,6 +35,9 @@ class UserCrudController extends AbstractCrudController
         return new User('', '');
     }
 
+    /**
+     * @param User $entityInstance
+     */
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
         $entityInstance->setPassword($this->passwordHasher->hashPassword($entityInstance, $entityInstance->getPassword()));
