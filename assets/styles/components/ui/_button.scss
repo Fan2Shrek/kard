@@ -1,12 +1,74 @@
-.btn {
-    display: inline-block;
-    padding: 0.5em 1em;
-    border: 1px solid #ccc;
-    border-radius: 0.25em;
-    background-color: #fff;
-    color: #333;
-    text-align: center;
-    text-decoration: none;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
+.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 0.5rem;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  // Variant
+  &--default {
+    background: #2563eb;
+    color: white;
+
+    &:hover {
+      background: #1d4ed8;
+    }
+  }
+
+  &--danger {
+    background: #dc2626;
+    color: white;
+
+    &:hover {
+      background: #b91c1c;
+    }
+  }
+
+  &--success {
+    background: var(--text-green);
+    color: white;
+
+    &:hover {
+      background: #16a34a;
+    }
+  }
+
+  // Size
+  &--small {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+
+    & svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+  }
+
+  &--medium {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+
+    & svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+
+  &--large {
+    padding: 1rem 2rem;
+    font-size: 1.25rem;
+
+    & svg {
+      width: 1.75rem;
+      height: 1.75rem;
+    }
+  }
 }

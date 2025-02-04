@@ -9,10 +9,12 @@ use Symfony\UX\TwigComponent\Attribute\ExposeInTemplate;
 use Symfony\UX\TwigComponent\Attribute\PreMount;
 use Twig\Extra\Html\Cva;
 
-#[AsTwigComponent(template: 'components/ui/LinkButton.html.twig')]
-class LinkButton
+#[AsTwigComponent(template: 'components/ui/Button.html.twig')]
+class Button
 {
-    public string $href;
+    public ?string $href = null;
+
+    public ?string $type = 'button';
 
     public string $text;
 
@@ -36,13 +38,16 @@ class LinkButton
     {
         $resolver = (new OptionsResolver())
             ->setDefaults([
+                'href' => null,
                 'iconLeft' => null,
                 'iconRight' => null,
                 'size' => 'medium',
+                'type' => 'button',
                 'unstyled' => false,
                 'variant' => 'default',
             ])
-            ->setRequired(['href', 'text'])
+            ->setAllowedTypes('href', ['null', 'string'])
+            ->setAllowedTypes('type', 'string')
             ->setAllowedTypes('variant', ['null', 'string'])
             ->setAllowedTypes('size', ['null', 'string'])
             ->setAllowedTypes('iconLeft', ['null', 'string'])
@@ -64,23 +69,23 @@ class LinkButton
     }
 
     #[ExposeInTemplate()]
-    public function getLinkButton(): Cva
+    public function getButton(): Cva
     {
         return new Cva(
             variants: [
                 'unstyled' => [
-                    'false' => 'link-button',
+                    'false' => 'button',
                     'true' => '',
                 ],
                 'variant' => [
-                    'default' => 'link-button--default',
-                    'danger' => 'link-button--danger',
-                    'success' => 'link-button--success',
+                    'default' => 'button--default',
+                    'danger' => 'button--danger',
+                    'success' => 'button--success',
                 ],
                 'size' => [
-                    'small' => 'link-button--small',
-                    'medium' => 'link-button--medium',
-                    'large' => 'link-button--large',
+                    'small' => 'button--small',
+                    'medium' => 'button--medium',
+                    'large' => 'button--large',
                 ],
             ]
         );

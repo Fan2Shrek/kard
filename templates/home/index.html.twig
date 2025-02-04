@@ -12,20 +12,20 @@
             <p>Le jeu de cartes en ligne</p>
             <div class="links">
                 {% if app.user %}
-                    <twig:LinkButton
+                    <twig:Button
                         :href="path('create')"
                         text="Lancer une partie"
                         iconLeft="ri:play-circle-line"
                         variant="success"
                     />
-                    <twig:LinkButton
+                    <twig:Button
                         :href="path('app_logout')"
                         text="Se déconnecter"
                         iconLeft="lucide:log-out"
                         variant="danger"
                     />
                 {% else %}
-                    <twig:LinkButton
+                    <twig:Button
                         :href="path('app_login')"
                         text="Se connecter"
                         iconLeft="lucide:log-in"
@@ -58,7 +58,7 @@
                                 <td>{{ game.owner.username }}</td>
                                 <td>{{ game.players.count }}</td>
                                 <td>
-                                    <twig:LinkButton
+                                    <twig:Button
                                         :href="path('waiting', {id: game.id})"
                                         text="Rejoindre"
                                         iconLeft="ri:arrow-right-s-line"
