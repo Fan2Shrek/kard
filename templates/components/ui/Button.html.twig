@@ -3,7 +3,7 @@
         href="{{ href }}"
         class="{{ button.apply({size, unstyled, variant}, attributes.render('class')) }}"
     >
-        {{ _self.button_content(text, iconLeft, iconRight) }}
+        {{ _self.buttonContent(text, iconLeft, iconRight) }}
     </a>
 {% else %}
     <button
@@ -11,18 +11,18 @@
         form="{{ form }}"
         class="{{ button.apply({size, unstyled, variant}, attributes.render('class')) }}"
     >
-        {{ _self.button_content(text, iconLeft, iconRight) }}
+        {{ _self.buttonContent(text, iconLeft, iconRight) }}
     </button>
 {% endif %}
 
-{% macro button_content(text, iconLeft, iconRight) %}
-    {% if iconLeft is not null %}
-        <twig:UX:Icon name="{{ iconLeft }}" />
+{% macro buttonContent(text, icon_left, icon_right) %}
+    {% if icon_left is not null %}
+        <twig:UX:Icon name="{{ icon_left }}" />
     {% endif %}
 
     <span>{{ text }}</span>
 
-    {% if iconRight is not null %}
-        <twig:UX:Icon name="{{ iconRight }}" />
+    {% if icon_right is not null %}
+        <twig:UX:Icon name="{{ icon_right }}" />
     {% endif %}
 {% endmacro %}
