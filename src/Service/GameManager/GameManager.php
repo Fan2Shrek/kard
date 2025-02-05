@@ -17,6 +17,7 @@ use App\Service\GameManager\GameMode\GameModeEnum;
 use App\Service\GameManager\GameMode\GameModeInterface;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 final class GameManager
@@ -31,6 +32,7 @@ final class GameManager
         private HandRepository $handRepository,
         private SerializerInterface $serializer,
         private ResultRepository $resultRepository,
+        private RouterInterface $router,
     ) {
     }
 
@@ -78,7 +80,10 @@ final class GameManager
                 sprintf('room-%s', $room->getId()),
                 $this->serializer->serialize([
                     'action' => 'end',
-                    'data' => $ctx,
+                    'data' => [
+                        'context' => $ctx,
+                        'url' => $this->router->generate('home'),
+                    ],
                 ], 'json'),
             ));
 

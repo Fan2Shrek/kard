@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 
 import './game.css';
 import Hand from './Hand/index.js';
@@ -27,6 +27,14 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
         message: (data) => {
             setKey((key) => key + 1);
             setText(data.text);
+        },
+        end: (data) => {
+            setCtx(data.context);
+            setText(`${data.context.currentPlayer.username} a gagné`);
+
+            setTimeout(() => {
+                window.location.href = data.url;
+            }, 3000);
         },
     }), []);
 
