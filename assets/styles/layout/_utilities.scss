@@ -2,4 +2,23 @@
   .text-center {
     text-align: center;
   }
+
+  .bg-card-image {
+    background-image: url(https://images.unsplash.com/photo-1511193311914-0346f16efe90?auto=format&fit=crop&w=1920);
+    background-size: cover;
+    background-position: center;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 0.5em 1em;
+    border: 1px solid #ccc;
+    border-radius: 0.25em;
+    background-color: #fff;
+    color: #333;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
 }

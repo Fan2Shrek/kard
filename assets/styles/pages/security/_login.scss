@@ -1,101 +1,72 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
-
 .login {
-  font-family: 'Montserrat', sans-serif;
+  min-height: 100vh;
+  padding-bottom: 3rem;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  background-color: #f7f7f7;
+  position: relative;
+  overflow: hidden;
 
-  .container {
-    max-width: 32rem;
-    position: relative;
-    padding: 1rem 0;
+  & .black-card {
+    gap: 1.5rem;
+    max-width: 28rem;
+    text-align: left;
 
-    .gradient-bg {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to right, #93c5fd, #2563eb);
-      transform: rotate(6deg);
-      border-radius: 1.5rem;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    & h2 {
+      font-size: 2rem;
+      text-align: center;
+      font-weight: 600;
     }
 
-    .card {
-      position: relative;
-      background: #fff;
-      border-radius: 1.5rem;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      padding: 2rem;
-      z-index: 1;
-      min-width: 20rem;
-      min-height: 20rem;
+    & form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
 
-      &__content {
-        max-width: 400px;
-        margin: 0 auto;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        gap: 1.5rem;
-        min-height: 16rem;
+    & .form-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
 
-        h1 {
-          font-size: 1.5rem;
-          font-weight: 700;
+      & label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--text-gray);
+      }
+
+      & .input-group {
+        position: relative;
+
+        & svg {
+          position: absolute;
+          top: 50%;
+          left: 0.75rem;
+          width: 1.25rem;
+          height: 1.25rem;
+          color: var(--text-gray-accent);
+          transform: translateY(-50%);
         }
 
-        .alert {
-          background: #fee2e2;
-          color: red;
-          border: 1px solid #f87171;
-          border-left-width: 4px;
-          padding: 1rem;
-          border-radius: 0.375rem;
-          margin-top: 1rem;
-        }
-
-        form {
-          display: flex;
-          flex-direction: column;
-          gap: 1.5rem;
-
-          input {
-            width: 100%;
-            border: 1px solid #cbd5e0;
-            border-radius: 0.375rem;
-            padding: 0.75rem;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.3s;
-
-            &:focus {
-              border-color: #3b82f6;
-            }
-
-            &::placeholder {
-              color: transparent;
-              font-family: 'Montserrat', sans-serif;
-              font-size: 0.875rem;
-              color: #a0aec0;
-            }
-          }
-        }
-
-        button {
-          background: #3b82f6;
-          color: #fff;
-          border: none;
-          border-radius: 0.375rem;
-          padding: 0.75rem;
+        & input {
+          color: var(--text-gray);
+          width: 100%;
+          padding: 0.75rem 1rem 0.75rem 3rem;
+          border: 1px solid rgb(255 255 255 / 0.1);
+          border-radius: 0.5rem;
+          background-color: rgb(0 0 0 / 0.5);
+          border-color: transparent;
           font-size: 1rem;
-          cursor: pointer;
-          transition: background-color 0.3s;
-          font-family: 'Montserrat', sans-serif;
 
-          &:hover {
-            background: #2563eb;
+          &:focus {
+            outline: 2px solid var(--text-green);
+            outline-offset: 1px;
+          }
+
+          &::placeholder {
+            color: var(--text-gray-accent);
           }
         }
       }

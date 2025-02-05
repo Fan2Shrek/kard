@@ -1,0 +1,62 @@
+.floating-background {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+
+  & > * {
+    position: absolute;
+    width: 6rem;
+    height: 6rem;
+    opacity: 0.2;
+  }
+
+  & .spade {
+    top: 2.5rem;
+    left: 15%;
+  }
+
+  & .heart {
+    top: 5rem;
+    right: 25%;
+  }
+
+  & .diamond {
+    bottom: 5rem;
+    left: 20%;
+  }
+
+  & .club {
+    bottom: 10rem;
+    right: 15%;
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow 8s ease-in-out infinite;
+}
+
+.animate-float-medium {
+  animation: float-medium 6s ease-in-out infinite;
+}
+
+.animate-float-fast {
+  animation: float-fast 4s ease-in-out infinite;
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(10px, -10px) rotate(5deg); }
+  50% { transform: translate(-5px, -20px) rotate(-5deg); }
+  75% { transform: translate(-10px, -10px) rotate(5deg); }
+}
+
+@keyframes float-medium {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(15px, -15px) rotate(10deg); }
+  66% { transform: translate(-15px, -25px) rotate(-10deg); }
+}
+
+@keyframes float-fast {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(20px, -20px) rotate(15deg); }
+}

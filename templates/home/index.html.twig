@@ -3,59 +3,40 @@
 {% block title %}Accueil !{% endblock %}
 
 {% block body %}
-    <article class='home'>
-        {# Background icons #}
-        <header>
-            <twig:UX:Icon name="ri:poker-spades-line" class="animate-float-slow spade" color="white" />
-            <twig:UX:Icon name="ri:heart-line" class="animate-float-medium heart" color="white" />
-            <twig:UX:Icon name="ri:poker-diamonds-line" class="animate-float-fast diamond" color="white" />
-            <twig:UX:Icon name="ph:club" class="animate-float-medium club" color="white" />
-        </header>
+    <main class='home bg-card-image'>
+        <twig:FloatingBackground />
 
-        <main>
-            <ul class="card-colors">
-                <li>
-                    <twig:UX:Icon name="ri:poker-spades-line" color="#ef4444" />
-                </li>
-                <li>
-                    <twig:UX:Icon name="ri:heart-line" color="white" />
-                </li>
-                <li>
-                    <twig:UX:Icon name="ri:poker-diamonds-line" color="#ef4444" />
-                </li>
-                <li>
-                    <twig:UX:Icon name="ph:club" color="white" />
-                </li>
-            </ul>
+        <twig:BlackCard>
+            <twig:ColorsHeader />
             <h1>Bienvenue sur Kard</h1>
             <p>Le jeu de cartes en ligne</p>
             <div class="links">
                 {% if app.user %}
-                    <twig:LinkButton
+                    <twig:Button
                         :href="path('create')"
                         text="Lancer une partie"
                         iconLeft="ri:play-circle-line"
                         variant="success"
                     />
-                    <twig:LinkButton
+                    <twig:Button
                         :href="path('app_logout')"
                         text="Se déconnecter"
-                        iconLeft="ic:outline-logout"
+                        iconLeft="lucide:log-out"
                         variant="danger"
                     />
                 {% else %}
-                    <twig:LinkButton
+                    <twig:Button
                         :href="path('app_login')"
                         text="Se connecter"
-                        iconLeft="ic:outline-login"
+                        iconLeft="lucide:log-in"
                         variant="success"
                     />
                 {% endif %}
             </div>
-        </main>
+        </twig:BlackCard>
 
-        <footer>
-            <div class="footer-title">
+        <section class="games">
+            <div class="games-title">
                 <twig:UX:Icon name="lucide:users" color="white" />
                 <h2>Parties en cours</h2>
             </div>
@@ -77,7 +58,7 @@
                                 <td>{{ game.owner.username }}</td>
                                 <td>{{ game.players.count }}</td>
                                 <td>
-                                    <twig:LinkButton
+                                    <twig:Button
                                         :href="path('waiting', {id: game.id})"
                                         text="Rejoindre"
                                         iconLeft="ri:arrow-right-s-line"
@@ -91,6 +72,6 @@
             {% else %}
                 <p>Il n'y a aucune partie en cours</p>
             {% endif %}
-        </footer>
-    </article>
+        </section>
+    </main>
 {% endblock %}

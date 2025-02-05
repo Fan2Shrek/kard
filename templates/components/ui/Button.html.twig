@@ -1,0 +1,28 @@
+{% if href is not null %}
+    <a
+        href="{{ href }}"
+        class="{{ button.apply({size, unstyled, variant}, attributes.render('class')) }}"
+    >
+        {{ _self.buttonContent(text, iconLeft, iconRight) }}
+    </a>
+{% else %}
+    <button
+        type="{{ type }}"
+        form="{{ form }}"
+        class="{{ button.apply({size, unstyled, variant}, attributes.render('class')) }}"
+    >
+        {{ _self.buttonContent(text, iconLeft, iconRight) }}
+    </button>
+{% endif %}
+
+{% macro buttonContent(text, icon_left, icon_right) %}
+    {% if icon_left is not null %}
+        <twig:UX:Icon name="{{ icon_left }}" />
+    {% endif %}
+
+    <span>{{ text }}</span>
+
+    {% if icon_right is not null %}
+        <twig:UX:Icon name="{{ icon_right }}" />
+    {% endif %}
+{% endmacro %}

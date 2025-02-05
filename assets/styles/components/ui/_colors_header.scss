@@ -1,0 +1,11 @@
+.card-colors {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  list-style: none;
+
+  & svg {
+    width: 2rem;
+    height: 2rem;
+  }
+}

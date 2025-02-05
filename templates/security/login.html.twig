@@ -1,32 +1,47 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Se connecter!{% endblock %}
+{% block title %}Connexion{% endblock %}
 
 {% block body %}
-    <main class="login">
-        <div class="container">
-            <div class="gradient-bg"></div>
-            <div class="card">
-                <div class="card__content">
-                    <div class="text-center">
-                        <h1>Connexion</h1>
-                    </div>
+    <main class="login bg-card-image">
+        <twig:FloatingBackground />
 
-                    {% if error %}
-                        <div class="alert">
-                            <p>Identifiants invalides</p>
-                        </div>
-                    {% endif %}
+        <twig:BlackCard>
+            <twig:ColorsHeader />
+            <h2>Connexion</h2>
 
-                    <form method="post" id="login-form">
-                        <input type="text" value="{{ last_username }}" name="_username" id="username" placeholder="Nom d'utilisateur" autocomplete="username" required autofocus>
-                        <input type="password" name="_password" id="password" placeholder="Mot de passe" autocomplete="current-password" required>
-                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-                    </form>
-
-                    <button type="submit" form="login-form">Se connecter</button>
+            {% if error %}
+                <div class="alert">
+                    <twig:UX:Icon name="ri:error-warning-line" />
+                    <p>Identifiants incorrects. Veuillez vérifier vos nom d'utilisateur et mot de passe.</p>
                 </div>
-            </div>
-        </div>
+            {% endif %}
+
+            <form method="post" id="login-form">
+                <div class="form-section">
+                    <label for="username">Nom d'utilisateur</label>
+                    <div class="input-group">
+                        <twig:UX:Icon name="lucide:mail" />
+                        <input type="text" value="{{ last_username }}" name="_username" id="username" placeholder="test@example.com" autocomplete="username" required autofocus>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <label for="password">Mot de passe</label>
+                    <div class="input-group">
+                        <twig:UX:Icon name="lucide:lock" />
+                        <input type="password" name="_password" id="password" placeholder="••••••••" autocomplete="current-password" required>
+                    </div>
+                </div>
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+            </form>
+
+            <twig:Button
+                type="submit"
+                form="login-form"
+                text="Se connecter"
+                iconLeft="lucide:log-in"
+                variant="success"
+            />
+        </twig:BlackCard>
     </main>
 {% endblock %}
