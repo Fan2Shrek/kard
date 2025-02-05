@@ -82,7 +82,7 @@ class Button
                     'true' => '',
                 ],
                 'variant' => [
-                    'default' => 'button--default',
+                    'default' => '',
                     'danger' => 'button--danger',
                     'success' => 'button--success',
                 ],

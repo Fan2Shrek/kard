@@ -13,11 +13,20 @@
             {% endfor %}
         </div>
 
-        <div class="btn__container">
+        <div class="links-row">
             {% if room.owner == app.user %}
-                <a class="btn" href="{{ path('game_start', {id: room.id}) }}" class="btn btn-primary">Commencer !</a>
+                <twig:Button
+                    :href="path('game_start', {id: room.id})"
+                    text="Lancer la partie"
+                    iconLeft="lucide:circle-play"
+                    variant="success"
+                />
             {% endif %}
-            <btn class="btn" onClick={copyLink()} class="btn btn-primary">Copier le lien</btn>
+            <twig:Button
+                text="copier le lien"
+                iconLeft="lucide:copy"
+                onClick="{copyLink()}"
+            />
         </div>
         <div {{ stimulus_controller('waiting') }}></div>
     </main>

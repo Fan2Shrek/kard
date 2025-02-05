@@ -9,21 +9,15 @@
   transition: all 0.3s ease;
   border-radius: 0.5rem;
   border: none;
+  color: white;
+  background: #2563eb;
 
   &:hover {
     transform: scale(1.05);
+    background: #1d4ed8;
   }
 
   // Variant
-  &--default {
-    background: #2563eb;
-    color: white;
-
-    &:hover {
-      background: #1d4ed8;
-    }
-  }
-
   &--danger {
     background: #dc2626;
     color: white;

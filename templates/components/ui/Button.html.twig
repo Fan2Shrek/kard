@@ -2,6 +2,7 @@
     <a
         href="{{ href }}"
         class="{{ button.apply({size, unstyled, variant}, attributes.render('class')) }}"
+        {{ attributes }}
     >
         {{ _self.buttonContent(text, iconLeft, iconRight) }}
     </a>
@@ -10,6 +11,7 @@
         type="{{ type }}"
         form="{{ form }}"
         class="{{ button.apply({size, unstyled, variant}, attributes.render('class')) }}"
+        {{ attributes }}
     >
         {{ _self.buttonContent(text, iconLeft, iconRight) }}
     </button>
