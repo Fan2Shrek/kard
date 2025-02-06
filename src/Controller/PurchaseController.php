@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Purchase\Order;
+use App\Form\Admin\OrderType;
 use App\Repository\Purchase\DurationPurchaseRepository;
 use App\Repository\Purchase\OneTimePurchaseRepository;
 use App\Repository\UserRepository;
 use App\Service\OrderManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -27,12 +29,33 @@ final class PurchaseController extends AbstractController
     ) {
     }
 
-    #[Route('/', name: 'purchase_index', methods: ['GET'])]
-    public function index(): Response
+    #[Route('/', name: 'purchase_index', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function index(Request $request): Response
     {
+        $order = new Order($this->getUser());
+        $form = $this->createForm(OrderType::class, $order);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $purchases = $form->get('purchases')->getData();
+            $purchases = array_map(fn ($purchase) => $purchase['purchase'], $purchases);
+
+            foreach ($purchases as $purchase) {
+                $order->addPurchase($purchase);
+                $this->em->persist($purchase);
+            }
+
+            $this->em->persist($order);
+            $this->em->flush();
+
+            return $this->redirectToRoute('pay_purchase', [
+                'id' => $order->getId(),
+            ]);
+        }
+
         return $this->render('purchase/index.html.twig', [
-            'oneTimePurchases' => $this->oneTimePurchaseRepository->findAll(),
-            'durationPurchases' => $this->durationPurchaseRepository->findAll(),
+            'form' => $form,
         ]);
     }
 

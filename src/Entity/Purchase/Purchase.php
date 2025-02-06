@@ -55,4 +55,17 @@ abstract class Purchase
 
         return $this;
     }
+
+    public function getNameWithType(): string
+    {
+        $isOneTimePurchase = $this instanceof OneTimePurchase;
+        $additional = $isOneTimePurchase
+            ? $this->price.'€'
+            : 'abonnement : '.$this->price.'€/mois';
+
+        return sprintf('%s (%s)',
+            $this->name,
+            $additional
+        );
+    }
 }
