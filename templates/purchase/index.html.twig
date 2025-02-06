@@ -1,14 +1,14 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <main class='purchase'>
-        todo rediriger vers le form dynamique pour chosir plus de produit
+    <main class='purchase bg-money-image'>
         <h1>Nos offres</h1>
-        <h2>Nos offres uniques</h2>
 
+        <h2>Nos offres uniques</h2>
         {% for purchase in oneTimePurchases %}
             {{ include('components/entity/_purchase.html.twig', {purchase: purchase}, false) }}
         {% endfor %}
+
         <h2>Nos abonnements</h2>
         {% for purchase in durationPurchases %}
             {{ include('components/entity/_purchase.html.twig', {purchase: purchase}, false) }}
