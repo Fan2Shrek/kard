@@ -17,13 +17,18 @@ final class OneTimePurchaseFixtures extends AbstractFixtures
     protected function getData(): iterable
     {
         yield [
-            'name' => 'Soutient des développeurs',
+            'name' => 'Soutien des développeurs',
             'price' => 10,
         ];
 
         yield [
-            'name' => 'Soutient des développeurs ++',
+            'name' => 'Soutien des développeurs ++',
             'price' => 20,
+        ];
+
+        yield [
+            'name' => 'Un autre paiement bien cher mais zebi c\'est la vie',
+            'price' => 999,
         ];
     }
 }
