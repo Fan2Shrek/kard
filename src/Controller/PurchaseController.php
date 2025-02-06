@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Purchase\Order;
+use App\Entity\User;
 use App\Form\Admin\OrderType;
-use App\Repository\Purchase\DurationPurchaseRepository;
-use App\Repository\Purchase\OneTimePurchaseRepository;
 use App\Repository\UserRepository;
 use App\Service\OrderManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,8 +20,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class PurchaseController extends AbstractController
 {
     public function __construct(
-        private OneTimePurchaseRepository $oneTimePurchaseRepository,
-        private DurationPurchaseRepository $durationPurchaseRepository,
         private UserRepository $userRepository,
         private OrderManager $orderManager,
         private EntityManagerInterface $em,
@@ -76,5 +73,16 @@ final class PurchaseController extends AbstractController
         return $this->render('purchase/pigeon.html.twig', [
             'pigeons' => $this->userRepository->findAllPigeon(),
         ]);
+    }
+
+    protected function getUser(): User
+    {
+        $user = parent::getUser();
+
+        if (!$user instanceof User) {
+            throw new \LogicException('User must be an instance of User');
+        }
+
+        return $user;
     }
 }
