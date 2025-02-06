@@ -14,10 +14,6 @@ class Button
 {
     public ?string $href = null;
 
-    public ?string $type = 'button';
-
-    public ?string $form = null;
-
     public string $text;
 
     public bool $unstyled = false;
@@ -40,18 +36,14 @@ class Button
     {
         $resolver = (new OptionsResolver())
             ->setDefaults([
-                'form' => null,
                 'href' => null,
                 'iconLeft' => null,
                 'iconRight' => null,
                 'size' => 'medium',
-                'type' => 'button',
                 'unstyled' => false,
                 'variant' => 'default',
             ])
             ->setAllowedTypes('href', ['null', 'string'])
-            ->setAllowedTypes('type', 'string')
-            ->setAllowedTypes('form', ['null', 'string'])
             ->setAllowedTypes('variant', ['null', 'string'])
             ->setAllowedTypes('size', ['null', 'string'])
             ->setAllowedTypes('iconLeft', ['null', 'string'])

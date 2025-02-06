@@ -1,0 +1,24 @@
+{{ form_start(form, {attr: {id: 'purchase-form'}}) }}
+    <h2>Nos offres</h2>
+    <div
+        data-controller="form-collection"
+        data-form-collection-index-value="{{ form.purchases|length > 0 ? form.purchases|last.vars.name + 1 : 0 }}"
+        data-form-collection-prototype-value="{{ form_widget(form.purchases.vars.prototype)|e('html_attr') }}"
+    >
+        <ul data-form-collection-target="collectionContainer"></ul>
+
+        <twig:Button
+            type="button"
+            data-action="click->form-collection#addCollectionElement"
+            text="Ajouter une offre à la commande"
+            iconLeft="fluent-emoji-high-contrast:money-with-wings"
+            size="small"
+        />
+    </div>
+    <twig:Button
+        type="submit"
+        text="Valider la commande"
+        iconLeft="lucide:check"
+        variant="success"
+    />
+{{ form_end(form) }}

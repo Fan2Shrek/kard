@@ -15,10 +15,6 @@ final class OrderManager
     {
         $this->stripeClient->pay($order->getTotal() * 100);
 
-        foreach ($order->getPurchases() as $purchase) {
-            $user = $order->getUser();
-
-            $user->addRole('ROLE_PIGEON');
-        }
+        $order->getUser()->addRole('ROLE_PIGEON');
     }
 }
