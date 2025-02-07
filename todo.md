@@ -23,11 +23,11 @@
 - [X] 3 roles
 - [X] Custom SQL queries
 - [X] External API
-- [ ] Dynamic form
+- [X] Dynamic form
 
 AND .... DOCS :(
 
-- [ ] Specifications
+- [X] Specifications
 - [X] UML (Check if it's up to date before sending)
 - [X] Fixtures (to maintains)
 - [X] How to setup the project (`make start`)
