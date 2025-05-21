@@ -16,7 +16,7 @@
 }
 
 .game {
-  background-color: #026341;
+  background-color: var(--bg-game-card);
   min-height: 100vh;
   overflow: hidden;
   display: flex;
