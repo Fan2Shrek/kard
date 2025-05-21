@@ -1,8 +1,10 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <main class="waiting">
-        <h1>En attente de joueurs !</h1>
+    <main class="waiting bg-card-image">
+        <div class="waiting__header black-card">
+            <h1>En attente de joueurs !</h1>
+        </div>
         <div {{ stimulus_controller('stream', {url: mercure('waiting')}) }}></div>
         <div id="player-join">
             <h2>Joueurs</h2>

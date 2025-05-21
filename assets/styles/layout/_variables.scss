@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 @layer base {
   :root {
     // Text
@@ -6,8 +8,13 @@
     --text-green: #22c55e;
     --text-green-light: #4ade80;
     --text-red: #ef4444;
+    --card-red: #b91c1c;
 
     // Background
+    --bg-game-card: #026341;
     --bg-green-accent: #16a34a;
+
+    // Font
+    --font: 'Inter', sans-serif;
   }
 }

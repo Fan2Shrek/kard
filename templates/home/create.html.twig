@@ -1,25 +1,28 @@
 {% extends 'base.html.twig' %}
 
-{# todo rendre beau #}
 {% block body %}
-    <main class="create">
-        <h1>Création !</h1>
-
-        <p>Choissiser un mode de jeu</p>
-
-        <form method="POST" id="gameModeForm">
-            <input type="hidden" name="gameMode" id="selectedMode" value="" />
-            <div class="description__list">
-                {% for mode in gameModes %}
-                    {% set description = descriptions[mode.id] %}
-                    <div class="description__container">
-                        <a class="description__card" style="background-image: url('{{ description.img }}');" onClick="handleClick('{{ mode.value.value }}')">
-                            <p class="description__content">{{ mode.value.value|capitalize }}</p>
-                        </a>
-                    </div>
-                {% endfor %}
-            </div>
-        </form>
+    <main class="create bg-card-image">
+        <div class="create__header">
+            <h1>Créer une partie</h1>
+            <p>Choisissez un mode de jeu</p>
+        </div>
+        <div class="create__content">
+            <form method="POST" id="gameModeForm">
+                <input type="hidden" name="gameMode" id="selectedMode" value=""/>
+                <div class="description__list">
+                    {% for mode in gameModes %}
+                        {% set description = descriptions[mode.id] %}
+                        <div class="description__container">
+                            <div class="description__before"></div>
+                            <a class="description__card" style="background-image: url('{{ description.img }}');"
+                               onClick="handleClick('{{ mode.value.value }}')">
+                                <p class="description__content">{{ mode.value.value|capitalize }}</p>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </form>
+        </div>
     </main>
 {% endblock %}
 {% block endscript %}
