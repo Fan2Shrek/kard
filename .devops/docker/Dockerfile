@@ -16,7 +16,7 @@ RUN install-php-extensions pdo_mysql redis intl amqp opcache
 
 RUN apk add --no-cache \
     nginx \
-    supervisor
+    multirun
 
 COPY .devops/docker/default.conf /etc/nginx/http.d/default.conf
 COPY .devops/docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
@@ -24,7 +24,7 @@ COPY .devops/docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY . /app
 WORKDIR /app
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+CMD ["multirun", "php-fpm -R -F", "nginx -g 'daemon off;'"]
 
 FROM main AS dev
 
