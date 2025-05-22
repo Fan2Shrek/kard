@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\GameModeDescription;
 use App\Entity\Room;
 use App\Entity\User;
+use App\Event\Room\RoomEvent;
 use App\Model\Player;
 use App\Repository\GameModeDescriptionRepository;
 use App\Repository\GameModeRepository;
@@ -21,6 +22,7 @@ use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /** @todo serviceSubscriber for perfomance optimisation */
 #[Route('/room')]
@@ -36,6 +38,7 @@ final class RoomController extends AbstractController
         private HubInterface $hub,
         private GameModeRepository $gameModeRepository,
         private GameModeDescriptionRepository $gameModeDescriptionRepository,
+        private EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -52,6 +55,8 @@ final class RoomController extends AbstractController
             $room->addPlayer($user);
 
             $this->roomRepository->save($room);
+
+            $this->eventDispatcher->dispatch(new RoomEvent($room), 'room.created');
 
             return $this->redirectToRoute('waiting', ['id' => $room->getId()]);
         }
