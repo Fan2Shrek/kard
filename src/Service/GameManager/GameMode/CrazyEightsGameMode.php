@@ -7,9 +7,8 @@ namespace App\Service\GameManager\GameMode;
 use App\Domain\Exception\RuleException;
 use App\Enum\Card\Rank;
 use App\Model\GameContext;
-use App\Model\Player;
 
-final class CrazyEightsGameMode extends AbstractGameMode
+final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameModeInterface
 {
     use CardsHelperTrait;
 
@@ -18,11 +17,23 @@ final class CrazyEightsGameMode extends AbstractGameMode
         return GameModeEnum::CRAZY_EIGHTS;
     }
 
-    public function getPlayerOrder(array $players): array
+    public function getCardsCount(int $playerCount): int
     {
-        shuffle($players);
+        return 7;
+    }
 
-        return array_map(fn (Player $p) => $p->id, $players);
+    public function setup(GameContext $ctx, array $hands): void
+    {
+        // @todo implements draw pile
+        // and draw the first card
+    }
+
+    public function getPlayerOrder(array $hands): array
+    {
+        $ids = array_keys($hands);
+        shuffle($ids);
+
+        return $ids;
     }
 
     public function isGameFinished(GameContext $gameContext): bool

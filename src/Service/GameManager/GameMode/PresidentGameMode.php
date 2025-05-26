@@ -24,6 +24,11 @@ final class PresidentGameMode extends AbstractGameMode
         return GameModeEnum::PRESIDENT;
     }
 
+    public function getCardsCount(int $playerCount): ?int
+    {
+        return null;
+    }
+
     public function getPlayerOrder(array $players): array
     {
         $order = [];

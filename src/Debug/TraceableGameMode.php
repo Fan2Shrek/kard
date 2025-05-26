@@ -36,6 +36,17 @@ final class TraceableGameMode implements GameModeInterface
         return $this->gameMode->getGameMode();
     }
 
+    public function getCardsCount(int $playerCount): ?int
+    {
+        $event = $this->stopwatch->start('game_mode_get_cards_count');
+
+        try {
+            return $this->gameMode->getCardsCount($playerCount);
+        } finally {
+            $event->stop();
+        }
+    }
+
     public function getPlayerOrder(array $players): array
     {
         return $this->gameMode->getPlayerOrder($players);

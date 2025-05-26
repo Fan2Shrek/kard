@@ -10,7 +10,6 @@ use App\Model\Player;
 use App\Repository\GameModeDescriptionRepository;
 use App\Repository\GameModeRepository;
 use App\Repository\RoomRepository;
-use App\Service\Card\CardGenerator;
 use App\Service\Card\HandRepository;
 use App\Service\GameContextProvider;
 use App\Service\GameManager\GameManager;
@@ -30,7 +29,6 @@ final class RoomController extends AbstractController
 {
     public function __construct(
         private RoomRepository $roomRepository,
-        private CardGenerator $cardGenerator,
         private SerializerInterface $serializer,
         private HandRepository $handRepository,
         private GameContextProvider $gameContextProvider,
@@ -112,8 +110,7 @@ final class RoomController extends AbstractController
     #[Route('/start/{id}', name: 'game_start')]
     public function start(Room $room): Response
     {
-        $playerCount = count($room->getPlayers());
-        $hands = $this->cardGenerator->generateHands($playerCount);
+        $hands = $this->gameManager->drawHands($room);
         $response = $this->redirectToRoute('game', ['id' => $room->getId()]);
 
         $gameContext = $this->gameContextProvider->provide($room);

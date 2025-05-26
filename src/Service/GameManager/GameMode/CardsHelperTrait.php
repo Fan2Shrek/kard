@@ -52,6 +52,9 @@ trait CardsHelperTrait
         return true;
     }
 
+    /**
+     * @param Card[] $cards
+     */
     private function allSameSuit(array $cards): bool
     {
         $suit = $cards[0]->suit->value;

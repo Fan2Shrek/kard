@@ -16,6 +16,11 @@ interface GameModeInterface
     public function getGameMode(): GameModeEnum;
 
     /**
+     * @return int|null The number of cards, or draw all cards
+     */
+    public function getCardsCount(int $playerCount): ?int;
+
+    /**
      * @param array<string, Hand> $players
      *
      * @return array<string>

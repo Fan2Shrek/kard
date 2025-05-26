@@ -178,5 +178,22 @@ describe('Huit américain: mercure', function () {
             expectMercureMessage(current(HubSpy::$published))->toBeAction('message');
             expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'Changement de sens !');
         });
+
+        test("Lorsqu'un huit est posé, un évenement est envoyé", function () {
+            Arrange::setCurrentCard(7, 'h');
+
+            Act::playCard(8, 's');
+
+            expect(HubSpy::$published)->toHaveCount(1);
+        })->todo();
+
+        test("Lorsqu'un huit est posé, un évenement contient un message", function () {
+            Arrange::setCurrentCard(7, 'h');
+
+            Act::playCard(8, 's');
+
+            expectMercureMessage(current(HubSpy::$published))->toBeAction('message');
+            expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'Changement de couleur !');
+        })->todo();
     });
 });

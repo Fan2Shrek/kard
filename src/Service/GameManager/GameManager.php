@@ -8,13 +8,16 @@ use App\Entity\Room;
 use App\Entity\User;
 use App\Enum\GameStatusEnum;
 use App\Model\Card\Card;
+use App\Model\Card\Hand;
 use App\Model\GameContext;
 use App\Model\Player;
 use App\Repository\ResultRepository;
+use App\Service\Card\CardGenerator;
 use App\Service\Card\HandRepository;
 use App\Service\GameContextProvider;
 use App\Service\GameManager\GameMode\GameModeEnum;
 use App\Service\GameManager\GameMode\GameModeInterface;
+use App\Service\GameManager\GameMode\SetupGameModeInterface;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\RouterInterface;
@@ -33,7 +36,21 @@ final class GameManager
         private SerializerInterface $serializer,
         private ResultRepository $resultRepository,
         private RouterInterface $router,
+        private CardGenerator $cardGenerator,
     ) {
+    }
+
+    /**
+     * @return array<Hand>
+     */
+    public function drawHands(Room $room): array
+    {
+        $gameMode = $this->getGameMode($room->getGameMode()->getValue());
+
+        return $this->cardGenerator->generateHands(
+            count($room->getPlayers()),
+            $gameMode->getCardsCount(count($room->getPlayers())) ?: 0,
+        );
     }
 
     /**
@@ -113,7 +130,6 @@ final class GameManager
     {
         $players = $ctx->getPlayers();
 
-        /* $players = $this->getGameMode($room->getGameMode())->getPlayerOrder($players); */
         $hands = array_reduce(
             $players,
             function ($acc, $player) use ($ctx) {
@@ -134,8 +150,12 @@ final class GameManager
             [],
         );
 
-        /* $order = $this->getGameMode($ctx->getRoom()->getGameMode())->getPlayerOrder($players); */
-        $order = $this->getGameMode(GameModeEnum::PRESIDENT)->getPlayerOrder($hands);
+        $gameMode = $this->getGameMode($ctx->getRoom()->getGameMode()->getValue());
+        $order = $gameMode->getPlayerOrder($hands);
+
+        if ($gameMode instanceof SetupGameModeInterface) {
+            $gameMode->setup($ctx, $hands);
+        }
 
         $ctx->setPlayerOrder(
             array_map(
