@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useSpring, animated } from '@react-spring/web'
 
-export default ({ card, img, selected = false, clickable = true, onClick = () => '', angle = null, xOffset = null, yOffset = null }) => {
+export default ({ card, img, springStyle = {}, selected = false, clickable = true, onClick = () => '', angle = null, xOffset = null, yOffset = null }) => {
     const [toggle, setToggle] = useState(selected);
 
     const styles = useSpring({
@@ -23,6 +23,13 @@ export default ({ card, img, selected = false, clickable = true, onClick = () =>
         setToggle(selected);
     }, [selected]);
 
+    const combinedStyle = {
+        ...springStyle,
+        transform: springStyle?.transform?.to
+            ? springStyle.transform.to(v => `${v} ${styles.transform.get()}`)
+            : styles.transform,
+    };
+
     const customCss = angle || xOffset || yOffset;
 
     useEffect(() => {
@@ -31,7 +38,7 @@ export default ({ card, img, selected = false, clickable = true, onClick = () =>
         }
     }, [angle]);
 
-    return <animated.div onClick={handleClick} style={styles} ref={containerRef} className='card'>
+    return <animated.div onClick={handleClick} style={combinedStyle} ref={containerRef} className='card'>
         <img src={img} />
     </animated.div>;
 }

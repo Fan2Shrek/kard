@@ -51,7 +51,7 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
             <div className='game'>
                 <PlayerList players={ctx.players} currentPlayer={ctx.currentPlayer} />
                 <div className='game__right'>
-                    <HiddenHand count={5} />
+                    {ctx.players.map(player => player.id !== ctx.currentPlayer.id && <HiddenHand count={player.cardsCount} /> )}
                     <div className='middle'>
                         <div id='middle'>
                             <PlayedCard cards={ctx.round.turns.map(t => t.cards).flat()} />
