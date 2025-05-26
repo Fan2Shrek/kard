@@ -7,27 +7,17 @@ use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
 use App\Model\Card\Card;
 use App\Model\GameContext;
-use Symfony\Component\Mercure\HubInterface;
-use Symfony\Component\Mercure\Update;
 
 /**
  * @see https://bicyclecards.com/how-to-play/presidents
  *
  * @todo gameData in gameContext ??
  */
-final class PresidentGameMode implements GameModeInterface
+final class PresidentGameMode extends AbstractGameMode
 {
     use CardsHelperTrait;
 
-    private GameContext $gameContext;
-    /** @var Card[] */
-    private array $cards;
     private bool $isTurnFinished;
-
-    public function __construct(
-        private HubInterface $hub,
-    ) {
-    }
 
     public function getGameMode(): GameModeEnum
     {
@@ -62,7 +52,7 @@ final class PresidentGameMode implements GameModeInterface
         return false;
     }
 
-    public function play(array $cards, GameContext $gameContext): void
+    protected function doPlay(array $cards, GameContext $gameContext): void
     {
         $this->cards = $cards;
         $this->gameContext = $gameContext;
@@ -262,18 +252,5 @@ final class PresidentGameMode implements GameModeInterface
         $this->gameContext->newRound();
         $this->dispatchMercureEvent('message', 'Fin du tour');
         $this->isTurnFinished = true;
-    }
-
-    private function dispatchMercureEvent(string $eventName, string $text): void
-    {
-        $this->hub->publish(new Update(
-            \sprintf('room-%s', $this->gameContext->getId()),
-            \json_encode([
-                'action' => $eventName,
-                'data' => [
-                    'text' => $text,
-                ],
-            ])
-        ));
     }
 }
