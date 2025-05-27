@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useSpring, animated } from '@react-spring/web'
 
+import './card.css';
+
 export default ({ card, img, springStyle = {}, selected = false, clickable = true, onClick = () => '', angle = null, xOffset = null, yOffset = null }) => {
     const [toggle, setToggle] = useState(selected);
 
@@ -30,7 +32,7 @@ export default ({ card, img, springStyle = {}, selected = false, clickable = tru
             : styles.transform,
     };
 
-    const customCss = angle || xOffset || yOffset;
+    const customCss = angle !== null || xOffset !== null || yOffset !== null;
 
     useEffect(() => {
         if (customCss && containerRef.current) {

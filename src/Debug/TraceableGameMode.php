@@ -5,6 +5,7 @@ namespace App\Debug;
 use App\Model\GameContext;
 use App\Service\GameManager\GameMode\GameModeEnum;
 use App\Service\GameManager\GameMode\GameModeInterface;
+use App\Service\GameManager\GameMode\SetupGameModeInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
@@ -12,12 +13,18 @@ use Symfony\Component\Stopwatch\Stopwatch;
  *
  * Probably unnecessary, but it's a still a good flex :p
  */
-final class TraceableGameMode implements GameModeInterface
+final class TraceableGameMode implements GameModeInterface, SetupGameModeInterface
 {
     public function __construct(
         private GameModeInterface $gameMode,
         private Stopwatch $stopwatch,
-    ) {
+    ) {}
+
+    public function setup(GameContext $gameContext, array $hands): void
+    {
+        if ($this->gameMode instanceof SetupGameModeInterface) {
+            $this->gameMode->setup($gameContext, $hands);
+        }
     }
 
     public function play(array $cards, GameContext $gameContext): void

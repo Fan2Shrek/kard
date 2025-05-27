@@ -110,10 +110,11 @@ final class RoomController extends AbstractController
     #[Route('/start/{id}', name: 'game_start')]
     public function start(Room $room): Response
     {
-        $hands = $this->gameManager->drawHands($room);
+        [$hands, $drawPile] = $this->gameManager->drawHands($room);
         $response = $this->redirectToRoute('game', ['id' => $room->getId()]);
 
         $gameContext = $this->gameContextProvider->provide($room);
+        $gameContext->setDrawPile($drawPile);
         $players = array_reduce($gameContext->getPlayers(), function (array $carry, Player $player) {
             $carry[$player->id] = $player;
 

@@ -7,6 +7,7 @@ import GameContext from '../Context/GameContext.js';
 import HiddenHand from './Hand/HiddenHand.js';
 import Stack from './Card/Stack.js';
 import PlayedCard from './Card/PlayedCard.js';
+import DrawPile from './Card/DrawPile.js';
 import PlayerList from './Player/PlayerList.js';
 import Text from './Animation/Text.js';
 
@@ -44,6 +45,8 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
         setHand(data.cards);
     });
 
+    console.log('gameContext', ctx);
+
     // @todo display one hand per player
     return <>
         <GameContext gameContext={ctx} player={player} currentPlayer={ctx.currentPlayer}>
@@ -56,6 +59,7 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
                         <div id='middle'>
                             <PlayedCard cards={ctx.round.turns.map(t => t.cards).flat()} />
                             <Stack cards={ctx.discarded} />
+                            <DrawPile cards={ctx.drawPile} />
                         </div>
                     </div>
                     <div className='bottom'>

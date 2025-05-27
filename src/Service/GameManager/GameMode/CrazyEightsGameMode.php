@@ -24,8 +24,7 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
 
     public function setup(GameContext $ctx, array $hands): void
     {
-        // @todo implements draw pile
-        // and draw the first card
+        $ctx->setCurrentCards($ctx->draw(1));
     }
 
     public function getPlayerOrder(array $hands): array

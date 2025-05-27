@@ -4,17 +4,20 @@ namespace App\Model;
 
 use App\Entity\Room;
 use App\Model\Card\Card;
+use App\Model\Card\Deck;
 
 final class GameContext
 {
     private PlayersList $players;
     private GameRound $currentRound;
     private ?Player $winner = null;
+    private Deck $drawPill;
 
     /**
      * @param string[] $assets
      * @param Player[] $players
      * @param Turn[]   $turns
+     * @param Card[]   $drawPill
      * @param Card[]   $discarded
      * @param mixed[]  $data
      */
@@ -25,11 +28,13 @@ final class GameContext
         array $players,
         Player $currentPlayer,
         array $turns = [],
+        array $drawPill = [],
         private array $discarded = [],
         private array $data = [],
     ) {
         $this->players = new PlayersList($players, $currentPlayer);
         $this->currentRound = new GameRound($turns);
+        $this->drawPill = new Deck($drawPill);
     }
 
     public function newRound(): void
@@ -47,6 +52,37 @@ final class GameContext
     public function setPlayerOrder(array $players): void
     {
         $this->players = new PlayersList($players, $this->players->getCurrentPlayer());
+    }
+
+    /**
+     * @return Card[]
+     */
+    public function setDrawPile(array $drawPile): void
+    {
+        $this->drawPill = new Deck($drawPile);
+    }
+
+    public function draw(int $count): array
+    {
+        if (empty($this->drawPill)) {
+            return [];
+        }
+
+        $cards = [];
+        for ($i = 0; $i < $count; ++$i) {
+            if (empty($this->drawPill)) {
+                break;
+            }
+
+            $cards[] = $this->drawPill->draw();
+        }
+
+        return $cards;
+    }
+
+    public function getDrawPile(): array
+    {
+        return $this->drawPill->getCards();
     }
 
     public function getId(): string

@@ -32,7 +32,10 @@ final class CardGenerator
     }
 
     /**
-     * @return Hand[]
+     * @return array{
+     *    0: Hand[],
+     *    1: Card[],
+     * }
      */
     public function generateHands(int $handsCount, int $cards = 0): array
     {
@@ -54,6 +57,6 @@ final class CardGenerator
             $hands[] = $hand;
         }
 
-        return $hands;
+        return [$hands, $deck->getCards()];
     }
 }
