@@ -19,7 +19,8 @@ final class TraceableGameMode implements GameModeInterface, SetupGameModeInterfa
     public function __construct(
         private GameModeInterface $gameMode,
         private Stopwatch $stopwatch,
-    ) {}
+    ) {
+    }
 
     public function setup(GameContext $gameContext, array $hands): void
     {

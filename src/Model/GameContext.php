@@ -60,13 +60,16 @@ final class GameContext
     }
 
     /**
-     * @return Card[]
+     * @param Card[] $drawPile
      */
     public function setDrawPile(array $drawPile): void
     {
         $this->drawPill = new Deck($drawPile);
     }
 
+    /**
+     * @return Card[] an array of drawn cards
+     */
     public function draw(int $count): array
     {
         if (empty($this->drawPill)) {
@@ -75,16 +78,15 @@ final class GameContext
 
         $cards = [];
         for ($i = 0; $i < $count; ++$i) {
-            if (empty($this->drawPill)) {
-                break;
-            }
-
             $cards[] = $this->drawPill->draw();
         }
 
         return $cards;
     }
 
+    /**
+     * @return Card[] an array of cards in the draw pile
+     */
     public function getDrawPile(): array
     {
         return $this->drawPill->getCards();

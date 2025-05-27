@@ -1,7 +1,8 @@
 <?php
 
 use App\Entity\GameMode;
-use App\Model\Player; use App\Service\GameManager\GameMode\CrazyEightsGameMode;
+use App\Model\Player;
+use App\Service\GameManager\GameMode\CrazyEightsGameMode;
 use App\Service\GameManager\GameMode\GameModeEnum;
 use App\Tests\AAA\Act\Act;
 use App\Tests\AAA\Arrange\Arrange;
@@ -13,6 +14,8 @@ beforeEach(function () {
     HubSpy::reset();
     Act::addContext('gamePlayer', new CrazyEightsGameMode(
         new HubSpy(),
+        $this->createMock(App\Service\Card\HandRepository::class),
+        $this->createMock(Symfony\Component\Serializer\SerializerInterface::class)
     ));
     Act::addContext('gameMode', new GameMode(GameModeEnum::CRAZY_EIGHTS));
 });

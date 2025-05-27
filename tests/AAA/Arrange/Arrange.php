@@ -44,7 +44,7 @@ abstract /* static */ class Arrange
     {
         $cards = [];
 
-        for ($i = 0; $i < $count; $i++) {
+        for ($i = 0; $i < $count; ++$i) {
             $cards[] = new Card(Suit::SPADES, Rank::from((string) ($i + 1)));
         }
 

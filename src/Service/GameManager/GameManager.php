@@ -41,7 +41,10 @@ final class GameManager
     }
 
     /**
-     * @return array<Hand>
+     * @return array{
+     *    0: Hand[],
+     *    1: Card[],
+     * }
      */
     public function drawHands(Room $room): array
     {
