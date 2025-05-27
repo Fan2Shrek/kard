@@ -8,6 +8,7 @@ use App\Entity\Room;
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
 use App\Model\Card\Card;
+use App\Model\Card\Deck;
 use App\Model\GameContext;
 use App\Model\Player;
 use App\Model\Turn;
@@ -33,6 +34,22 @@ abstract /* static */ class Arrange
     public static function setCurrentCards(array $cards): void
     {
         Act::addContext('gameContext', self::createGameContext([new Turn(array_map(fn (int $card) => new Card(Suit::SPADES, Rank::from((string) $card)), $cards))]));
+    }
+
+    public static function setCurrentHand(array $cards): void
+    {
+        Act::addContext('handCards', array_map(fn (array $card) => new Card(Suit::from($card[1]), Rank::from((string) $card[0])), $cards));
+    }
+
+    public static function setDrawPillSize(int $count): void
+    {
+        $cards = [];
+
+        for ($i = 0; $i < $count; $i++) {
+            $cards[] = new Card(Suit::SPADES, Rank::from((string) ($i + 1)));
+        }
+
+        Act::addContext('drawPill', $cards);
     }
 
     public static function setGameStarted(): void
@@ -74,6 +91,7 @@ abstract /* static */ class Arrange
             $players,
             current($players),
             $turns,
+            Act::get('drawPill') ?? [],
         );
     }
 }

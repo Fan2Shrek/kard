@@ -214,6 +214,17 @@ describe('Président: règles basiques', function () {
         expect($result)->toBeFalse();
         expect(Act::get('gameContext')->getWinner())->toBeNull();
     });
+
+    test('Poser une carte la retire de sa main', function () {
+        Arrange::setcurrentcard(3);
+        Arrange::setCurrentHand([
+            [5, 's'],
+            [6, 's'],
+        ]);
+        Act::playCard(5, 's');
+
+        expect(Act::get('currentHand'))->toHaveCount(1);
+    });
 });
 
 describe('Président: carte simple', function () {

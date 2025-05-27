@@ -6,6 +6,7 @@ use App\Domain\Exception\RuleException;
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
 use App\Model\Card\Card;
+use App\Model\Card\Hand;
 use App\Model\GameContext;
 
 /**
@@ -57,7 +58,7 @@ final class PresidentGameMode extends AbstractGameMode
         return false;
     }
 
-    protected function doPlay(array $cards, GameContext $gameContext): void
+    protected function doPlay(array $cards, GameContext $gameContext, Hand $hand): void
     {
         $this->cards = $cards;
         $this->gameContext = $gameContext;
@@ -98,6 +99,7 @@ final class PresidentGameMode extends AbstractGameMode
         $gameContext->setCurrentCards($cards);
         $gameContext->addData('lastPlayer', $gameContext->getCurrentPlayer()->id);
         $gameContext->nextPlayer();
+        $hand->removeCards($cards);
     }
 
     /**

@@ -74,14 +74,13 @@ final class GameManager
         $gameMode = $this->getGameMode($room->getGameMode()->getValue());
 
         try {
-            $gameMode->play($cards, $ctx);
+            $gameMode->play($cards, $ctx, $hand);
         } catch (RuleException $e) {
             /* @todo do something */
             throw $e;
             /* return; */
         }
 
-        $hand->removeCards($cards);
         $this->handRepository->save($user, $room, $hand);
 
         $player = current(array_filter(

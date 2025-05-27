@@ -5,6 +5,8 @@ namespace App\Tests\AAA\Act;
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
 use App\Model\Card\Card;
+use App\Model\Card\Hand;
+use App\Model\GameContext;
 
 abstract /* static */ class Act
 {
@@ -20,13 +22,13 @@ abstract /* static */ class Act
         $play = $value ? [
             self::createCard($value, $color),
         ] : [];
-        static::get('gamePlayer')->play($play, static::get('gameContext'));
+        static::play($play, static::get('gameContext'), static::get('handCards') ?? []);
     }
 
     public static function playCards(array $cards): void
     {
         $cards = array_map(fn ($card) => self::createCard($card[0], $card[1] ?? 's'), $cards);
-        static::get('gamePlayer')->play($cards, static::get('gameContext'));
+        static::play($cards, static::get('gameContext'), static::get('handCards') ?? []);
     }
 
     public static function orderPlayers(array $players): array
@@ -47,5 +49,13 @@ abstract /* static */ class Act
     public static function get(string $key): mixed
     {
         return self::$context[$key] ?? null;
+    }
+
+    private static function play(array $cards, GameContext $gameContext, array $hand): void
+    {
+        $hand = new Hand($hand);
+        self::$context['currentHand'] = $hand;
+
+        static::get('gamePlayer')->play($cards, $gameContext, $hand);
     }
 }

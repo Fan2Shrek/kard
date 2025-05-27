@@ -1,8 +1,7 @@
 <?php
 
 use App\Entity\GameMode;
-use App\Model\Player;
-use App\Service\GameManager\GameMode\CrazyEightsGameMode;
+use App\Model\Player; use App\Service\GameManager\GameMode\CrazyEightsGameMode;
 use App\Service\GameManager\GameMode\GameModeEnum;
 use App\Tests\AAA\Act\Act;
 use App\Tests\AAA\Arrange\Arrange;
@@ -127,6 +126,21 @@ describe('Huit américain: cartes spéciales', function () {
         Act::playCard('j', 's');
 
         expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('3');
+    });
+
+    test('Sauter son tour permet de piocher', function () {
+        Arrange::setDrawPillSize(3);
+        Arrange::setRound([
+            [7],
+        ]);
+        Arrange::setCurrentHand([
+            [5, 's'],
+            [6, 's'],
+        ]);
+
+        Act::playCard(null);
+
+        expect(Act::get('currentHand'))->toHaveCount(3);
     });
 
     test('Le 8 permet de changer de couleur', function () {

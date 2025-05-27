@@ -6,6 +6,7 @@ namespace App\Service\GameManager\GameMode;
 
 use App\Domain\Exception\RuleException;
 use App\Enum\Card\Rank;
+use App\Model\Card\Hand;
 use App\Model\GameContext;
 
 final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameModeInterface
@@ -48,8 +49,15 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
         return false;
     }
 
-    protected function doPlay(array $cards, GameContext $gameContext): void
+    protected function doPlay(array $cards, GameContext $gameContext, Hand $hand): void
     {
+        if (empty($cards)) {
+            $hand->add($gameContext->draw(1)[0]);
+            $gameContext->nextPlayer();
+
+            return;
+        }
+
         $currentCards = $gameContext->getCurrentCards();
         // always the last card played
         $currentCard = end($currentCards);
@@ -81,7 +89,6 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
         }
 
         $gameContext->setCurrentCards($cards);
-        $gameContext->addData('lastPlayer', $gameContext->getCurrentPlayer()->id);
         $gameContext->nextPlayer();
     }
 }

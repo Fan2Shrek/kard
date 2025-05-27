@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service\GameManager\GameMode;
 
 use App\Model\Card\Card;
+use App\Model\Card\Hand;
 use App\Model\GameContext;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
@@ -22,12 +23,12 @@ abstract class AbstractGameMode implements GameModeInterface
     ) {
     }
 
-    public function play(array $cards, GameContext $gameContext): void
+    public function play(array $cards, GameContext $gameContext, Hand $hand): void
     {
         $this->cards = $cards;
         $this->gameContext = $gameContext;
 
-        $this->doPlay($cards, $gameContext);
+        $this->doPlay($cards, $gameContext, $hand);
     }
 
     /**
@@ -35,7 +36,7 @@ abstract class AbstractGameMode implements GameModeInterface
      *
      * @param array<Card> $cards
      */
-    abstract protected function doPlay(array $cards, GameContext $gameContext): void;
+    abstract protected function doPlay(array $cards, GameContext $gameContext, Hand $hand): void;
 
     protected function dispatchMercureEvent(string $eventName, string $text): void
     {

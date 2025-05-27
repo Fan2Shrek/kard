@@ -2,6 +2,7 @@
 
 namespace App\Debug;
 
+use App\Model\Card\Hand;
 use App\Model\GameContext;
 use App\Service\GameManager\GameMode\GameModeEnum;
 use App\Service\GameManager\GameMode\GameModeInterface;
@@ -27,12 +28,12 @@ final class TraceableGameMode implements GameModeInterface, SetupGameModeInterfa
         }
     }
 
-    public function play(array $cards, GameContext $gameContext): void
+    public function play(array $cards, GameContext $gameContext, Hand $hand): void
     {
         $event = $this->stopwatch->start('game_mode_play');
 
         try {
-            $this->gameMode->play($cards, $gameContext);
+            $this->gameMode->play($cards, $gameContext, $hand);
         } finally {
             $event->stop();
         }

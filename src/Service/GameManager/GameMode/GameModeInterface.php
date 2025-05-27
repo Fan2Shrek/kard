@@ -11,7 +11,7 @@ interface GameModeInterface
     /**
      * @param array<Card> $cards
      */
-    public function play(array $cards, GameContext $gameContext): void;
+    public function play(array $cards, GameContext $gameContext, Hand $hand): void;
 
     public function getGameMode(): GameModeEnum;
 
