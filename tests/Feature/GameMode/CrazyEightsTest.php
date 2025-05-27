@@ -58,7 +58,7 @@ describe('Huit américain: règles basiques', function () {
 
         Act::playCards([
             [5, 'd'],
-            [5, 'd'],
+            [7, 'd'],
         ]);
     })->throws('Cards are unrelated');
 
@@ -97,6 +97,33 @@ describe('Huit américain: règles basiques', function () {
 
         expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('2');
     });
+
+    test('Sauter son tour permet de piocher', function () {
+        Arrange::setDrawPillSize(3);
+        Arrange::setRound([
+            [7],
+        ]);
+        Arrange::setCurrentHand([
+            [5, 's'],
+            [6, 's'],
+        ]);
+
+        Act::playCard(null);
+
+        expect(Act::get('currentHand'))->toHaveCount(3);
+    });
+
+    test('Sauter son tour passe au joueur suivant', function () {
+        Arrange::setPlayers([
+            new Player('1', 'Player 1'),
+            new Player('2', 'Player 2'),
+        ]);
+        Arrange::setCurrentCard(5, 's');
+
+        Act::playCard(null);
+
+        expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('2');
+    });
 });
 
 describe('Huit américain: cartes spéciales', function () {
@@ -126,21 +153,6 @@ describe('Huit américain: cartes spéciales', function () {
         Act::playCard('j', 's');
 
         expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('3');
-    });
-
-    test('Sauter son tour permet de piocher', function () {
-        Arrange::setDrawPillSize(3);
-        Arrange::setRound([
-            [7],
-        ]);
-        Arrange::setCurrentHand([
-            [5, 's'],
-            [6, 's'],
-        ]);
-
-        Act::playCard(null);
-
-        expect(Act::get('currentHand'))->toHaveCount(3);
     });
 
     test('Poser une carte la retire de sa main', function () {
@@ -220,5 +232,20 @@ describe('Huit américain: mercure', function () {
             expectMercureMessage(current(HubSpy::$published))->toBeAction('message');
             expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'Changement de couleur !');
         })->todo();
+    });
+});
+
+describe('Huit américan: fin de partie', function () {
+    test('Un joueur sans carte est déclaré vainqueur', function () {
+        Arrange::setPlayers([
+            new Player('1', 'Player 1', 3),
+            new Player('2', 'Player 2', 0),
+        ]);
+        Arrange::setGameStarted();
+
+        $result = Act::isGameFinished();
+
+        expect($result)->toBeTrue();
+        expect(Act::get('gameContext'))->toHaveWinner('Player 2');
     });
 });

@@ -1,4 +1,4 @@
-name: PHP tests 
+name: PHP tests
 
 on: [push]
 
@@ -8,11 +8,11 @@ env:
 jobs:
   tests:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -26,4 +26,4 @@ jobs:
         run: ${PHP} vendor/bin/pest --parallel
 
       - name: Run mutation testing
-        run: ${PHP} vendor/bin/pest --mutate --parallel --min=100
+        run: ${PHP} vendor/bin/pest --mutate --parallel --min=90

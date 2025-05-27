@@ -32,7 +32,7 @@ export default ({ card, img, springStyle = {}, selected = false, clickable = tru
     const customCss = angle !== null || xOffset !== null || yOffset !== null;
 
     useEffect(() => {
-        if (customCss && containerRef.current && toggle) {
+        if (customCss && containerRef.current && !clickable && !toggle) {
             containerRef.current.style.transform = `rotate(${angle ?? 0}deg) translate(${xOffset ?? 0}px, ${yOffset ?? 0}px)`;
         }
     }, [angle]);

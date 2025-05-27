@@ -6,7 +6,6 @@ import { GameContext } from '../../Context/GameContext.js';
 
 export default ({ cards }) => {
     const { getBackAsset } = useContext(GameContext);
-    console.log('cards', cards);
 
     return <div className='stack'>
         {cards.map((card, i) =>

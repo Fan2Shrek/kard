@@ -1,15 +1,11 @@
 import React, { useMemo, useState, useEffect } from 'react';
 
 import './game.css';
-import Hand from './Hand/index.js';
 import useMercure from '../hook/useMercure.js';
 import GameContext from '../Context/GameContext.js';
-import HiddenHand from './Hand/HiddenHand.js';
-import Stack from './Card/Stack.js';
-import PlayedCard from './Card/PlayedCard.js';
-import DrawPile from './Card/DrawPile.js';
-import PlayerList from './Player/PlayerList.js';
 import Text from './Animation/Text.js';
+import PresidentBoard from './GameMode/PresidentBoard.js';
+import CrazyEightsBoard from './GameMode/CrazyEightsBoard.js';
 
 export default ({ gameContext, hand: currentHand, player: user }) => {
     const [ctx, setCtx] = useState(JSON.parse(gameContext));
@@ -51,22 +47,8 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
     return <>
         <GameContext gameContext={ctx} player={player} currentPlayer={ctx.currentPlayer}>
             { text && <Text key={key} text={text} /> }
-            <div className='game'>
-                <PlayerList players={ctx.players} currentPlayer={ctx.currentPlayer} />
-                <div className='game__right'>
-                    {ctx.players.map(player => player.id !== ctx.currentPlayer.id && <HiddenHand count={player.cardsCount} /> )}
-                    <div className='middle'>
-                        <div id='middle'>
-                            <PlayedCard cards={ctx.round.turns.map(t => t.cards).flat()} />
-                            <Stack cards={ctx.discarded} />
-                            <DrawPile cards={ctx.drawPile} />
-                        </div>
-                    </div>
-                    <div className='bottom'>
-                        <Hand hand={hand} canPlay={ctx.currentPlayer.id === player.id} />
-                    </div>
-                </div>
-            </div>
+            { ctx.room.gameMode.value === 'president' && <PresidentBoard ctx={ctx} hand={hand} player={player} /> }
+            { ctx.room.gameMode.value === 'crazy_eights' && <CrazyEightsBoard ctx={ctx} hand={hand} player={player} /> }
         </GameContext>
     </>;
 }
