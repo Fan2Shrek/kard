@@ -62,7 +62,7 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
         // always the last card played
         $currentCard = end($currentCards);
 
-        if (!$this->allSameRank($cards) && !$this->allSameSuit($cards)) {
+        if (!$this->allSameRank($cards)) {
             throw new RuleException($this->getGameMode(), 'Cards are unrelated');
         }
 
@@ -88,6 +88,7 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
             );
         }
 
+        $hand->removeCards($cards);
         $gameContext->setCurrentCards($cards);
         $gameContext->nextPlayer();
     }

@@ -53,14 +53,14 @@ describe('Huit américain: règles basiques', function () {
         ]);
     })->throwsNoExceptions();
 
-    test('Il est possible de jouer plusieurs cartes si elles ont la même couleur', function () {
+    test('Il est impossible de jouer plusieurs cartes si elles ont la même couleur', function () {
         Arrange::setCurrentCard(5, 's');
 
         Act::playCards([
             [5, 'd'],
             [5, 'd'],
         ]);
-    })->throwsNoExceptions();
+    })->throws('Cards are unrelated');
 
     test('Il est impossible de jouer plusieurs cartes si elles rien en commun', function () {
         Arrange::setCurrentCard(5, 's');
@@ -141,6 +141,17 @@ describe('Huit américain: cartes spéciales', function () {
         Act::playCard(null);
 
         expect(Act::get('currentHand'))->toHaveCount(3);
+    });
+
+    test('Poser une carte la retire de sa main', function () {
+        Arrange::setcurrentcard(3);
+        Arrange::setCurrentHand([
+            [5, 's'],
+            [6, 's'],
+        ]);
+        Act::playCard(5, 's');
+
+        expect(Act::get('currentHand'))->toHaveCount(1);
     });
 
     test('Le 8 permet de changer de couleur', function () {
