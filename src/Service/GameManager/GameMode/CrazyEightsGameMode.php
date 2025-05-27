@@ -8,10 +8,22 @@ use App\Domain\Exception\RuleException;
 use App\Enum\Card\Rank;
 use App\Model\Card\Hand;
 use App\Model\GameContext;
+use App\Service\Card\HandRepository;
+use Symfony\Component\Mercure\HubInterface;
+use Symfony\Component\Mercure\Update;
+use Symfony\Component\Serializer\SerializerInterface;
 
 final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameModeInterface
 {
     use CardsHelperTrait;
+
+    public function __construct(
+        HubInterface $hub,
+        private HandRepository $handRepository,
+        private SerializerInterface $serializer,
+    ) {
+        parent::__construct($hub);
+    }
 
     public function getGameMode(): GameModeEnum
     {
@@ -78,6 +90,24 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
                 'message',
                 'Changement de sens !',
             );
+        }
+
+        if (Rank::TWO === $mainCard->rank) {
+            $nextPlayer = $gameContext->getNextPlayer();
+            $nextHand = $this->handRepository->get($nextPlayer->id, $gameContext->getRoom());
+            $nextHand->addMultipleCards($gameContext->draw(2 * count($cards)));
+            $this->handRepository->save($nextPlayer->id, $gameContext->getRoom(), $nextHand);
+
+            $this->dispatchMercureEvent(
+                'message',
+                \sprintf('Le joueur %s pioche %d cartes', $gameContext->getNextPlayer()->username, 2 * count($cards)),
+            );
+            $this->getHub()->publish(new Update(
+                sprintf('room-%s-%s', $gameContext->getRoom()->getId(), $nextPlayer->id),
+                $this->serializer->serialize($nextHand, 'json'),
+            ));
+
+            $gameContext->nextPlayer(); // skip turn
         }
 
         if (Rank::JACK === $mainCard->rank) {

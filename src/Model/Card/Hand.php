@@ -22,6 +22,19 @@ final class Hand implements \Countable
         $this->add($card);
     }
 
+    /**
+     * @param Card[] $cards
+    */
+    public function addMultipleCards(array $cards): void
+    {
+        foreach ($cards as $card) {
+            if (!$card instanceof Card) {
+                throw new \InvalidArgumentException('All items must be instances of Card');
+            }
+            $this->add($card);
+        }
+    }
+
     public function remove(Card $card): void
     {
         if (!$this->has($card)) {

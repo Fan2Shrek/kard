@@ -31,6 +31,11 @@ abstract class AbstractGameMode implements GameModeInterface
         $this->doPlay($cards, $gameContext, $hand);
     }
 
+    public function getHub(): HubInterface
+    {
+        return $this->hub;
+    }
+
     /**
      * This method implements the game rules.
      *

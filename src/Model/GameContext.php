@@ -54,6 +54,11 @@ final class GameContext
         $this->players = new PlayersList($players, $this->players->getCurrentPlayer());
     }
 
+    public function getNextPlayer(): Player
+    {
+        return $this->players->getNextPlayer();
+    }
+
     /**
      * @return Card[]
      */
@@ -230,6 +235,15 @@ class PlayersList
     public function getCurrentPlayer(): Player
     {
         return $this->currentPlayer;
+    }
+
+    public function getNextPlayer(): Player
+    {
+        if ($this->currentIndex === count($this->players) - 1) {
+            return $this->players[0];
+        }
+
+        return $this->players[$this->currentIndex + 1];
     }
 
     public function nextPlayer(): void

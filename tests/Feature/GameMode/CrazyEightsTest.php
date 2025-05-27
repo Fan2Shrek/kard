@@ -166,6 +166,18 @@ describe('Huit américain: cartes spéciales', function () {
         expect(Act::get('currentHand'))->toHaveCount(1);
     });
 
+    test('Poser un deux force le joueur suivant à piocher deux cartes', function () {
+        Arrange::setDrawPillSize(3);
+        Arrange::setRound([
+            [7],
+        ]);
+
+        Act::playCard(2, 's');
+
+        // implements tests for multiple 2 cards
+        expect(Act::get('currentHand'))->toHaveCount(4);
+    })->todo('Seems hard to implements ^^');
+
     test('Le 8 permet de changer de couleur', function () {
         Arrange::setCurrentCard(5, 's');
 
