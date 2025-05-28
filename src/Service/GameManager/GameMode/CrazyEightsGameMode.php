@@ -6,6 +6,7 @@ namespace App\Service\GameManager\GameMode;
 
 use App\Domain\Exception\RuleException;
 use App\Enum\Card\Rank;
+use App\Enum\Card\Suit;
 use App\Model\Card\Hand;
 use App\Model\GameContext;
 use App\Service\Card\HandRepository;
@@ -61,7 +62,7 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
         return false;
     }
 
-    protected function doPlay(array $cards, GameContext $gameContext, Hand $hand): void
+    protected function doPlay(array $cards, GameContext $gameContext, Hand $hand, array $data): void
     {
         if (empty($cards)) {
             $hand->add($gameContext->draw(1)[0]);
@@ -80,7 +81,30 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
 
         $mainCard = $cards[0];
 
-        if (!$this->isSameRank($mainCard, $currentCard) && !$this->isSameSuit($mainCard, $currentCard)) {
+        if (Rank::EIGHT === $mainCard->rank) {
+            if (!isset($data['name'])) {
+                throw new \LogicException('You must provide a name for the new suit');
+            }
+
+            $newSuit = Suit::from(strtolower($data['name'][0]));
+
+            $this->dispatchMercureEvent(
+                'message',
+                \sprintf('Changement de couleur en %s', $newSuit->getSymbol()),
+            );
+
+            $gameContext->addData('suit', $newSuit);
+            $gameContext->setCurrentCards($cards);
+            $gameContext->nextPlayer();
+
+            return;
+        }
+
+        if (Rank::EIGHT === $currentCard->rank && ($gameContext->getData('suit') ?? $currentCard->suit) !== $mainCard->suit) {
+            throw new RuleException($this->getGameMode(), 'Cannot play this card');
+        }
+
+        if (Rank::EIGHT !== $currentCard->rank && !$this->isSameRank($mainCard, $currentCard) && !$this->isSameSuit($mainCard, $currentCard)) {
             throw new RuleException($this->getGameMode(), 'Cannot play this card');
         }
 

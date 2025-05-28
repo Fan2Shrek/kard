@@ -1,6 +1,7 @@
 <?php
 
 use App\Entity\GameMode;
+use App\Enum\Card\Suit;
 use App\Model\Player;
 use App\Service\GameManager\GameMode\CrazyEightsGameMode;
 use App\Service\GameManager\GameMode\GameModeEnum;
@@ -26,25 +27,25 @@ describe('Huit américain: règles basiques', function () {
     test('Il est possible de jouer une carte', function () {
         Arrange::setCurrentCard(7);
 
-        Act::playCard(8, 's');
+        Act::playCard(9, 's');
     })->throwsNoExceptions();
 
-    test('Il est possible de jouer une sur la même valeur', function () {
+    test('Il est possible de jouer une carte sur la même valeur', function () {
         Arrange::setCurrentCard(8);
 
-        Act::playCard(8, 's');
+        Act::playCard(9, 's');
     })->throwsNoExceptions();
 
-    test('Il est possible de jouer une sur la même couleur', function () {
+    test('Il est possible de jouer une carte sur la même couleur', function () {
         Arrange::setCurrentCard(1, suit: 'h');
 
-        Act::playCard(8, 'h');
+        Act::playCard(9, 'h');
     })->throwsNoExceptions();
 
-    test('Il est impossible de jouer ni la couleur ni la valuer est la même', function () {
+    test('Il est impossible de jouer ni la couleur ni la valeur est la même', function () {
         Arrange::setCurrentCard(3, 's');
 
-        Act::playCard(8, 'c');
+        Act::playCard(9, 'c');
     })->throws('Cannot play this card');
 
     test('Il est possible de jouer plusieurs cartes si elles ont la même valeur', function () {
@@ -87,7 +88,7 @@ describe('Huit américain: règles basiques', function () {
         expect($players)->not()->toBe([1, 2, 3, 4]);
     });
 
-    test('Jouer un coup passe la mian au joueur suivant', function () {
+    test('Jouer un coup passe la main au joueur suivant', function () {
         Arrange::setPlayers([
             new Player('1', 'Player 1'),
             new Player('2', 'Player 2'),
@@ -184,10 +185,44 @@ describe('Huit américain: cartes spéciales', function () {
     test('Le 8 permet de changer de couleur', function () {
         Arrange::setCurrentCard(5, 's');
 
-        Act::playCard(8, 's');
+        Act::playCard(8, 's', ['name' => 'heart']);
 
-        expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('3');
-    })->todo();
+        expect(Act::get('gameContext')->getData('suit'))->toBe(Suit::HEARTS);
+    });
+
+    test("Le 8 peut être joué sur n'importe quelle carte", function () {
+        Arrange::setCurrentCard(5, 's');
+
+        Act::playCard(8, 's', ['name' => 'spade']);
+    })->throwsNoExceptions();
+
+    test('La carte joué après le huit doit être de la couleur demandé', function () {
+        Arrange::setCurrentCard(5, 's');
+
+        Act::playCard(8, 's', ['name' => 'diamond']);
+        Act::playCard(3, 'd');
+    })->throwsNoExceptions();
+
+    test('Après un huit, le tour passe au joueur suivant', function () {
+        Arrange::setPlayers([
+            new Player('1', 'Player 1'),
+            new Player('2', 'Player 2'),
+            new Player('3', 'Player 3'),
+        ]);
+        Arrange::setGameStarted();
+        Arrange::setCurrentCard(5, 's');
+
+        Act::playCard(8, 's', ['name' => 'diamond']);
+
+        expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('2');
+    });
+
+    test("La carte joué après le huit ne doit être d'un autre couleur", function () {
+        Arrange::setCurrentCard(5, 's');
+
+        Act::playCard(8, 's', ['name' => 'diamond']);
+        Act::playCard(3, 's');
+    })->throws('Cannot play this card');
 });
 
 describe('Huit américain: mercure', function () {
@@ -234,19 +269,19 @@ describe('Huit américain: mercure', function () {
         test("Lorsqu'un huit est posé, un évenement est envoyé", function () {
             Arrange::setCurrentCard(7, 'h');
 
-            Act::playCard(8, 's');
+            Act::playCard(8, 's', ['name' => 'spade']);
 
             expect(HubSpy::$published)->toHaveCount(1);
-        })->todo();
+        });
 
         test("Lorsqu'un huit est posé, un évenement contient un message", function () {
             Arrange::setCurrentCard(7, 'h');
 
-            Act::playCard(8, 's');
+            Act::playCard(8, 's', ['name' => 'heart']);
 
             expectMercureMessage(current(HubSpy::$published))->toBeAction('message');
-            expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'Changement de couleur !');
-        })->todo();
+            expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'Changement de couleur en ♥️');
+        });
     });
 });
 

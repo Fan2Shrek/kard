@@ -57,9 +57,10 @@ final class GameManager
     }
 
     /**
-     * @param array<Card> $cards
+     * @param array<Card>          $cards
+     * @param array<string, mixed> $data
      */
-    public function play(Room $room, User $user, array $cards): void
+    public function play(Room $room, User $user, array $cards, array $data = []): void
     {
         $room->setStatus(GameStatusEnum::PLAYING);
         $ctx = $this->gameContextProvider->provide($room);
@@ -77,7 +78,7 @@ final class GameManager
         $gameMode = $this->getGameMode($room->getGameMode()->getValue());
 
         try {
-            $gameMode->play($cards, $ctx, $hand);
+            $gameMode->play($cards, $ctx, $hand, $data);
         } catch (RuleException $e) {
             /* @todo do something */
             throw $e;

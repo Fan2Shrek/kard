@@ -58,7 +58,7 @@ final class PresidentGameMode extends AbstractGameMode
         return false;
     }
 
-    protected function doPlay(array $cards, GameContext $gameContext, Hand $hand): void
+    protected function doPlay(array $cards, GameContext $gameContext, Hand $hand, array $data): void
     {
         $this->cards = $cards;
         $this->gameContext = $gameContext;

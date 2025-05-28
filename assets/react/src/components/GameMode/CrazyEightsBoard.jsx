@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import DrawPile from '../Card/DrawPile.js';
 import Hand from '../Hand/index.js';
@@ -7,8 +7,25 @@ import PlayedCard from '../Card/PlayedCard.js';
 import PlayerList from '../Player/PlayerList.js';
 import Stack from '../Card/Stack.js';
 
+import { suitsIcons } from '../../enum.js';
+
 export default ({ ctx, hand, player }) => {
-    console.log('CrazyEightsBoard', ctx, hand, player);
+    const gameActions = useMemo(() => (handlePlay) => ({
+        8: (
+            <div>
+                {Object.entries(suitsIcons).map(([ name, icon ]) => (
+                    <a
+                        key={name}
+                        className="button button--medium"
+                        onClick={() => handlePlay({ name })}
+                    >
+                    {icon}
+                    </a>
+                ))}
+            </div>
+        ),
+    }), []);
+
     return <div className='game'>
             <PlayerList players={ctx.players} currentPlayer={ctx.currentPlayer} />
             <div className='game__right'>
@@ -20,7 +37,7 @@ export default ({ ctx, hand, player }) => {
                     </div>
                 </div>
                 <div className='bottom'>
-                    <Hand hand={hand} canPlay={ctx.currentPlayer.id === player.id} />
+                    <Hand hand={hand} canPlay={ctx.currentPlayer.id === player.id} gameActions={gameActions} />
                 </div>
             </div>
         </div>

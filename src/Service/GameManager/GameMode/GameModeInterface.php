@@ -9,9 +9,10 @@ use App\Model\GameContext;
 interface GameModeInterface
 {
     /**
-     * @param array<Card> $cards
+     * @param array<Card>          $cards
+     * @param array<string, mixed> $data
      */
-    public function play(array $cards, GameContext $gameContext, Hand $hand): void;
+    public function play(array $cards, GameContext $gameContext, Hand $hand, array $data = []): void;
 
     public function getGameMode(): GameModeEnum;
 

@@ -29,12 +29,12 @@ final class TraceableGameMode implements GameModeInterface, SetupGameModeInterfa
         }
     }
 
-    public function play(array $cards, GameContext $gameContext, Hand $hand): void
+    public function play(array $cards, GameContext $gameContext, Hand $hand, array $data = []): void
     {
         $event = $this->stopwatch->start('game_mode_play');
 
         try {
-            $this->gameMode->play($cards, $gameContext, $hand);
+            $this->gameMode->play($cards, $gameContext, $hand, $data);
         } finally {
             $event->stop();
         }

@@ -23,12 +23,12 @@ abstract class AbstractGameMode implements GameModeInterface
     ) {
     }
 
-    public function play(array $cards, GameContext $gameContext, Hand $hand): void
+    public function play(array $cards, GameContext $gameContext, Hand $hand, array $data = []): void
     {
         $this->cards = $cards;
         $this->gameContext = $gameContext;
 
-        $this->doPlay($cards, $gameContext, $hand);
+        $this->doPlay($cards, $gameContext, $hand, $data);
     }
 
     public function getHub(): HubInterface
@@ -39,9 +39,10 @@ abstract class AbstractGameMode implements GameModeInterface
     /**
      * This method implements the game rules.
      *
-     * @param array<Card> $cards
+     * @param array<Card>          $cards
+     * @param array<string, mixed> $data
      */
-    abstract protected function doPlay(array $cards, GameContext $gameContext, Hand $hand): void;
+    abstract protected function doPlay(array $cards, GameContext $gameContext, Hand $hand, array $data): void;
 
     protected function dispatchMercureEvent(string $eventName, string $text): void
     {
