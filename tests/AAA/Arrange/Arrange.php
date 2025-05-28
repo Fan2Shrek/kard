@@ -49,6 +49,7 @@ abstract /* static */ class Arrange
         }
 
         Act::addContext('drawPill', $cards);
+        Act::addContext('gameContext', self::createGameContext([]));
     }
 
     public static function setGameStarted(): void

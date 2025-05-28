@@ -31,6 +31,19 @@ abstract /* static */ class Act
         static::play($cards, static::get('gameContext'), static::get('handCards') ?? [], $data);
     }
 
+    public static function draw(int $playerCount): int
+    {
+        return static::get('gamePlayer')->getCardsCount($playerCount);
+    }
+
+    public static function setup(): void
+    {
+        static::get('gamePlayer')->setup(
+            static::get('gameContext'),
+            static::get('handCards') ?? []
+        );
+    }
+
     public static function orderPlayers(array $players): array
     {
         return static::get('gamePlayer')->getPlayerOrder($players);

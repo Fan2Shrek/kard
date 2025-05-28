@@ -24,6 +24,21 @@ beforeEach(function () {
 pest()->group('Huit');
 
 describe('Huit américain: règles basiques', function () {
+    test('On distribue 7 cartes à chaque joueurs', function () {
+        expect(Act::draw(4))->toBe(7);
+    });
+
+    test('Au début on prend la première carte de la pioche', function () {
+        Arrange::setDrawPillSize(4);
+
+        Act::setup();
+
+        expect(Act::get('gameContext')->getDrawPile())->toHaveCount(3);
+        expect(Act::get('gameContext')->getCurrentCards())->toHaveCount(1);
+    });
+});
+
+describe('Huit américain: règles basiques', function () {
     test('Il est possible de jouer une carte', function () {
         Arrange::setCurrentCard(7);
 
@@ -128,6 +143,17 @@ describe('Huit américain: règles basiques', function () {
 
         expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('2');
     });
+
+    test('Poser une carte la retire de sa main', function () {
+        Arrange::setcurrentcard(3);
+        Arrange::setCurrentHand([
+            [5, 's'],
+            [6, 's'],
+        ]);
+        Act::playCard(5, 's');
+
+        expect(Act::get('currentHand'))->toHaveCount(1);
+    });
 });
 
 describe('Huit américain: cartes spéciales', function () {
@@ -157,17 +183,6 @@ describe('Huit américain: cartes spéciales', function () {
         Act::playCard('j', 's');
 
         expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('3');
-    });
-
-    test('Poser une carte la retire de sa main', function () {
-        Arrange::setcurrentcard(3);
-        Arrange::setCurrentHand([
-            [5, 's'],
-            [6, 's'],
-        ]);
-        Act::playCard(5, 's');
-
-        expect(Act::get('currentHand'))->toHaveCount(1);
     });
 
     test('Poser un deux force le joueur suivant à piocher deux cartes', function () {
@@ -282,6 +297,27 @@ describe('Huit américain: mercure', function () {
             expectMercureMessage(current(HubSpy::$published))->toBeAction('message');
             expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'Changement de couleur en ♥️');
         });
+
+        test("Lorsqu'un deux est posé, un évenement est envoyé", function () {
+            Arrange::setCurrentCard(7, 'h');
+
+            Act::playCard(2, 'h');
+
+            expect(HubSpy::$published)->toHaveCount(1);
+        })->todo();
+
+        test("Lorsqu'un deux est posé, un évenement contient un message", function () {
+            Arrange::setPlayers([
+                new Player('1', 'Player 1'),
+                new Player('2', 'Player 2'),
+            ]);
+            Arrange::setCurrentCard(7, 'h');
+
+            Act::playCard(2, 'h');
+
+            expectMercureMessage(current(HubSpy::$published))->toBeAction('message');
+            expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'Le joueur Player 2 pioche 2 cartes');
+        })->todo('Seems hard to implements ^^');
     });
 });
 
