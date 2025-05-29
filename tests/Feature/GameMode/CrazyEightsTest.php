@@ -20,7 +20,7 @@ beforeEach(function () {
     Act::reset();
     Act::addContext('gamePlayer', new CrazyEightsGameMode(
         new HubSpy(),
-        new ActHandRepository,
+        new ActHandRepository(),
         $this->createMock(Symfony\Component\Serializer\SerializerInterface::class)
     ));
     Act::addContext('gameMode', new GameMode(GameModeEnum::CRAZY_EIGHTS));

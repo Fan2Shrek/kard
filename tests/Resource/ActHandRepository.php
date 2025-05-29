@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Resource;
 
-use App\Service\Card\HandRepositoryInterface;
 use App\Entity\Room;
 use App\Entity\User;
 use App\Model\Card\Hand;
+use App\Service\Card\HandRepositoryInterface;
 use App\Tests\AAA\Act\Act;
 
 final class ActHandRepository implements HandRepositoryInterface
