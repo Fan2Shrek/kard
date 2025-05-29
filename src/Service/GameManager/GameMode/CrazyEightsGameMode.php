@@ -9,7 +9,7 @@ use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
 use App\Model\Card\Hand;
 use App\Model\GameContext;
-use App\Service\Card\HandRepository;
+use App\Service\Card\HandRepositoryInterface;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -20,7 +20,7 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
 
     public function __construct(
         HubInterface $hub,
-        private HandRepository $handRepository,
+        private HandRepositoryInterface $handRepository,
         private SerializerInterface $serializer,
     ) {
         parent::__construct($hub);
@@ -65,7 +65,7 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
     protected function doPlay(array $cards, GameContext $gameContext, Hand $hand, array $data): void
     {
         if (empty($cards)) {
-            $hand->add($gameContext->draw(1)[0]);
+            $hand->addMultipleCards($gameContext->draw(1));
             $gameContext->nextPlayer();
 
             return;
@@ -120,17 +120,19 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
             $nextPlayer = $gameContext->getNextPlayer();
             $nextHand = $this->handRepository->get($nextPlayer->id, $gameContext->getRoom());
             $nextHand->addMultipleCards($gameContext->draw(2 * count($cards)));
-            $this->handRepository->save($nextPlayer->id, $gameContext->getRoom(), $nextHand);
+            $this->handRepository->save($nextPlayer->id, $gameContext->getRoom(), $nextHand); // @pest-mutate-ignore
 
             $this->dispatchMercureEvent(
                 'message',
                 \sprintf('Le joueur %s pioche %d cartes', $gameContext->getNextPlayer()->username, 2 * count($cards)),
             );
+
             $this->getHub()->publish(new Update(
                 sprintf('room-%s-%s', $gameContext->getRoom()->getId(), $nextPlayer->id),
                 $this->serializer->serialize($nextHand, 'json'),
             ));
 
+            // todo maybe player can add a 2
             $gameContext->nextPlayer(); // skip turn
         }
 

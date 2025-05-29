@@ -8,10 +8,12 @@ use App\Entity\Room;
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
 use App\Model\Card\Card;
+use App\Model\Card\Hand;
 use App\Model\GameContext;
 use App\Model\Player;
 use App\Model\Turn;
 use App\Tests\AAA\Act\Act;
+use Ramsey\Uuid\Uuid;
 
 abstract /* static */ class Arrange
 {
@@ -38,6 +40,22 @@ abstract /* static */ class Arrange
     public static function setCurrentHand(array $cards): void
     {
         Act::addContext('handCards', array_map(fn (array $card) => new Card(Suit::from($card[1]), Rank::from((string) $card[0])), $cards));
+    }
+
+    public static function setHands(array $hands): void
+    {
+        Act::addContext('hands', array_reduce(
+            array_keys($hands),
+            static function (array $carry, int $index) use ($hands): array {
+                $carry[$index] = new Hand(array_map(
+                    fn (array $card) => new Card(Suit::from($card[1]), Rank::from((string) $card[0])),
+                    $hands[$index]
+                ));
+
+                return $carry;
+            },
+            []
+        ));
     }
 
     public static function setDrawPillSize(int $count): void
@@ -86,6 +104,7 @@ abstract /* static */ class Arrange
             'room-id',
             new Room(
                 Act::get('gameMode'),
+                Uuid::uuid4(),
             ),
             [],
             $players,

@@ -1,21 +1,26 @@
 <?php
 
 use App\Entity\GameMode;
+use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
+use App\Model\Card\Card;
+use App\Model\Card\Hand;
 use App\Model\Player;
 use App\Service\GameManager\GameMode\CrazyEightsGameMode;
 use App\Service\GameManager\GameMode\GameModeEnum;
 use App\Tests\AAA\Act\Act;
 use App\Tests\AAA\Arrange\Arrange;
+use App\Tests\Resource\ActHandRepository;
 use App\Tests\Resource\HubSpy;
 
 covers(CrazyEightsGameMode::class);
 
 beforeEach(function () {
     HubSpy::reset();
+    Act::reset();
     Act::addContext('gamePlayer', new CrazyEightsGameMode(
         new HubSpy(),
-        $this->createMock(App\Service\Card\HandRepository::class),
+        new ActHandRepository,
         $this->createMock(Symfony\Component\Serializer\SerializerInterface::class)
     ));
     Act::addContext('gameMode', new GameMode(GameModeEnum::CRAZY_EIGHTS));
@@ -23,7 +28,7 @@ beforeEach(function () {
 
 pest()->group('Huit');
 
-describe('Huit américain: règles basiques', function () {
+describe('Huit américain: règles tierces', function () {
     test('On distribue 7 cartes à chaque joueurs', function () {
         expect(Act::draw(4))->toBe(7);
     });
@@ -44,6 +49,15 @@ describe('Huit américain: règles basiques', function () {
 
         Act::playCard(9, 's');
     })->throwsNoExceptions();
+
+    test('Jouer une carte la met sur le haut du tas', function () {
+        Arrange::setCurrentCard(7);
+
+        Act::playCard(9, 's');
+
+        expect(Act::get('gameContext')->getCurrentCards())->toHaveCount(1);
+        expect(Act::get('gameContext')->getCurrentCards())->toEqual([new Card(Suit::SPADES, Rank::NINE)]);
+    });
 
     test('Il est possible de jouer une carte sur la même valeur', function () {
         Arrange::setCurrentCard(8);
@@ -91,16 +105,25 @@ describe('Huit américain: règles basiques', function () {
     })->throws('Cards are unrelated');
 
     test("L'ordre des joueurs est aléatoire", function () {
-        $players = [
-            new Player('1', 'Player 1'),
-            new Player('2', 'Player 2'),
-            new Player('3', 'Player 3'),
-            new Player('4', 'Player 4'),
+        $hands = [
+            1 => new Hand([
+                new Card(Suit::SPADES, Rank::EIGHT),
+                new Card(Suit::HEARTS, Rank::EIGHT),
+            ]),
+            2 => new Hand([
+                new Card(Suit::SPADES, Rank::EIGHT),
+                new Card(Suit::HEARTS, Rank::QUEEN),
+            ]),
+            3 => new Hand([
+                new Card(Suit::SPADES, Rank::EIGHT),
+                new Card(Suit::HEARTS, Rank::KING),
+            ]),
         ];
 
-        $players = Act::orderPlayers($players);
+        $players = Act::orderPlayers($hands);
 
-        expect($players)->not()->toBe([1, 2, 3, 4]);
+        expect($players)->toContain(1, 2, 3);
+        expect($players)->not()->toBe([1, 2, 3]);
     });
 
     test('Jouer un coup passe la main au joueur suivant', function () {
@@ -119,20 +142,23 @@ describe('Huit américain: règles basiques', function () {
 
     test('Sauter son tour permet de piocher', function () {
         Arrange::setDrawPillSize(3);
-        Arrange::setRound([
-            [7],
+        Arrange::setPlayers([
+            new Player('1', 'Player 1'),
+            new Player('2', 'Player 2'),
         ]);
-        Arrange::setCurrentHand([
-            [5, 's'],
-            [6, 's'],
+        Arrange::setHands([
+            '1' => [[5, 's']],
+            '2' => [[6, 's']],
         ]);
+        Arrange::setCurrentCard(5, 's');
 
         Act::playCard(null);
 
-        expect(Act::get('currentHand'))->toHaveCount(3);
+        expect(Act::get('hands')['1']->getCards())->toHaveCount(2);
     });
 
     test('Sauter son tour passe au joueur suivant', function () {
+        Arrange::setDrawPillSize(3);
         Arrange::setPlayers([
             new Player('1', 'Player 1'),
             new Player('2', 'Player 2'),
@@ -145,7 +171,7 @@ describe('Huit américain: règles basiques', function () {
     });
 
     test('Poser une carte la retire de sa main', function () {
-        Arrange::setcurrentcard(3);
+        Arrange::setCurrentCard(5, 's');
         Arrange::setCurrentHand([
             [5, 's'],
             [6, 's'],
@@ -187,20 +213,71 @@ describe('Huit américain: cartes spéciales', function () {
 
     test('Poser un deux force le joueur suivant à piocher deux cartes', function () {
         Arrange::setDrawPillSize(3);
-        Arrange::setRound([
-            [7],
+        Arrange::setPlayers([
+            new Player('1', 'Player 1'),
+            new Player('2', 'Player 2'),
         ]);
+        Arrange::setHands([
+            '1' => [[5, 's']],
+            '2' => [[6, 's']],
+        ]);
+        Arrange::setCurrentCard(5, 's');
 
         Act::playCard(2, 's');
 
-        // implements tests for multiple 2 cards
-        expect(Act::get('currentHand'))->toHaveCount(4);
-    })->todo('Seems hard to implements ^^');
+        expect(Act::get('hands')['2'])->toHaveCount(3);
+    });
+
+    test('Poser un deux force le joueur suivant et sauter son tour', function () {
+        Arrange::setDrawPillSize(3);
+        Arrange::setPlayers([
+            new Player('1', 'Player 1'),
+            new Player('2', 'Player 2'),
+        ]);
+        Arrange::setHands([
+            '1' => [[5, 's']],
+            '2' => [[6, 's']],
+        ]);
+        Arrange::setCurrentCard(5, 's');
+
+        Act::playCard(2, 's');
+
+        expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('1');
+    });
+
+    test('Poser plusieurs deux force le joueur suivant à piocher deux * nombre de deux cartes', function () {
+        Arrange::setDrawPillSize(7);
+        Arrange::setPlayers([
+            new Player('1', 'Player 1'),
+            new Player('2', 'Player 2'),
+        ]);
+        Arrange::setHands([
+            '1' => [[5, 's']],
+            '2' => [[6, 's']],
+        ]);
+        Arrange::setCurrentCard(5, 's');
+
+        Act::playCards([
+            [2, 's'],
+            [2, 'd'],
+            [2, 'h'],
+        ]);
+
+        expect(Act::get('hands')['2'])->toHaveCount(7);
+    });
 
     test('Le 8 permet de changer de couleur', function () {
         Arrange::setCurrentCard(5, 's');
 
         Act::playCard(8, 's', ['name' => 'heart']);
+
+        expect(Act::get('gameContext')->getData('suit'))->toBe(Suit::HEARTS);
+    });
+
+    test('La couleur demandé par le 8 est insensible à la case', function () {
+        Arrange::setCurrentCard(5, 's');
+
+        Act::playCard(8, 's', ['name' => 'HEART']);
 
         expect(Act::get('gameContext')->getData('suit'))->toBe(Suit::HEARTS);
     });
@@ -299,25 +376,42 @@ describe('Huit américain: mercure', function () {
         });
 
         test("Lorsqu'un deux est posé, un évenement est envoyé", function () {
-            Arrange::setCurrentCard(7, 'h');
-
-            Act::playCard(2, 'h');
-
-            expect(HubSpy::$published)->toHaveCount(1);
-        })->todo();
-
-        test("Lorsqu'un deux est posé, un évenement contient un message", function () {
+            Arrange::setDrawPillSize(3);
             Arrange::setPlayers([
                 new Player('1', 'Player 1'),
                 new Player('2', 'Player 2'),
             ]);
+            Arrange::setHands([
+                '1' => [[5, 's']],
+                '2' => [[6, 's']],
+            ]);
+            Arrange::setCurrentCard(5, 's');
+
+            Act::playCard(2, 's');
+
+            expect(HubSpy::$published)->toHaveCount(2);
+        });
+
+        test("Lorsqu'un deux est posé, un évenement contient un message", function () {
+            Arrange::setDrawPillSize(5);
+            Arrange::setPlayers([
+                new Player('1', 'Player 1'),
+                new Player('2', 'Player 2'),
+            ]);
+            Arrange::setHands([
+                '1' => [[5, 's']],
+                '2' => [[6, 's']],
+            ]);
             Arrange::setCurrentCard(7, 'h');
 
-            Act::playCard(2, 'h');
+            Act::playCards([
+                [2, 'h'],
+                [2, 'd'],
+            ]);
 
             expectMercureMessage(current(HubSpy::$published))->toBeAction('message');
-            expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'Le joueur Player 2 pioche 2 cartes');
-        })->todo('Seems hard to implements ^^');
+            expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'Le joueur Player 2 pioche 4 cartes');
+        });
     });
 });
 
@@ -333,5 +427,17 @@ describe('Huit américan: fin de partie', function () {
 
         expect($result)->toBeTrue();
         expect(Act::get('gameContext'))->toHaveWinner('Player 2');
+    });
+
+    test('Si tous les joueurs ont encore des cartes, la partie continue', function () {
+        Arrange::setPlayers([
+            new Player('1', 'Player 1', 3),
+            new Player('2', 'Player 2', 2),
+        ]);
+        Arrange::setGameStarted();
+
+        $result = Act::isGameFinished();
+
+        expect($result)->toBeFalse();
     });
 });

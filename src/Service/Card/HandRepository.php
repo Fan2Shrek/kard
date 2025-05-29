@@ -10,7 +10,7 @@ use App\Model\Card\Hand;
 use App\Service\Redis\RedisConnection;
 use Symfony\Component\Serializer\SerializerInterface;
 
-class HandRepository
+class HandRepository implements HandRepositoryInterface
 {
     public function __construct(
         private readonly RedisConnection $redisConnection,

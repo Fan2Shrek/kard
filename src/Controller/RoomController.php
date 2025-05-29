@@ -11,6 +11,7 @@ use App\Repository\GameModeDescriptionRepository;
 use App\Repository\GameModeRepository;
 use App\Repository\RoomRepository;
 use App\Service\Card\HandRepository;
+use App\Service\Card\HandRepositoryInterface;
 use App\Service\GameContextProvider;
 use App\Service\GameManager\GameManager;
 use App\Service\GameManager\GameMode\GameModeEnum;
@@ -30,7 +31,7 @@ final class RoomController extends AbstractController
     public function __construct(
         private RoomRepository $roomRepository,
         private SerializerInterface $serializer,
-        private HandRepository $handRepository,
+        private HandRepositoryInterface $handRepository,
         private GameContextProvider $gameContextProvider,
         private GameManager $gameManager,
         private HubInterface $hub,

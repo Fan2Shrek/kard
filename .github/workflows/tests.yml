@@ -26,4 +26,4 @@ jobs:
         run: ${PHP} vendor/bin/pest --parallel
 
       - name: Run mutation testing
-        run: ${PHP} vendor/bin/pest --mutate --parallel --min=90
+        run: ${PHP} vendor/bin/pest --mutate --parallel --min=100

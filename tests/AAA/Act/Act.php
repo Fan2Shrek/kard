@@ -12,6 +12,11 @@ abstract /* static */ class Act
 {
     private static array $context = [];
 
+    public static function reset(): void
+    {
+        self::$context = [];
+    }
+
     public static function addContext(string $key, $value): void
     {
         self::$context[$key] = $value;
@@ -27,7 +32,7 @@ abstract /* static */ class Act
 
     public static function playCards(array $cards, array $data = []): void
     {
-        $cards = array_map(fn ($card) => self::createCard($card[0], $card[1] ?? 's'), $cards);
+        $cards = array_map(fn($card) => self::createCard($card[0], $card[1] ?? 's'), $cards);
         static::play($cards, static::get('gameContext'), static::get('handCards') ?? [], $data);
     }
 
@@ -44,9 +49,9 @@ abstract /* static */ class Act
         );
     }
 
-    public static function orderPlayers(array $players): array
+    public static function orderPlayers(array $hands): array
     {
-        return static::get('gamePlayer')->getPlayerOrder($players);
+        return static::get('gamePlayer')->getPlayerOrder($hands);
     }
 
     public static function isGameFinished(): bool
@@ -64,9 +69,11 @@ abstract /* static */ class Act
         return self::$context[$key] ?? null;
     }
 
-    private static function play(array $cards, GameContext $gameContext, array $hand, array $data): void
+    private static function play(array $cards, GameContext $gameContext, array $handCards, array $data): void
     {
-        $hand = new Hand($hand);
+        $currentPlayer = static::get('gameContextPlayers')[current(array_keys(static::get('gameContextPlayers') ?? []))] ?? null;
+        $hands = static::get('hands') ?? [];
+        $hand = $hands[$currentPlayer?->id] ?? new Hand($handCards);
         self::$context['currentHand'] = $hand;
 
         static::get('gamePlayer')->play($cards, $gameContext, $hand, $data);

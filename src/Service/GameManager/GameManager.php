@@ -14,6 +14,7 @@ use App\Model\Player;
 use App\Repository\ResultRepository;
 use App\Service\Card\CardGenerator;
 use App\Service\Card\HandRepository;
+use App\Service\Card\HandRepositoryInterface;
 use App\Service\GameContextProvider;
 use App\Service\GameManager\GameMode\GameModeEnum;
 use App\Service\GameManager\GameMode\GameModeInterface;
@@ -32,7 +33,7 @@ final class GameManager
         private iterable $gameModes,
         private HubInterface $hub,
         private GameContextProvider $gameContextProvider,
-        private HandRepository $handRepository,
+        private HandRepositoryInterface $handRepository,
         private SerializerInterface $serializer,
         private ResultRepository $resultRepository,
         private RouterInterface $router,
