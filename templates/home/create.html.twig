@@ -14,7 +14,7 @@
                         {% set description = descriptions[mode.id] %}
                         <div class="description__container">
                             <div class="description__before"></div>
-                            <a class="description__card" style="background-image: url('{{ description.img }}');"
+                            <a class="description__card" style="background-image: url('{{ asset('uploads/game_mode/' ~ description.img) }}');"
                                onClick="handleClick('{{ mode.value.value }}')">
                                 <p class="description__content">{{ mode.value.value|capitalize }}</p>
                             </a>
