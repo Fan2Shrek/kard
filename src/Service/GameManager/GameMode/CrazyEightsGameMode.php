@@ -101,8 +101,13 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
             return;
         }
 
-        if (Rank::EIGHT === $currentCard->rank && ($gameContext->getData('suit') ?? $currentCard->suit) !== $mainCard->suit) {
-            throw new RuleException($this->getGameMode(), 'Cannot play this card');
+        if (Rank::EIGHT === $currentCard->rank) {
+            $suit = $gameContext->getData('suit') ?? $currentCard->suit;
+            $suit = $suit instanceof Suit ? $suit : Suit::from($suit); // @pest-mutate-ignore as this is more a denormalization issue
+
+            if ($suit !== $mainCard->suit) {
+                throw new RuleException($this->getGameMode(), 'Cannot play this card');
+            }
         }
 
         if (Rank::EIGHT !== $currentCard->rank && !$this->isSameRank($mainCard, $currentCard) && !$this->isSameSuit($mainCard, $currentCard)) {
