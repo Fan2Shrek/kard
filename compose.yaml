@@ -37,7 +37,6 @@ services:
 
   mercure:
     image: dunglas/mercure
-    restart: unless-stopped
     ports:
       - "8090:80"
     environment:
