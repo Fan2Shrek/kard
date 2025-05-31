@@ -2,9 +2,11 @@
 
 namespace App\Debug;
 
+use App\Model\Card\Hand;
 use App\Model\GameContext;
 use App\Service\GameManager\GameMode\GameModeEnum;
 use App\Service\GameManager\GameMode\GameModeInterface;
+use App\Service\GameManager\GameMode\SetupGameModeInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
@@ -12,7 +14,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
  *
  * Probably unnecessary, but it's a still a good flex :p
  */
-final class TraceableGameMode implements GameModeInterface
+final class TraceableGameMode implements GameModeInterface, SetupGameModeInterface
 {
     public function __construct(
         private GameModeInterface $gameMode,
@@ -20,12 +22,19 @@ final class TraceableGameMode implements GameModeInterface
     ) {
     }
 
-    public function play(array $cards, GameContext $gameContext): void
+    public function setup(GameContext $gameContext, array $hands): void
+    {
+        if ($this->gameMode instanceof SetupGameModeInterface) {
+            $this->gameMode->setup($gameContext, $hands);
+        }
+    }
+
+    public function play(array $cards, GameContext $gameContext, Hand $hand, array $data = []): void
     {
         $event = $this->stopwatch->start('game_mode_play');
 
         try {
-            $this->gameMode->play($cards, $gameContext);
+            $this->gameMode->play($cards, $gameContext, $hand, $data);
         } finally {
             $event->stop();
         }
@@ -34,6 +43,17 @@ final class TraceableGameMode implements GameModeInterface
     public function getGameMode(): GameModeEnum
     {
         return $this->gameMode->getGameMode();
+    }
+
+    public function getCardsCount(int $playerCount): ?int
+    {
+        $event = $this->stopwatch->start('game_mode_get_cards_count');
+
+        try {
+            return $this->gameMode->getCardsCount($playerCount);
+        } finally {
+            $event->stop();
+        }
     }
 
     public function getPlayerOrder(array $players): array

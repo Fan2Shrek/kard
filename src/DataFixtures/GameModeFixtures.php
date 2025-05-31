@@ -20,8 +20,8 @@ class GameModeFixtures extends AbstractFixtures
         ];
 
         yield [
-            'name' => 'AMERICAN_EIGHT',
-            'value' => GameModeEnum::AMERICAN_EIGHT,
+            'name' => 'Crazy Eights',
+            'value' => GameModeEnum::CRAZY_EIGHTS,
             'active' => false,
         ];
     }

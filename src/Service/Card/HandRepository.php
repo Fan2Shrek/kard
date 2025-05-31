@@ -10,7 +10,7 @@ use App\Model\Card\Hand;
 use App\Service\Redis\RedisConnection;
 use Symfony\Component\Serializer\SerializerInterface;
 
-final class HandRepository
+class HandRepository implements HandRepositoryInterface
 {
     public function __construct(
         private readonly RedisConnection $redisConnection,
@@ -46,9 +46,12 @@ final class HandRepository
         return $deck;
     }
 
-    public function save(User $player, Room $room, Hand $hand): void
+    public function save(string|User $player, Room $room, Hand $hand): void
     {
-        $player = (string) $player->getId();
+        if ($player instanceof User) {
+            // Convert User object to string ID
+            $player = (string) $player->getId();
+        }
 
         $this->redisConnection->set($this->getKey($player, $room), $this->serializer->serialize($hand, 'json'));
     }

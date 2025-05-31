@@ -7,5 +7,5 @@ namespace App\Service\GameManager\GameMode;
 enum GameModeEnum: string
 {
     case PRESIDENT = 'president';
-    case AMERICAN_EIGHT = 'american_eight';
+    case CRAZY_EIGHTS = 'crazy_eights';
 }

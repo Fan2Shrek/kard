@@ -10,8 +10,7 @@ use App\Model\Player;
 use App\Repository\GameModeDescriptionRepository;
 use App\Repository\GameModeRepository;
 use App\Repository\RoomRepository;
-use App\Service\Card\CardGenerator;
-use App\Service\Card\HandRepository;
+use App\Service\Card\HandRepositoryInterface;
 use App\Service\GameContextProvider;
 use App\Service\GameManager\GameManager;
 use App\Service\GameManager\GameMode\GameModeEnum;
@@ -30,9 +29,8 @@ final class RoomController extends AbstractController
 {
     public function __construct(
         private RoomRepository $roomRepository,
-        private CardGenerator $cardGenerator,
         private SerializerInterface $serializer,
-        private HandRepository $handRepository,
+        private HandRepositoryInterface $handRepository,
         private GameContextProvider $gameContextProvider,
         private GameManager $gameManager,
         private HubInterface $hub,
@@ -112,11 +110,11 @@ final class RoomController extends AbstractController
     #[Route('/start/{id}', name: 'game_start')]
     public function start(Room $room): Response
     {
-        $playerCount = count($room->getPlayers());
-        $hands = $this->cardGenerator->generateHands($playerCount);
+        [$hands, $drawPile] = $this->gameManager->drawHands($room);
         $response = $this->redirectToRoute('game', ['id' => $room->getId()]);
 
         $gameContext = $this->gameContextProvider->provide($room);
+        $gameContext->setDrawPile($drawPile);
         $players = array_reduce($gameContext->getPlayers(), function (array $carry, Player $player) {
             $carry[$player->id] = $player;
 

@@ -21,6 +21,8 @@ export default class {
 
             return response.json();
         } catch (e) {
+            console.error('Error during POST request:', e);
+            throw e;
         };
     }
 }

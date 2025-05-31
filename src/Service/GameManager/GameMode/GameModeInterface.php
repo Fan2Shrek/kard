@@ -9,11 +9,17 @@ use App\Model\GameContext;
 interface GameModeInterface
 {
     /**
-     * @param array<Card> $cards
+     * @param array<Card>          $cards
+     * @param array<string, mixed> $data
      */
-    public function play(array $cards, GameContext $gameContext): void;
+    public function play(array $cards, GameContext $gameContext, Hand $hand, array $data = []): void;
 
     public function getGameMode(): GameModeEnum;
+
+    /**
+     * @return int|null The number of cards, or draw all cards
+     */
+    public function getCardsCount(int $playerCount): ?int;
 
     /**
      * @param array<string, Hand> $players

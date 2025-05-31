@@ -32,6 +32,11 @@ trait CardsHelperTrait
         return $card->rank->value === $currentCard->rank->value;
     }
 
+    private function isSameSuit(Card $card, Card $currentCard): bool
+    {
+        return $card->suit->value === $currentCard->suit->value;
+    }
+
     /**
      * @param Card[] $cards
      */
@@ -40,6 +45,21 @@ trait CardsHelperTrait
         $rank = $cards[0]->rank->value;
         foreach ($cards as $card) {
             if ($card->rank->value !== $rank) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param Card[] $cards
+     */
+    private function allSameSuit(array $cards): bool
+    {
+        $suit = $cards[0]->suit->value;
+        foreach ($cards as $card) {
+            if ($card->suit->value !== $suit) {
                 return false;
             }
         }
