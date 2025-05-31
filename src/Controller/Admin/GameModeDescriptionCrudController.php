@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\GameModeDescription;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 
 class GameModeDescriptionCrudController extends AbstractCrudController
@@ -19,6 +20,11 @@ class GameModeDescriptionCrudController extends AbstractCrudController
         return [
             AssociationField::new('gameMode'),
             TextEditorField::new('description'),
+            ImageField::new('img')
+                ->setBasePath('/uploads/game_mode')
+                ->setUploadDir('public/uploads/game_mode')
+                ->setUploadedFileNamePattern('[randomhash].[extension]')
+                ->setRequired(false),
         ];
     }
 }
