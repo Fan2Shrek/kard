@@ -11,3 +11,5 @@ export const suitsIcons = {
     [suits.CLUBS]: '♣️',
     [suits.SPADES]: '♠️',
 };
+
+export default {};
