@@ -28,8 +28,8 @@ export default ({ hand, canPlay, gameActions = null }) => {
     const actions = gameActions && gameActions(handlePlay) || {};
 
     return <div className='hand__container'>
-        {selectedCards.length > 0 && canPlay && <a class="button button--medium" onClick={handlePlay}>Jouer</a>}
-        {selectedCards.length === 0 && canPlay && <a class="button button--medium" onClick={handlePlay}>Passer</a>}
+        {selectedCards.length > 0 && canPlay && <a class="button button--medium" onClick={() => handlePlay()}>Jouer</a>}
+        {selectedCards.length === 0 && canPlay && <a class="button button--medium" onClick={() => handlePlay()}>Passer</a>}
         {canPlay &&
           Object.entries(actions)
             .filter(([key]) =>

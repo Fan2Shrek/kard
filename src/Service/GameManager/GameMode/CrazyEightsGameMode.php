@@ -93,6 +93,7 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
                 \sprintf('Changement de couleur en %s', $newSuit->getSymbol()),
             );
 
+            $hand->removeCards($cards);
             $gameContext->addData('suit', $newSuit);
             $gameContext->setCurrentCards($cards);
             $gameContext->nextPlayer();

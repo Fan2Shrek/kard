@@ -266,7 +266,7 @@ describe('Huit américain: cartes spéciales', function () {
         expect(Act::get('hands')['2'])->toHaveCount(7);
     });
 
-    test('Le 8 permet de changer de couleur', function () {
+    test('Le huit permet de changer de couleur', function () {
         Arrange::setCurrentCard(5, 's');
 
         Act::playCard(8, 's', ['name' => 'heart']);
@@ -274,7 +274,7 @@ describe('Huit américain: cartes spéciales', function () {
         expect(Act::get('gameContext')->getData('suit'))->toBe(Suit::HEARTS);
     });
 
-    test('La couleur demandé par le 8 est insensible à la case', function () {
+    test('La couleur demandé par le huit est insensible à la case', function () {
         Arrange::setCurrentCard(5, 's');
 
         Act::playCard(8, 's', ['name' => 'HEART']);
@@ -282,11 +282,23 @@ describe('Huit américain: cartes spéciales', function () {
         expect(Act::get('gameContext')->getData('suit'))->toBe(Suit::HEARTS);
     });
 
-    test("Le 8 peut être joué sur n'importe quelle carte", function () {
+    test("Le huit peut être joué sur n'importe quelle carte", function () {
         Arrange::setCurrentCard(5, 's');
 
         Act::playCard(8, 's', ['name' => 'spade']);
     })->throwsNoExceptions();
+
+    test('Jouer un huit, retire la carte du joueur', function () {
+        Arrange::setCurrentCard(5, 's');
+        Arrange::setCurrentHand([
+            [5, 's'],
+            [8, 's'],
+        ]);
+
+        Act::playCard(8, 's', ['name' => 'spade']);
+
+        expect(Act::get('currentHand'))->toHaveCount(1);
+    });
 
     test('La carte joué après le huit doit être de la couleur demandé', function () {
         Arrange::setCurrentCard(5, 's');
