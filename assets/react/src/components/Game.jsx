@@ -3,6 +3,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import './game.css';
 import useMercure from '../hook/useMercure.js';
 import GameContext from '../Context/GameContext.js';
+import AnimationContext from '../Context/AnimationContext.js';
 import Text from './Animation/Text.js';
 import PresidentBoard from './GameMode/PresidentBoard.js';
 import CrazyEightsBoard from './GameMode/CrazyEightsBoard.js';
@@ -20,6 +21,7 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
     const gameActions = useMemo(() => ({
         play: (data) => {
             setCtx(data);
+            const currentCards = data.currentCards;
         },
         message: (data) => {
             setKey((key) => key + 1);
@@ -44,9 +46,11 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
     // @todo display one hand per player
     return <>
         <GameContext gameContext={ctx} player={player} currentPlayer={ctx.currentPlayer}>
-            { text && <Text key={key} text={text} /> }
-            { ctx.room.gameMode.value === 'president' && <PresidentBoard ctx={ctx} hand={hand} player={player} /> }
-            { ctx.room.gameMode.value === 'crazy_eights' && <CrazyEightsBoard ctx={ctx} hand={hand} player={player} /> }
+            <AnimationContext>
+                { text && <Text key={key} text={text} /> }
+                { ctx.room.gameMode.value === 'president' && <PresidentBoard ctx={ctx} hand={hand} player={player} /> }
+                { ctx.room.gameMode.value === 'crazy_eights' && <CrazyEightsBoard ctx={ctx} hand={hand} player={player} /> }
+            </AnimationContext>
         </GameContext>
     </>;
 }
