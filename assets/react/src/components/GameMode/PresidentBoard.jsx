@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 
 import { GameContext } from '../../Context/GameContext.js';
 import { AnimationContext } from '../../Context/AnimationContext.js';
@@ -10,17 +10,17 @@ import PlayerList from '../Player/PlayerList.js';
 import Stack from '../Card/Stack.js';
 
 export default ({ ctx, hand, player }) => {
-    const { gameContext: { currentCards: [currentCards] } } = useContext(GameContext);
-    const { animateCard } = useContext(AnimationContext);
+    const { gameContext: { currentCards } } = useContext(GameContext);
+    const { animateCards } = useContext(AnimationContext);
 
     const playedCardRef = useRef();
     const handRef = useRef();
 
     useEffect(() => {
-        if (animateCard && currentCards && playedCardRef.current && handRef.current) {
-            animateCard(currentCards, handRef.current.getBoundingClientRect(), playedCardRef.current.getBoundingClientRect(), () => console.log('Animation done'));
+        if (animateCards && currentCards && playedCardRef.current && handRef.current) {
+            animateCards(currentCards, handRef.current, playedCardRef.current );
         }
-    }, [animateCard, currentCards]);
+    }, [animateCards, currentCards]);
 
     return <div className='game'>
             <PlayerList players={ctx.players} currentPlayer={ctx.currentPlayer} />
