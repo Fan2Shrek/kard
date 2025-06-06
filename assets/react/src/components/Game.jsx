@@ -7,6 +7,7 @@ import AnimationContext from '../Context/AnimationContext.js';
 import Text from './Animation/Text.js';
 import PresidentBoard from './GameMode/PresidentBoard.js';
 import CrazyEightsBoard from './GameMode/CrazyEightsBoard.js';
+import Board from './GameMode/Board.js';
 
 export default ({ gameContext, hand: currentHand, player: user }) => {
     const [ctx, setCtx] = useState(JSON.parse(gameContext));
@@ -48,8 +49,10 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
         <GameContext gameContext={ctx} player={player} currentPlayer={ctx.currentPlayer}>
             <AnimationContext>
                 { text && <Text key={key} text={text} /> }
-                { ctx.room.gameMode.value === 'president' && <PresidentBoard ctx={ctx} hand={hand} player={player} /> }
-                { ctx.room.gameMode.value === 'crazy_eights' && <CrazyEightsBoard ctx={ctx} hand={hand} player={player} /> }
+                <Board players={ctx.players.filter((player) => player.id !== ctx.currentPlayer.id)}>
+                    { ctx.room.gameMode.value === 'president' && <PresidentBoard ctx={ctx} hand={hand} player={player} /> }
+                    { ctx.room.gameMode.value === 'crazy_eights' && <CrazyEightsBoard ctx={ctx} hand={hand} player={player} /> }
+                </Board>
             </AnimationContext>
         </GameContext>
     </>;

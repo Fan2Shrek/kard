@@ -25,7 +25,6 @@ export default ({ ctx, hand, player }) => {
     return <div className='game'>
             <PlayerList players={ctx.players} currentPlayer={ctx.currentPlayer} />
             <div className='game__right'>
-                {ctx.players.map(player => player.id !== ctx.currentPlayer.id && <HiddenHand count={player.cardsCount} /> )}
                 <div className='middle'>
                     <div id='middle'>
                         <PlayedCard ref={playedCardRef} cards={ctx.round.turns.map(t => t.cards).flat()} />

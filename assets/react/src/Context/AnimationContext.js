@@ -61,8 +61,6 @@ export function AnimationProvider({ children }) {
         },
     });
 
-    console.log(spring)
-
     return (
         <AnimationContext.Provider value={{ animateCards }}>
             {children}
