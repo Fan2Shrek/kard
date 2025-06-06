@@ -27,7 +27,7 @@ export default ({ ctx, hand, player }) => {
             <div className='game__right'>
                 <div className='middle'>
                     <div id='middle'>
-                        <PlayedCard ref={playedCardRef} cards={ctx.round.turns.map(t => t.cards).flat()} />
+                        <PlayedCard ref={playedCardRef} turns={ctx.round.turns} />
                         <Stack cards={ctx.discarded} />
                     </div>
                 </div>
