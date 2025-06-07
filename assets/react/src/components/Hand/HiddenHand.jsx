@@ -1,18 +1,26 @@
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useEffect, useRef, useContext } from 'react';
 import { useSprings, animated } from '@react-spring/web';
 
 import Card from '../Card.js';
 import { GameContext } from '../../Context/GameContext.js';
+import { AnimationContext } from '../../Context/AnimationContext.js';
 
 // To be refactored later, a clean up
 // will not be refuse like in my room
-export default ({ count }) => {
+export default ({ count, id = null }) => {
     const spread = 60;
     const radius = 180;
     const startAngle = -spread / 1.5;
 
     const { getBackAsset } = useContext(GameContext);
     const cards = Array.from({ length: count });
+
+    const ref = useRef(null);
+    const { addHandRef } = useContext(AnimationContext);
+
+    useEffect(() => {
+        id && ref.current && addHandRef(id, ref);
+    }, [ref])
 
     const springs = useSprings(
         count,
@@ -51,7 +59,7 @@ export default ({ count }) => {
         [spread, radius, startAngle, count],
     );
 
-    return <div className='hand__container--hidden'>
+    return <div ref={ref} className='hand__container--hidden'>
         <div className="hand hand-hidden">
             {springs.map((style, index) => {
                 const { angle, xOffset, yOffset } = calculateStyle(index, count);

@@ -13,7 +13,7 @@ export default ({ children, players }) => {
 
                 return (
                     <div key={player.id} className={`player-hand player-hand--${position}`}>
-                        <HiddenHand count={player.cardsCount} />
+                        <HiddenHand count={player.cardsCount} id={player.id} />
                     </div>
                 );
             })}

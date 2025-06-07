@@ -6,6 +6,8 @@ import { GameContext } from './GameContext.js';
 
 export const AnimationContext = createContext({
     animateCards: () => {},
+    getHandRef: (id) => null,
+    addHandRef: (id, ref) => null,
 });
 
 export const useAnimation = () => useContext(AnimationContext);
@@ -17,9 +19,28 @@ export function AnimationProvider({ children }) {
     const [animKey, setAnimKey] = useState(0);
 
     const [idk, setIdk] = useState([]);
+    const [handRefs, setHandRefs] = useState({});
 
     const { getCardAsset } = useContext(GameContext);
     const animationDoneCallback = useRef(null);
+
+    const getHandRef = (id) => {
+        if (handRefs[id]) {
+            return handRefs[id];
+        }
+    }
+
+    const addHandRef = (id, ref) => {
+        if (!ref.current) {
+            console.warn('No ref provided for hand', id);
+            return;
+        }
+
+        setHandRefs((prev) => ({
+            ...prev,
+            [id]: ref,
+        }));
+    };
 
     const animateCards = (cards, from, to) => {
         const key = cards.reduce((acc, cur) => `${acc}_${cur.suit}--${cur.rank}`, '');
@@ -62,7 +83,11 @@ export function AnimationProvider({ children }) {
     });
 
     return (
-        <AnimationContext.Provider value={{ animateCards }}>
+        <AnimationContext.Provider value={{
+            animateCards,
+            getHandRef,
+            addHandRef,
+        }}>
             {children}
             {flyingCards && animationProps && isAnimating && (
                 <animated.div

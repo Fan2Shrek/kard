@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useEffect, useRef, useState,  } from 'react';
 
 import './game.css';
 import useMercure from '../hook/useMercure.js';
@@ -18,6 +18,8 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
     const player = JSON.parse(user);
     const gameUrl = useMemo(() => JSON.parse(document.getElementById('mercure-game-url').textContent), []);
     const playerUrl = useMemo(() => JSON.parse(document.getElementById('mercure-game-player').textContent), []);
+
+    const boardRef = useRef(null);
 
     const gameActions = useMemo(() => ({
         play: (data) => {
@@ -49,7 +51,7 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
         <GameContext gameContext={ctx} player={player} currentPlayer={ctx.currentPlayer}>
             <AnimationContext>
                 { text && <Text key={key} text={text} /> }
-                <Board players={ctx.players.filter((player) => player.id !== ctx.currentPlayer.id)}>
+                <Board ref={boardRef} players={ctx.players.filter((player) => player.id !== ctx.currentPlayer.id)}>
                     { ctx.room.gameMode.value === 'president' && <PresidentBoard ctx={ctx} hand={hand} player={player} /> }
                     { ctx.room.gameMode.value === 'crazy_eights' && <CrazyEightsBoard ctx={ctx} hand={hand} player={player} /> }
                 </Board>

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useRef } from 'react';
+import React, { useContext, useEffect, useMemo, useState, useRef } from 'react';
 
 import { GameContext } from '../../Context/GameContext.js';
 import { AnimationContext } from '../../Context/AnimationContext.js';
@@ -11,14 +11,18 @@ import Stack from '../Card/Stack.js';
 
 export default ({ ctx, hand, player }) => {
     const { gameContext: { currentCards } } = useContext(GameContext);
-    const { animateCards } = useContext(AnimationContext);
+    const { animateCards, getHandRef } = useContext(AnimationContext);
 
     const playedCardRef = useRef();
     const handRef = useRef();
 
+    const lastPlayerHandRef = ctx.data.lastPlayer && getHandRef(ctx.data.lastPlayer);
+
     useEffect(() => {
-        if (animateCards && currentCards && playedCardRef.current && handRef.current) {
-            animateCards(currentCards, handRef.current, playedCardRef.current );
+        if (animateCards && currentCards && playedCardRef.current)  {
+            const fromDiv = ctx.data.lastPlayer === player.id ? handRef : lastPlayerHandRef;
+
+            fromDiv && fromDiv.current && animateCards(currentCards, fromDiv.current, playedCardRef.current );
         }
     }, [animateCards, currentCards]);
 
