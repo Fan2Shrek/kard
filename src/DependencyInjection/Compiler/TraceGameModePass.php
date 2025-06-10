@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 final class TraceGameModePass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if ('dev' !== $container->getParameter('kernel.environment')) {
             return;
