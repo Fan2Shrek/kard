@@ -1,11 +1,13 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useEffect, useRef, useState,  } from 'react';
 
 import './game.css';
 import useMercure from '../hook/useMercure.js';
 import GameContext from '../Context/GameContext.js';
+import AnimationContext from '../Context/AnimationContext.js';
 import Text from './Animation/Text.js';
 import PresidentBoard from './GameMode/PresidentBoard.js';
 import CrazyEightsBoard from './GameMode/CrazyEightsBoard.js';
+import Board from './GameMode/Board.js';
 
 export default ({ gameContext, hand: currentHand, player: user }) => {
     const [ctx, setCtx] = useState(JSON.parse(gameContext));
@@ -17,9 +19,12 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
     const gameUrl = useMemo(() => JSON.parse(document.getElementById('mercure-game-url').textContent), []);
     const playerUrl = useMemo(() => JSON.parse(document.getElementById('mercure-game-player').textContent), []);
 
+    const boardRef = useRef(null);
+
     const gameActions = useMemo(() => ({
         play: (data) => {
             setCtx(data);
+            const currentCards = data.currentCards;
         },
         message: (data) => {
             setKey((key) => key + 1);
@@ -44,9 +49,13 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
     // @todo display one hand per player
     return <>
         <GameContext gameContext={ctx} player={player} currentPlayer={ctx.currentPlayer}>
-            { text && <Text key={key} text={text} /> }
-            { ctx.room.gameMode.value === 'president' && <PresidentBoard ctx={ctx} hand={hand} player={player} /> }
-            { ctx.room.gameMode.value === 'crazy_eights' && <CrazyEightsBoard ctx={ctx} hand={hand} player={player} /> }
+            <AnimationContext>
+                { text && <Text key={key} text={text} /> }
+                <Board ref={boardRef} players={ctx.players.filter((player) => player.id !== ctx.currentPlayer.id)}>
+                    { ctx.room.gameMode.value === 'president' && <PresidentBoard ctx={ctx} hand={hand} player={player} /> }
+                    { ctx.room.gameMode.value === 'crazy_eights' && <CrazyEightsBoard ctx={ctx} hand={hand} player={player} /> }
+                </Board>
+            </AnimationContext>
         </GameContext>
     </>;
 }
