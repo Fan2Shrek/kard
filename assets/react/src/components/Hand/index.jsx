@@ -5,7 +5,6 @@ import Card from '../Card.js';
 import api from '../../lib/api.js';
 import { GameContext } from '../../Context/GameContext.js';
 
-// @todo handle multiple cards
 export default forwardRef(({ hand, canPlay, gameActions = null }, ref) => {
     const { getCardAsset, roomId, currentPlayer } = useContext(GameContext);
     const [selectedCards, setSelectedCards] = useState([]);
@@ -21,7 +20,6 @@ export default forwardRef(({ hand, canPlay, gameActions = null }, ref) => {
     const handlePlay = (data = {}) => {
         api.game.play(roomId, { cards: selectedCards, player: currentPlayer, data });
 
-        // @todo uncomment
         setSelectedCards([]);
     }
 

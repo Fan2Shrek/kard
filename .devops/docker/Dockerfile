@@ -19,7 +19,6 @@ RUN apk add --no-cache \
     multirun
 
 COPY .devops/docker/default.conf /etc/nginx/http.d/default.conf
-COPY .devops/docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 COPY . /app
 WORKDIR /app
@@ -48,3 +47,5 @@ COPY --from=compiler /app/dist /app/assets/react/dist
 
 RUN bin/console sass:build
 RUN bin/console asset-map:compile
+
+RUN chown -R www-data:www-data /app/var
