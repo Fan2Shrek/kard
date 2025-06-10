@@ -21,7 +21,7 @@ final class GameModeDescriptionFixtures extends AbstractFixtures implements Depe
         ];
     }
 
-    public function getDependencies()
+    public function getDependencies(): array
     {
         return [
             GameModeFixtures::class,
