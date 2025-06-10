@@ -7,6 +7,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 
+/**
+ * @extends AbstractCrudController<GameMode>
+ */
 class GameModeCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string

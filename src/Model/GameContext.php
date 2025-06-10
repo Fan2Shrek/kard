@@ -72,7 +72,7 @@ final class GameContext
      */
     public function draw(int $count): array
     {
-        if (empty($this->drawPill)) {
+        if (empty($this->drawPill->getCards())) {
             return [];
         }
 

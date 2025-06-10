@@ -8,6 +8,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 
+/**
+ * @extends AbstractCrudController<GameModeDescription>
+ */
 class GameModeDescriptionCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string

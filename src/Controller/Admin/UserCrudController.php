@@ -9,10 +9,14 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
+/**
+ * @extends AbstractCrudController<User>
+ */
 class UserCrudController extends AbstractCrudController
 {
-    public function __construct(private readonly UserPasswordHasherInterface $passwordHasher)
-    {
+    public function __construct(
+        private readonly UserPasswordHasherInterface $passwordHasher,
+    ) {
     }
 
     public static function getEntityFqcn(): string
