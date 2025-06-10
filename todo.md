@@ -5,14 +5,13 @@
 - [ ] Auto deploy
 - [X] Docker build ?
 
-- [ ] AbstractGameMode
-- [ ] Adapt code to be more flexible with game mode
-- [ ] American eight
+- [X] AbstractGameMode
+- [X] Adapt code to be more flexible with game mode
+- [X] Krazy Eights
 
 - [ ] Display Rule Exception on React
-- [ ] Display winner on React
+- [X] Display winner on React
 - [X] Fix end turn
 - [X] Data in gameContext
 
 - [ ] (?) Integrate https://github.com/MattCain/svg-playing-cards/tree/master
-- [ ] Update to Sf 7.3 as soon as available
