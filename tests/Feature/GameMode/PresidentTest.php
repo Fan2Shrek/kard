@@ -481,6 +481,17 @@ describe('Président: fin de tour', function () {
         expect(Act::get('gameContext'))->toHaveNewRound();
     });
 
+    test('Jouer un deux, le retire de la main du joueur', function () {
+        Arrange::setCurrentCard(5, 's');
+        Arrange::setCurrentHand([
+            [5, 's'],
+            [2, 's'],
+        ]);
+        Act::playCard(2, 's');
+
+        expect(Act::get('currentHand'))->toHaveCount(1);
+    });
+
     test('Le tour se termine si un joueur joue un double 2', function () {
         Arrange::setRound([
             [7, 7],

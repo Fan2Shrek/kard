@@ -92,6 +92,7 @@ final class PresidentGameMode extends AbstractGameMode
             default => throw new \LogicException('Invalid number of cards played'),
         };
 
+        $hand->removeCards($cards);
         if ($this->isTurnFinished ?? false) {
             return;
         }
@@ -99,7 +100,6 @@ final class PresidentGameMode extends AbstractGameMode
         $gameContext->setCurrentCards($cards);
         $gameContext->addData('lastPlayer', $gameContext->getCurrentPlayer()->id);
         $gameContext->nextPlayer();
-        $hand->removeCards($cards);
     }
 
     /**
