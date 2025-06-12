@@ -19,6 +19,16 @@ $radius: 100px;
         &--hidden {
             transform: rotate(180deg);
         }
+
+        .error {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(255, 0, 0, 0.1);
+            color: red;
+            font-weight: bold;
+        }
+
     }
 
     &-hidden {
