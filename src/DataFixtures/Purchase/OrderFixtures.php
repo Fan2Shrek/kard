@@ -8,7 +8,7 @@ use App\Entity\Purchase\Order;
 use App\Entity\User;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
-final class sOrderFixtures extends AbstractFixtures implements DependentFixtureInterface
+final class OrderFixtures extends AbstractFixtures implements DependentFixtureInterface
 {
     protected function getEntityClass(): string
     {
