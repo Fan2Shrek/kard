@@ -2,10 +2,10 @@ import React, { forwardRef, useContext } from 'react';
 
 import './stack.css';
 import Card from '../Card.js';
-import { GameContext } from '../../Context/GameContext.js';
+import { AssetsContext } from '../../Context/AssetsContext.js';
 
 export default forwardRef(({ cards }, ref) => {
-    const { getCardAsset } = useContext(GameContext);
+    const { getCardAsset } = useContext(AssetsContext);
 
     return <div ref={ref} className='stack'>
         {cards.map((card, i) =>

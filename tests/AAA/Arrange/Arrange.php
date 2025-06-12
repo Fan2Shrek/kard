@@ -106,7 +106,6 @@ abstract /* static */ class Arrange
                 Act::get('gameMode'),
                 Uuid::uuid4(),
             ),
-            [],
             $players,
             current($players),
             $turns,

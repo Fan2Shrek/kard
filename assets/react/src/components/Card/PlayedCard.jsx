@@ -2,10 +2,10 @@ import React, { forwardRef, useContext } from 'react';
 
 import './playedCard.css';
 import Card from '../Card.js';
-import { GameContext } from '../../Context/GameContext.js';
+import { AssetsContext } from '../../Context/AssetsContext.js';
 
 export default forwardRef(({ turns }, ref) => {
-    const { getCardAsset } = useContext(GameContext);
+    const { getCardAsset } = useContext(AssetsContext);
 
     if (turns.length === 0) {
         return null;
