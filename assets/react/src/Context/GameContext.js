@@ -5,8 +5,6 @@ export const GameContext = createContext({
     gameContext: null,
     currentPlayer: null,
     player: null,
-    getCardAsset: () => { },
-    getBackAsset: () => { },
     isPlayerTurn: () => { },
 })
 

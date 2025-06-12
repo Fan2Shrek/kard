@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useContext } from 'react';
 import { useSprings, animated } from '@react-spring/web';
 
 import Card from '../Card.js';
-import { GameContext } from '../../Context/GameContext.js';
+import { AssetsContext } from '../../Context/AssetsContext.js';
 import { AnimationContext } from '../../Context/AnimationContext.js';
 
 // To be refactored later, a clean up
@@ -12,7 +12,7 @@ export default ({ count, id = null }) => {
     const radius = 180;
     const startAngle = -spread / 1.5;
 
-    const { getBackAsset } = useContext(GameContext);
+    const { getBackAsset } = useContext(AssetsContext);
     const cards = Array.from({ length: count });
 
     const ref = useRef(null);

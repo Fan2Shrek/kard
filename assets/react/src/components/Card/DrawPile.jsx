@@ -2,10 +2,10 @@ import React, { useContext } from 'react';
 
 import './stack.css';
 import Card from '../Card.js';
-import { GameContext } from '../../Context/GameContext.js';
+import { AssetsContext } from '../../Context/AssetsContext.js';
 
 export default ({ cards }) => {
-    const { getBackAsset } = useContext(GameContext);
+    const { getBackAsset } = useContext(AssetsContext);
 
     return <div className='stack'>
         {cards.map((card, i) =>

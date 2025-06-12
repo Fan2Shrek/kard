@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useRef } from 'react';
 import { useSpring, animated } from '@react-spring/web';
 
 import Card from '../components/Card.js';
-import { GameContext } from './GameContext.js';
+import { AssetsContext } from './AssetsContext.js';
 
 export const AnimationContext = createContext({
     animateCards: () => {},
@@ -21,7 +21,7 @@ export function AnimationProvider({ children }) {
     const [idk, setIdk] = useState([]);
     const [handRefs, setHandRefs] = useState({});
 
-    const { getCardAsset } = useContext(GameContext);
+    const { getCardAsset } = useContext(AssetsContext);
     const animationDoneCallback = useRef(null);
 
     const getHandRef = (id) => {

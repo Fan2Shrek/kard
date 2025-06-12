@@ -10,6 +10,7 @@ use App\Model\Player;
 use App\Repository\GameModeDescriptionRepository;
 use App\Repository\GameModeRepository;
 use App\Repository\RoomRepository;
+use App\Service\AssetsProvider;
 use App\Service\Card\HandRepositoryInterface;
 use App\Service\GameContextProvider;
 use App\Service\GameManager\GameManager;
@@ -37,6 +38,7 @@ final class RoomController extends AbstractController
         private GameModeRepository $gameModeRepository,
         private GameModeDescriptionRepository $gameModeDescriptionRepository,
         private EventDispatcherInterface $eventDispatcher,
+        private AssetsProvider $assetsProvider,
     ) {
     }
 
@@ -146,6 +148,7 @@ final class RoomController extends AbstractController
         $user = $this->getUser();
 
         return $this->render('home/game.html.twig', [
+            'assets' => $this->assetsProvider->getAllCardsAssets(),
             'game' => $this->serializer->serialize($this->gameContextProvider->provide($room), 'json'),
             'player' => $this->serializer->serialize($this->getUser(), 'json'),
             'hand' => $this->handRepository->get($user, $room)->getCards(),

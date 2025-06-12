@@ -4,9 +4,11 @@ import './hand.css';
 import Card from '../Card.js';
 import api from '../../lib/api.js';
 import { GameContext } from '../../Context/GameContext.js';
+import { AssetsContext } from '../../Context/AssetsContext.js';
 
 export default forwardRef(({ hand, canPlay, gameActions = null }, ref) => {
-    const { getCardAsset, roomId, currentPlayer } = useContext(GameContext);
+    const { roomId, currentPlayer } = useContext(GameContext);
+    const { getCardAsset } = useContext(AssetsContext);
     const [selectedCards, setSelectedCards] = useState([]);
 
     const handleCard = (card) => {

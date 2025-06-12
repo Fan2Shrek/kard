@@ -14,7 +14,6 @@ final class GameContext
     private Deck $drawPill;
 
     /**
-     * @param string[] $assets
      * @param Player[] $players
      * @param Turn[]   $turns
      * @param Card[]   $drawPill
@@ -24,7 +23,6 @@ final class GameContext
     public function __construct(
         private string $id,
         private Room $room,
-        private array $assets,
         array $players,
         Player $currentPlayer,
         array $turns = [],
@@ -117,14 +115,6 @@ final class GameContext
     }
 
     /**
-     * @return string[]
-     */
-    public function getAssets(): array
-    {
-        return $this->assets;
-    }
-
-    /**
      * @return Player[]
      */
     public function getPlayers(): array
@@ -168,11 +158,6 @@ final class GameContext
     public function getDiscarded(): array
     {
         return $this->discarded;
-    }
-
-    public function addToDeck(Card $card): void
-    {
-        $this->assets[] = $card;
     }
 
     public function addDiscarded(Card $card): void
