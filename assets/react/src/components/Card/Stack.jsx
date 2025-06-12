@@ -14,6 +14,9 @@ export default forwardRef(({ cards }, ref) => {
                 clickable={false}
                 card={card}
                 img={getCardAsset(card)}
+                angle={Math.floor(Math.random() * 181)}
+                xOffset={Math.floor(Math.random() * 10)}
+                yOffset={Math.floor(Math.random() * 10)}
             />
         )}
     </div>;
