@@ -33,7 +33,3 @@ Ensuite allez sur [localhost:8000](http://localhost:8000) et vous êtes prêt à
 - Mercure
 - Docker
 - EasyAdmin
-
-## Schéma de la base de données
-
-![Database schema](./docs/database-schema.png)
