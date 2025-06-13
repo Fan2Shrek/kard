@@ -120,7 +120,6 @@ final class GameManager implements ServiceSubscriberInterface
      */
     public function play(Room $room, User $user, array $cards, array $data = []): void
     {
-        $room->setStatus(GameStatusEnum::PLAYING);
         $ctx = $this->gameContextProvider->provide($room);
 
         if ($ctx->getCurrentPlayer()->id !== $user->getId()->toString()) {

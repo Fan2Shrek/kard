@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\GameModeDescription;
 use App\Entity\Room;
+use App\Enum\GameStatusEnum;
 use App\Event\Room\RoomEvent;
 use App\Model\Player;
 use App\Repository\GameModeDescriptionRepository;
@@ -110,6 +111,7 @@ final class RoomController extends AbstractController
     public function start(Room $room): Response
     {
         $response = $this->redirectToRoute('game', ['id' => $room->getId()]);
+        $room->setStatus(GameStatusEnum::PLAYING);
 
         $gameContext = $this->gameManager->setupRoom($room);
 
