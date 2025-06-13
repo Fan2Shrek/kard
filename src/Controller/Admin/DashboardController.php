@@ -15,6 +15,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class DashboardController extends AbstractDashboardController
 {
     #[Route('/admin', name: 'admin')]
+    #[\Override]
     public function index(): Response
     {
         $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
@@ -22,11 +23,13 @@ class DashboardController extends AbstractDashboardController
         return $this->redirect($adminUrlGenerator->setController(GameModeCrudController::class)->generateUrl());
     }
 
+    #[\Override]
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()->setTitle('Kard - Admin');
     }
 
+    #[\Override]
     public function configureMenuItems(): iterable
     {
         // yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');

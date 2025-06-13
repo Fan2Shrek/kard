@@ -18,6 +18,7 @@ final class HomeController extends AbstractController
         ]);
     }
 
+    #[\Override]
     protected function getUser(): User
     {
         $user = parent::getUser();

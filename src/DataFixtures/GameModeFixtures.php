@@ -7,12 +7,12 @@ use App\Service\GameManager\GameMode\GameModeEnum;
 
 class GameModeFixtures extends AbstractFixtures
 {
-    public function getEntityClass(): string
+    protected function getEntityClass(): string
     {
         return GameMode::class;
     }
 
-    public function getData(): iterable
+    protected function getData(): iterable
     {
         yield [
             'name' => 'President',

@@ -37,7 +37,7 @@ final class PurchaseController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $purchases = $form->get('purchases')->getData();
-            $purchases = array_map(fn ($purchase) => $purchase['purchase'], $purchases);
+            $purchases = array_map(fn (array $purchase) => $purchase['purchase'], $purchases);
 
             foreach ($purchases as $purchase) {
                 $order->addPurchase($purchase);
@@ -76,6 +76,7 @@ final class PurchaseController extends AbstractController
         ]);
     }
 
+    #[\Override]
     protected function getUser(): User
     {
         $user = parent::getUser();

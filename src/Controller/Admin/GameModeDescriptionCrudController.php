@@ -18,6 +18,7 @@ class GameModeDescriptionCrudController extends AbstractCrudController
         return GameModeDescription::class;
     }
 
+    #[\Override]
     public function configureFields(string $pageName): iterable
     {
         return [
