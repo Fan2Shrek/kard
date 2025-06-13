@@ -68,8 +68,8 @@ final class PresidentGameMode extends AbstractGameMode
             throw new RuleException($this->getGameMode(), 'Invalid number of cards played');
         }
 
-        if (0 === count($cards)) {
-            if (0 === count($gameContext->getRound()->getTurns())) {
+        if ([] === $cards) {
+            if ([] === $gameContext->getRound()->getTurns()) {
                 throw new RuleException($this->getGameMode(), 'First turn must have at least one card');
             }
 
@@ -124,7 +124,7 @@ final class PresidentGameMode extends AbstractGameMode
             $this->handleRoundEnd();
         }
 
-        $nonSkippedTurns = array_values(array_filter($previousTurns, fn ($turn) => !empty($turn->getCards())));
+        $nonSkippedTurns = array_values(array_filter($previousTurns, fn ($turn): bool => !empty($turn->getCards())));
 
         [$lastTurn, $beforeLastTurn] = [$nonSkippedTurns[0]->getCards() ?? null, ($nonSkippedTurns[1] ?? null)?->getCards() ?? null]; // @phpstan-ignore-line
 
@@ -145,7 +145,7 @@ final class PresidentGameMode extends AbstractGameMode
 
             // verify if square
             $rank = $lastTurn[0]->rank;
-            $count = array_filter($nonSkippedTurns, fn ($turn) => $rank === $turn->getCards()[0]->rank);
+            $count = array_filter($nonSkippedTurns, fn ($turn): bool => $rank === $turn->getCards()[0]->rank);
 
             if (3 === count($count)) {
                 $this->handleRoundEnd();

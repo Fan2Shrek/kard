@@ -30,10 +30,10 @@ final class GameContextSerializer implements DenormalizerInterface, Denormalizer
             $data['id'],
             $this->denormalizer->denormalize($data['room'], Room::class, $format, $context),
             $players,
-            current(array_filter($players, fn (Player $player) => $player->id === $data['currentPlayer']['id'])),
+            current(array_filter($players, fn (Player $player): bool => $player->id === $data['currentPlayer']['id'])),
             $this->denormalizer->denormalize($data['round']['turns'], Turn::class.'[]', $format, $context),
             array_map(
-                fn ($card) => $this->denormalizer->denormalize($card, Card::class, $format, $context),
+                fn ($card): mixed => $this->denormalizer->denormalize($card, Card::class, $format, $context),
                 $data['drawPile'],
             ),
             $data['discarded'],

@@ -99,7 +99,7 @@ final class RoomController extends AbstractController
         }
 
         $players = array_map(
-            fn ($player) => Player::fromUser($player),
+            fn ($player): \App\Model\Player => Player::fromUser($player),
             $room->getPlayers()->toArray(),
         );
 
@@ -117,6 +117,7 @@ final class RoomController extends AbstractController
 
         $gameContext = $this->gameContextProvider->provide($room);
         $gameContext->setDrawPile($drawPile);
+        
         $players = array_reduce($gameContext->getPlayers(), function (array $carry, Player $player) {
             $carry[$player->id] = $player;
 
@@ -157,6 +158,7 @@ final class RoomController extends AbstractController
         ]);
     }
 
+    #[\Override]
     protected function getUser(): User
     {
         $user = parent::getUser();

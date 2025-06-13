@@ -14,24 +14,22 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand('app:data:init')]
-final class InitDataCommand extends Command
+final class InitDataCommand
 {
     private int $gameModeCount = 0;
+    
     private int $descriptionCount = 0;
 
-    public function __construct(
-        private EntityManagerInterface $entityManager,
-        private GameModeRepository $gameModeRepository,
-        private GameModeDescriptionRepository $gameModeDescriptionRepository,
-    ) {
-        parent::__construct();
+    public function __construct(private EntityManagerInterface $entityManager, private GameModeRepository $gameModeRepository, private GameModeDescriptionRepository $gameModeDescriptionRepository)
+    {
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function __invoke(OutputInterface $output): int
     {
-        $this->gameModeCount = $this->descriptionCount = 0;
+        $this->gameModeCount = 0;
+        $this->descriptionCount = 0;
         foreach (GameModeEnum::cases() as $gm) {
-            if ($gameMode = $this->gameModeRepository->findByGameMode($gm)) {
+            if (($gameMode = $this->gameModeRepository->findByGameMode($gm)) !== null) {
                 $this->createDescription($gameMode);
                 continue;
             }
@@ -39,6 +37,7 @@ final class InitDataCommand extends Command
             $this->entityManager->persist(new GameMode($gm));
             ++$this->gameModeCount;
         }
+        
         $this->entityManager->flush();
 
         $output->writeln(sprintf('%d game mode(s) added', $this->gameModeCount));
@@ -49,9 +48,10 @@ final class InitDataCommand extends Command
 
     private function createDescription(GameMode $gameMode): GameModeDescription
     {
-        if ($description = $this->gameModeDescriptionRepository->findByGameMode($gameMode)) {
+        if (($description = $this->gameModeDescriptionRepository->findByGameMode($gameMode)) !== null) {
             return $description;
         }
+        
         ++$this->descriptionCount;
 
         $this->entityManager->persist($gm = new GameModeDescription($gameMode));

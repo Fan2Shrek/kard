@@ -27,7 +27,7 @@ final class OneTimePurchaseFixtures extends AbstractFixtures
         ];
 
         yield [
-            'name' => 'Un autre paiement bien cher mais zebi c\'est la vie',
+            'name' => "Un autre paiement bien cher mais zebi c'est la vie",
             'price' => 999,
         ];
     }

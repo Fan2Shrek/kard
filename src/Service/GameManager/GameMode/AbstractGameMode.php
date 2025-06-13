@@ -13,6 +13,7 @@ use Symfony\Component\Mercure\Update;
 abstract class AbstractGameMode implements GameModeInterface
 {
     protected GameContext $gameContext;
+
     /**
      * @var array<Card>
      */

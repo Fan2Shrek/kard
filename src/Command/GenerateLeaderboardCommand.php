@@ -21,18 +21,13 @@ use Symfony\Component\Scheduler\Attribute\AsCronTask;
     name: 'app:generate-leaderboard',
     description: 'Generate a leaderboard of the previous day',
 )]
-final class GenerateLeaderboardCommand extends Command
+final class GenerateLeaderboardCommand
 {
-    public function __construct(
-        private EntityManagerInterface $entityManager,
-        private ResultRepository $resultRepository,
-        private UserRepository $userRepository,
-        private MessageBusInterface $messageBus,
-    ) {
-        parent::__construct();
+    public function __construct(private EntityManagerInterface $entityManager, private ResultRepository $resultRepository, private UserRepository $userRepository, private MessageBusInterface $messageBus)
+    {
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function __invoke(OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
 
@@ -42,6 +37,7 @@ final class GenerateLeaderboardCommand extends Command
 
             return self::SUCCESS;
         }
+        
         $user = $this->userRepository->find($data['user']);
 
         $leaderboard = new Leaderboard(player: $user, winsNumber: $data['wins']);

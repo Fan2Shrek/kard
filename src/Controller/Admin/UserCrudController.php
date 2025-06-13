@@ -24,6 +24,7 @@ class UserCrudController extends AbstractCrudController
         return User::class;
     }
 
+    #[\Override]
     public function configureFields(string $pageName): iterable
     {
         return [
@@ -34,6 +35,7 @@ class UserCrudController extends AbstractCrudController
         ];
     }
 
+    #[\Override]
     public function createEntity(string $entityFqcn): User
     {
         return new User('', '');
@@ -42,6 +44,7 @@ class UserCrudController extends AbstractCrudController
     /**
      * @param User $entityInstance
      */
+    #[\Override]
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
         $entityInstance->setPassword($this->passwordHasher->hashPassword($entityInstance, $entityInstance->getPassword()));
