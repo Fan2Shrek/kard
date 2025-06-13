@@ -118,12 +118,24 @@ describe('Huit américain: règles basiques', function () {
                 new Card(Suit::SPADES, Rank::EIGHT),
                 new Card(Suit::HEARTS, Rank::KING),
             ]),
+            4 => new Hand([
+                new Card(Suit::SPADES, Rank::EIGHT),
+                new Card(Suit::HEARTS, Rank::KING),
+            ]),
+            5 => new Hand([
+                new Card(Suit::SPADES, Rank::EIGHT),
+                new Card(Suit::HEARTS, Rank::KING),
+            ]),
+            6 => new Hand([
+                new Card(Suit::SPADES, Rank::EIGHT),
+                new Card(Suit::HEARTS, Rank::KING),
+            ]),
         ];
 
         $players = Act::orderPlayers($hands);
 
         expect($players)->toContain(1, 2, 3);
-        expect($players)->not()->toBe([1, 2, 3]);
+        expect($players)->not()->toBe([1, 2, 3, 4, 5, 6]);
     });
 
     test('Jouer un coup passe la main au joueur suivant', function () {
