@@ -15,8 +15,8 @@ class RuleException extends \Exception implements TranslatableException
 
     public function __construct(GameModeEnum $gameMode, string $message = '', int $code = 0, ?\Throwable $previous = null)
     {
-        $this->gameMode = $gameMode;
         parent::__construct($message, $code, $previous);
+        $this->gameMode = $gameMode;
     }
 
     public function getGameMode(): GameModeEnum

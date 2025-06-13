@@ -18,26 +18,35 @@ use App\Service\GameContextProvider;
 use App\Service\GameManager\GameMode\GameModeEnum;
 use App\Service\GameManager\GameMode\GameModeInterface;
 use App\Service\GameManager\GameMode\SetupGameModeInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-final class GameManager
+final class GameManager implements ServiceSubscriberInterface
 {
     /**
      * @param iterable<GameModeInterface> $gameModes
      */
     public function __construct(
         private iterable $gameModes,
+        private ContainerInterface $container,
         private HubInterface $hub,
         private GameContextProvider $gameContextProvider,
         private HandRepositoryInterface $handRepository,
         private SerializerInterface $serializer,
-        private ResultRepository $resultRepository,
-        private RouterInterface $router,
-        private CardGenerator $cardGenerator,
     ) {
+    }
+
+    public static function getSubscribedServices(): array
+    {
+        return [
+            'router' => RouterInterface::class,
+            'result_repository' => ResultRepository::class,
+            'card_generator' => CardGenerator::class,
+        ];
     }
 
     public function setupRoom(Room $room): GameContext
@@ -149,7 +158,7 @@ final class GameManager
                     'action' => 'end',
                     'data' => [
                         'context' => $ctx,
-                        'url' => $this->router->generate('home'),
+                        'url' => $this->container->get('router')->generate('home'),
                     ],
                 ], 'json'),
             ));
@@ -157,7 +166,7 @@ final class GameManager
             $room->setStatus(GameStatusEnum::FINISHED);
 
             $result = new Result($user, $room->getGameMode());
-            $this->resultRepository->save($result);
+            $this->container->get('result_repository')->save($result);
 
             return;
         }
@@ -197,7 +206,7 @@ final class GameManager
     {
         $gameMode = $this->getGameMode($room->getGameMode()->getValue());
 
-        return $this->cardGenerator->generateHands(
+        return $this->container->get('card_generator')->generateHands(
             count($room->getPlayers()),
             $gameMode->getCardsCount(count($room->getPlayers())) ?: 0,
         );
