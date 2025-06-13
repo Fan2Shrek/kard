@@ -3,11 +3,13 @@ import { useSpring, animated } from '@react-spring/web';
 
 import Card from '../components/Card.js';
 import { AssetsContext } from './AssetsContext.js';
+import Text from '../components/Animation/Text.js';
 
 export const AnimationContext = createContext({
     animateCards: () => {},
     getHandRef: (id) => null,
     addHandRef: (id, ref) => null,
+    displayText: (text) => {},
 });
 
 export const useAnimation = () => useContext(AnimationContext);
@@ -17,6 +19,8 @@ export function AnimationProvider({ children }) {
     const [animationProps, setAnimationProps] = useState(null);
     const [isAnimating, setIsAnimating] = useState(false);
     const [animKey, setAnimKey] = useState(0);
+    const [text, setText] = useState(null);
+    const [key, setKey] = useState(0);
 
     const [idk, setIdk] = useState([]);
     const [handRefs, setHandRefs] = useState({});
@@ -69,6 +73,11 @@ export function AnimationProvider({ children }) {
         });
     };
 
+    const displayText = (text) => {
+        setKey((prevKey) => prevKey + 1);
+        setText(text);
+    }
+
     const spring = useSpring({
         from: animationProps?.from || {},
         to: animationProps?.to || {},
@@ -87,7 +96,9 @@ export function AnimationProvider({ children }) {
             animateCards,
             getHandRef,
             addHandRef,
+            displayText,
         }}>
+            {text && <Text key={key} text={text} />}
             {children}
             {flyingCards && animationProps && isAnimating && (
                 <animated.div
