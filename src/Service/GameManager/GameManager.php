@@ -18,42 +18,100 @@ use App\Service\GameContextProvider;
 use App\Service\GameManager\GameMode\GameModeEnum;
 use App\Service\GameManager\GameMode\GameModeInterface;
 use App\Service\GameManager\GameMode\SetupGameModeInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-final class GameManager
+final class GameManager implements ServiceSubscriberInterface
 {
     /**
      * @param iterable<GameModeInterface> $gameModes
      */
     public function __construct(
         private iterable $gameModes,
+        private ContainerInterface $container,
         private HubInterface $hub,
         private GameContextProvider $gameContextProvider,
         private HandRepositoryInterface $handRepository,
         private SerializerInterface $serializer,
-        private ResultRepository $resultRepository,
-        private RouterInterface $router,
-        private CardGenerator $cardGenerator,
     ) {
     }
 
-    /**
-     * @return array{
-     *    0: Hand[],
-     *    1: Card[],
-     * }
-     */
-    public function drawHands(Room $room): array
+    public static function getSubscribedServices(): array
     {
-        $gameMode = $this->getGameMode($room->getGameMode()->getValue());
+        return [
+            'router' => RouterInterface::class,
+            'result_repository' => ResultRepository::class,
+            'card_generator' => CardGenerator::class,
+        ];
+    }
 
-        return $this->cardGenerator->generateHands(
-            count($room->getPlayers()),
-            $gameMode->getCardsCount(count($room->getPlayers())) ?: 0,
+    public function setupRoom(Room $room): GameContext
+    {
+        [$hands, $drawPile] = $this->drawHands($room);
+
+        $gameContext = $this->gameContextProvider->provide($room);
+        $gameContext->setDrawPile($drawPile);
+        $players = array_reduce($gameContext->getPlayers(), function (array $carry, Player $player) {
+            $carry[$player->id] = $player;
+
+            return $carry;
+        }, []);
+
+        foreach ($room->getPlayers() as $k => $player) {
+            $this->handRepository->save($player, $room, $hands[$k]);
+            $players[$player->getId()->toString()]->cardsCount = count($hands[$k]);
+        }
+
+        $this->gameContextProvider->save($gameContext);
+
+        return $gameContext;
+    }
+
+    public function start(GameContext $ctx): void
+    {
+        $players = $ctx->getPlayers();
+
+        $hands = array_reduce(
+            $players,
+            function ($acc, $player) use ($ctx) {
+                $acc[$player->id] = $this->handRepository->get($player->id, $ctx->getRoom());
+
+                return $acc;
+            },
+            [],
         );
+
+        $players = array_reduce(
+            $players,
+            function ($acc, $player) {
+                $acc[$player->id] = $player;
+
+                return $acc;
+            },
+            [],
+        );
+
+        $gameMode = $this->getGameMode($ctx->getRoom()->getGameMode()->getValue());
+        $order = $gameMode->getPlayerOrder($hands);
+
+        if ($gameMode instanceof SetupGameModeInterface) {
+            $gameMode->setup($ctx, $hands);
+        }
+
+        $ctx->setPlayerOrder(
+            array_map(
+                function ($id) use ($players) {
+                    return $players[$id];
+                },
+                $order,
+            ),
+        );
+
+        $this->gameContextProvider->save($ctx);
     }
 
     /**
@@ -102,7 +160,7 @@ final class GameManager
                     'action' => 'end',
                     'data' => [
                         'context' => $ctx,
-                        'url' => $this->router->generate('home'),
+                        'url' => $this->container->get('router')->generate('home'),
                     ],
                 ], 'json'),
             ));
@@ -110,7 +168,7 @@ final class GameManager
             $room->setStatus(GameStatusEnum::FINISHED);
 
             $result = new Result($user, $room->getGameMode());
-            $this->resultRepository->save($result);
+            $this->container->get('result_repository')->save($result);
 
             return;
         }
@@ -129,47 +187,6 @@ final class GameManager
         ));
     }
 
-    public function start(GameContext $ctx): void
-    {
-        $players = $ctx->getPlayers();
-
-        $hands = array_reduce(
-            $players,
-            function ($acc, $player) use ($ctx) {
-                $acc[$player->id] = $this->handRepository->get($player->id, $ctx->getRoom());
-
-                return $acc;
-            },
-            [],
-        );
-
-        $players = array_reduce(
-            $players,
-            function ($acc, $player) {
-                $acc[$player->id] = $player;
-
-                return $acc;
-            },
-            [],
-        );
-
-        $gameMode = $this->getGameMode($ctx->getRoom()->getGameMode()->getValue());
-        $order = $gameMode->getPlayerOrder($hands);
-
-        if ($gameMode instanceof SetupGameModeInterface) {
-            $gameMode->setup($ctx, $hands);
-        }
-
-        $ctx->setPlayerOrder(
-            array_map(
-                function ($id) use ($players) {
-                    return $players[$id];
-                },
-                $order,
-            ),
-        );
-    }
-
     public function getGameMode(GameModeEnum $gameModeEnum): GameModeInterface
     {
         foreach ($this->gameModes as $gameMode) {
@@ -179,5 +196,21 @@ final class GameManager
         }
 
         throw new \InvalidArgumentException('Game mode not found');
+    }
+
+    /**
+     * @return array{
+     *    0: Hand[],
+     *    1: Card[],
+     * }
+     */
+    private function drawHands(Room $room): array
+    {
+        $gameMode = $this->getGameMode($room->getGameMode()->getValue());
+
+        return $this->container->get('card_generator')->generateHands(
+            count($room->getPlayers()),
+            $gameMode->getCardsCount(count($room->getPlayers())) ?: 0,
+        );
     }
 }

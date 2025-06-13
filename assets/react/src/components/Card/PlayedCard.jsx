@@ -1,7 +1,7 @@
 import React, { forwardRef, useContext } from 'react';
 
 import './playedCard.css';
-import Card from '../Card.js';
+import { Card } from '../components.js';
 import { AssetsContext } from '../../Context/AssetsContext.js';
 
 export default forwardRef(({ turns }, ref) => {

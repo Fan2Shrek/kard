@@ -1,6 +1,6 @@
 import React from 'react';
 
-import HiddenHand from '../Hand/HiddenHand.js';
+import { HiddenHand } from '../components.js';
 import './board.css';
 
 export default ({ children, players }) => {

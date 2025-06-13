@@ -5,7 +5,7 @@ namespace App\Domain\Command;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler()]
+#[AsMessageHandler]
 final class SendEmailHandler
 {
     public function __construct(

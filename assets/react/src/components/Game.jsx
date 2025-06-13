@@ -1,12 +1,15 @@
 import React, { useContext, useMemo, useEffect, useRef, useState,  } from 'react';
 
-import './game.css';
 import useMercure from '../hook/useMercure.js';
 import GameContext from '../Context/GameContext.js';
-import PresidentBoard from './GameMode/PresidentBoard.js';
-import CrazyEightsBoard from './GameMode/CrazyEightsBoard.js';
 import { AnimationContext } from '../Context/AnimationContext.js';
-import Board from './GameMode/Board.js';
+import {
+    Board,
+    CrazyEightsBoard,
+    PresidentBoard,
+} from './components.js';
+
+import './game.css';
 
 export default ({ gameContext, hand: currentHand, player: user }) => {
     const [ctx, setCtx] = useState(JSON.parse(gameContext));

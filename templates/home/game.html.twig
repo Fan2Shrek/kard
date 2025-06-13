@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div {{ react_component('components/AppGame', {assets: assets, gameContext: game, hand: hand, player: player}) }}></div>
+    <div {{ react_component('App', {assets: assets, gameContext: game, hand: hand, player: player}) }}></div>
 {% endblock %}
 {% block endscript %}
     <script type="application/json" id="mercure-game-url">

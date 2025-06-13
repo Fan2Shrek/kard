@@ -1,10 +1,4 @@
 export default class {
-    async get(url) {
-        const response = await fetch(url);
-
-        return response.json();
-    }
-
     async post(url, data, throwOnError = true) {
         try {
             const response = await fetch(url, {
