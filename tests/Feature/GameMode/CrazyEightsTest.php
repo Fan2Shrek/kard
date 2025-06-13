@@ -1,5 +1,6 @@
 <?php
 
+use App\Domain\Exception\RuleException;
 use App\Entity\GameMode;
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
@@ -75,7 +76,20 @@ describe('Huit américain: règles basiques', function () {
         Arrange::setCurrentCard(3, 's');
 
         Act::playCard(9, 'c');
-    })->throws('Cannot play this card');
+    })->throws('cards.same_rank_or_suit');
+
+    test('Il est impossible de jouer ni la couleur ni la valeur est la même, exception', function () {
+        Arrange::setCurrentCard(3, 's');
+
+        try {
+            Act::playCard(9, 'c');
+        } catch (RuleException $e) {
+            expect($e->getParams())->toBe([
+                '%rank%' => '3',
+                '%suit%' => '♠️',
+            ]);
+        }
+    });
 
     test('Il est possible de jouer plusieurs cartes si elles ont la même valeur', function () {
         Arrange::setCurrentCard(3, 's');
@@ -93,7 +107,7 @@ describe('Huit américain: règles basiques', function () {
             [5, 'd'],
             [7, 'd'],
         ]);
-    })->throws('Cards are unrelated');
+    })->throws('cards.same_rank');
 
     test('Il est impossible de jouer plusieurs cartes si elles rien en commun', function () {
         Arrange::setCurrentCard(5, 's');
@@ -102,7 +116,7 @@ describe('Huit américain: règles basiques', function () {
             [5, 'd'],
             [9, 'c'],
         ]);
-    })->throws('Cards are unrelated');
+    })->throws('cards.same_rank');
 
     test("L'ordre des joueurs est aléatoire", function () {
         $hands = [
@@ -338,7 +352,20 @@ describe('Huit américain: cartes spéciales', function () {
 
         Act::playCard(8, 's', ['name' => 'diamond']);
         Act::playCard(3, 's');
-    })->throws('Cannot play this card');
+    })->throws('cards.bad_suit');
+
+    test("La carte joué après le huit ne doit être d'un autre couleur, paramètre", function () {
+        Arrange::setCurrentCard(5, 's');
+
+        Act::playCard(8, 's', ['name' => 'diamond']);
+        try {
+            Act::playCard(3, 's');
+        } catch (RuleException $e) {
+            expect($e->getParams())->toBe([
+                '%suit%' => '♦️',
+            ]);
+        }
+    });
 });
 
 describe('Huit américain: mercure', function () {

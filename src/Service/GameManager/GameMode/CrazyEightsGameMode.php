@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Service\GameManager\GameMode;
 
-use App\Domain\Exception\RuleException;
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
 use App\Model\Card\Hand;
@@ -76,7 +75,7 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
         $currentCard = end($currentCards);
 
         if (!$this->allSameRank($cards)) {
-            throw new RuleException($this->getGameMode(), 'Cards are unrelated');
+            throw $this->createRuleException('cards.same_rank');
         }
 
         $mainCard = $cards[0];
@@ -106,12 +105,12 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
             $suit = $suit instanceof Suit ? $suit : Suit::from($suit); // @pest-mutate-ignore as this is more a denormalization issue
 
             if ($suit !== $mainCard->suit) {
-                throw new RuleException($this->getGameMode(), 'Cannot play this card');
+                throw $this->createRuleException('cards.bad_suit', ['%suit%' => $suit->getSymbol()]);
             }
         }
 
         if (Rank::EIGHT !== $currentCard->rank && !$this->isSameRank($mainCard, $currentCard) && !$this->isSameSuit($mainCard, $currentCard)) {
-            throw new RuleException($this->getGameMode(), 'Cannot play this card');
+            throw $this->createRuleException('cards.same_rank_or_suit', ['%rank%' => $currentCard->rank->value, '%suit%' => $currentCard->suit->getSymbol()]);
         }
 
         if (Rank::ACE === $mainCard->rank) {

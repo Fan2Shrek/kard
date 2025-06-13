@@ -1,0 +1,4 @@
+cards:
+  same_rank: "Les cartes doivent être de même valeur."
+  bad_suit: "Les cartes doivent être de couleur %suit%"
+  same_rank_or_suit: "Les cartes doivent être de couleur %suit% ou de valeur %rank%."
