@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\GameModeDescription;
 use App\Entity\Room;
-use App\Entity\User;
 use App\Event\Room\RoomEvent;
 use App\Model\Player;
 use App\Repository\GameModeDescriptionRepository;
@@ -24,30 +23,28 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-/** @todo serviceSubscriber for perfomance optimisation */
 #[Route('/room')]
 final class RoomController extends AbstractController
 {
+    use ControllerTrait;
+
     public function __construct(
         private RoomRepository $roomRepository,
-        private SerializerInterface $serializer,
-        private HandRepositoryInterface $handRepository,
-        private GameContextProvider $gameContextProvider,
         private GameManager $gameManager,
         private HubInterface $hub,
-        private GameModeRepository $gameModeRepository,
-        private GameModeDescriptionRepository $gameModeDescriptionRepository,
         private EventDispatcherInterface $eventDispatcher,
-        private AssetsProvider $assetsProvider,
     ) {
     }
 
     #[Route('/create', name: 'create')]
-    public function create(Request $request): Response
-    {
+    public function create(
+        Request $request,
+        GameModeRepository $gameModeRepository,
+        GameModeDescriptionRepository $gameModeDescriptionRepository,
+    ): Response {
         if (Request::METHOD_POST === $request->getMethod()) {
             $gameMode = $request->getPayload()->get('gameMode');
-            $gameMode = $this->gameModeRepository->findByGameMode(GameModeEnum::from($gameMode));
+            $gameMode = $gameModeRepository->findByGameMode(GameModeEnum::from($gameMode));
 
             $user = $this->getUser();
             $room = new Room($gameMode);
@@ -61,8 +58,8 @@ final class RoomController extends AbstractController
             return $this->redirectToRoute('waiting', ['id' => $room->getId()]);
         }
 
-        $gameModes = $this->gameModeRepository->findActiveGameModes();
-        $descriptions = $this->gameModeDescriptionRepository->findAllByGameMode($gameModes);
+        $gameModes = $gameModeRepository->findActiveGameModes();
+        $descriptions = $gameModeDescriptionRepository->findAllByGameMode($gameModes);
 
         return $this->render('home/create.html.twig', [
             'gameModes' => $gameModes,
@@ -112,25 +109,12 @@ final class RoomController extends AbstractController
     #[Route('/start/{id}', name: 'game_start')]
     public function start(Room $room): Response
     {
-        [$hands, $drawPile] = $this->gameManager->drawHands($room);
         $response = $this->redirectToRoute('game', ['id' => $room->getId()]);
 
-        $gameContext = $this->gameContextProvider->provide($room);
-        $gameContext->setDrawPile($drawPile);
-        $players = array_reduce($gameContext->getPlayers(), function (array $carry, Player $player) {
-            $carry[$player->id] = $player;
-
-            return $carry;
-        }, []);
-
-        foreach ($room->getPlayers() as $k => $player) {
-            $this->handRepository->save($player, $room, $hands[$k]);
-            $players[$player->getId()->toString()]->cardsCount = count($hands[$k]);
-        }
+        $gameContext = $this->gameManager->setupRoom($room);
 
         $this->gameManager->start($gameContext);
         $this->roomRepository->save($room);
-        $this->gameContextProvider->save($gameContext);
 
         $this->hub->publish(new Update(
             sprintf('game-%s', $room->getId()),
@@ -143,28 +127,22 @@ final class RoomController extends AbstractController
     }
 
     #[Route('/game/{id}', name: 'game')]
-    public function game(Room $room): Response
-    {
+    public function game(
+        Room $room,
+        SerializerInterface $serializer,
+        AssetsProvider $assetsProvider,
+        GameContextProvider $gameContextProvider,
+        HandRepositoryInterface $handRepository,
+    ): Response {
         $user = $this->getUser();
 
         return $this->render('home/game.html.twig', [
-            'assets' => $this->assetsProvider->getAllCardsAssets(),
-            'game' => $this->serializer->serialize($this->gameContextProvider->provide($room), 'json'),
-            'player' => $this->serializer->serialize($this->getUser(), 'json'),
-            'hand' => $this->handRepository->get($user, $room)->getCards(),
+            'assets' => $assetsProvider->getAllCardsAssets(),
+            'game' => $serializer->serialize($gameContextProvider->provide($room), 'json'),
+            'player' => $serializer->serialize($this->getUser(), 'json'),
+            'hand' => $handRepository->get($user, $room)->getCards(),
             'playerId' => $user->getId(),
             'room' => $room,
         ]);
-    }
-
-    protected function getUser(): User
-    {
-        $user = parent::getUser();
-
-        if (!$user instanceof User) {
-            throw new \LogicException('User must be an instance of User');
-        }
-
-        return $user;
     }
 }
