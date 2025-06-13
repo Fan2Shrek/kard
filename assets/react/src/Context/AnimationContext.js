@@ -1,9 +1,8 @@
 import React, { createContext, useContext, useState, useRef } from 'react';
 import { useSpring, animated } from '@react-spring/web';
 
-import Card from '../components/Card.js';
 import { AssetsContext } from './AssetsContext.js';
-import Text from '../components/Animation/Text.js';
+import { Text, Card } from '../components/components.js';
 
 export const AnimationContext = createContext({
     animateCards: () => {},

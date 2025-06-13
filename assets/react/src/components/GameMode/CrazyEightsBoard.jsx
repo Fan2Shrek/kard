@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react';
 
-import DrawPile from '../Card/DrawPile.js';
-import Hand from '../Hand/index.js';
-import HiddenHand from '../Hand/HiddenHand.js';
-import PlayedCard from '../Card/PlayedCard.js';
-import PlayerList from '../Player/PlayerList.js';
-import Stack from '../Card/Stack.js';
-
+import {
+    Hand,
+    HiddenHand,
+    PlayedCard,
+    PlayerList,
+    Stack,
+} from '../components.js';
 import { suitsIcons } from '../../enum.js';
 
 export default ({ ctx, hand, player }) => {

@@ -2,12 +2,14 @@ import React, { useContext, useEffect, useMemo, useState, useRef } from 'react';
 
 import { GameContext } from '../../Context/GameContext.js';
 import { AnimationContext } from '../../Context/AnimationContext.js';
-import Hand from '../Hand/index.js';
-import Card from '../Card.js';
-import HiddenHand from '../Hand/HiddenHand.js';
-import PlayedCard from '../Card/PlayedCard.js';
-import PlayerList from '../Player/PlayerList.js';
-import Stack from '../Card/Stack.js';
+import {
+    Hand,
+    HiddenHand,
+    PlayedCard,
+    PlayerList,
+    Card,
+    Stack,
+} from '../components.js';
 
 export default ({ ctx, hand, player }) => {
     const { gameContext: { currentCards } } = useContext(GameContext);

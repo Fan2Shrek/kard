@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useContext } from 'react';
 import { useSprings, animated } from '@react-spring/web';
 
-import Card from '../Card.js';
+import { Card } from '../components.js';
 import { AssetsContext } from '../../Context/AssetsContext.js';
 import { AnimationContext } from '../../Context/AnimationContext.js';
 
