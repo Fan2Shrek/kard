@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service\GameManager\GameMode;
 
+use App\Domain\Exception\RuleException;
 use App\Model\Card\Card;
 use App\Model\Card\Hand;
 use App\Model\GameContext;
@@ -55,5 +56,16 @@ abstract class AbstractGameMode implements GameModeInterface
                 ],
             ])
         ));
+    }
+
+    /**
+     * @param array<mixed> $params
+     */
+    protected function createRuleException(string $message, array $params = []): RuleException
+    {
+        $e = new RuleException($this->getGameMode(), $message);
+        $e->setParams($params);
+
+        return $e;
     }
 }

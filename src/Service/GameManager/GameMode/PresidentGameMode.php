@@ -2,7 +2,6 @@
 
 namespace App\Service\GameManager\GameMode;
 
-use App\Domain\Exception\RuleException;
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
 use App\Model\Card\Card;
@@ -64,13 +63,9 @@ final class PresidentGameMode extends AbstractGameMode
         $this->gameContext = $gameContext;
         $currentCards = $gameContext->getCurrentCards();
 
-        if (count($cards) > 3) { // TODO handle revolution
-            throw new RuleException($this->getGameMode(), 'Invalid number of cards played');
-        }
-
         if (0 === count($cards)) {
             if (0 === count($gameContext->getRound()->getTurns())) {
-                throw new RuleException($this->getGameMode(), 'First turn must have at least one card');
+                throw $this->createRuleException('turn.first.at_least_one_card');
             }
 
             // skip
@@ -89,7 +84,7 @@ final class PresidentGameMode extends AbstractGameMode
             1 => $this->handleOneCard($cards, $currentCards),
             2 => $this->handleTwoCards($cards, $currentCards),
             3 => $this->handleThreeCards($cards, $currentCards),
-            default => throw new \LogicException('Invalid number of cards played'),
+            default => throw $this->createRuleException('card.count.invalid'),
         };
 
         $hand->removeCards($cards);
@@ -109,7 +104,7 @@ final class PresidentGameMode extends AbstractGameMode
     private function handleOneCard(array $cards, array $currentCard): void
     {
         if (1 !== count($cards)) {
-            throw new RuleException($this->getGameMode(), 'Incorrect number of cards played');
+            throw $this->createRuleException('card.count.invalid');
         }
 
         $previousTurns = array_reverse($this->gameContext->getRound()->getTurns());
@@ -117,7 +112,7 @@ final class PresidentGameMode extends AbstractGameMode
         $card = $cards[0];
 
         if (!$this->isLegacyHigher($card, $currentCard[0]) && !$this->isSameRank($card, $currentCard[0])) {
-            throw new RuleException($this->getGameMode(), 'A card with a higher or same value must be played');
+            throw $this->createRuleException('card.value.higher');
         }
 
         if (Rank::TWO === $card->rank) {
@@ -140,7 +135,7 @@ final class PresidentGameMode extends AbstractGameMode
         if ($lastTurn[0]->rank === $beforeLastTurn[0]->rank) {
             // assert skip turn
             if ($card->rank !== $lastTurn[0]->rank) {
-                throw new RuleException($this->getGameMode(), \sprintf('Can not play "%s" when "%s" or nothing.', $card->rank->value, $lastTurn[0]->rank->value));
+                throw $this->createRuleException('card.or_nothing', ['%played_card%' => $card->rank->value, '%actual_card%' => $lastTurn[0]->rank->value]);
             }
 
             // verify if square
@@ -159,7 +154,7 @@ final class PresidentGameMode extends AbstractGameMode
     private function handleStart(array $cards): void
     {
         if (!$this->allSameRank($cards)) {
-            throw new RuleException($this->getGameMode(), "Can't play multiple cards with different values");
+            throw $this->createRuleException('card.values.not_same');
         }
 
         [$card] = $cards;
@@ -176,11 +171,11 @@ final class PresidentGameMode extends AbstractGameMode
     private function handleTwoCards(array $cards, array $currentCards): void
     {
         if (2 !== count($cards)) {
-            throw new RuleException($this->getGameMode(), 'Incorrect number of cards played');
+            throw $this->createRuleException('card.count.invalid');
         }
 
         if (!$this->allSameRank($cards)) {
-            throw new RuleException($this->getGameMode(), "Can't play multiple cards with different values");
+            throw $this->createRuleException('card.values.not_same');
         }
 
         [$card] = $cards;
@@ -197,7 +192,7 @@ final class PresidentGameMode extends AbstractGameMode
         }
 
         if (!$this->isLegacyHigher($card, $currentCard)) {
-            throw new RuleException($this->getGameMode(), 'Cards with a higher or same value must be played');
+            throw $this->createRuleException('card.values.higher');
         }
     }
 
@@ -208,11 +203,11 @@ final class PresidentGameMode extends AbstractGameMode
     private function handleThreeCards(array $cards, array $currentCards): void
     {
         if (3 !== count($cards)) {
-            throw new RuleException($this->getGameMode(), 'Incorrect number of cards played');
+            throw $this->createRuleException('card.count.invalid');
         }
 
         if (!$this->allSameRank($cards)) {
-            throw new RuleException($this->getGameMode(), "Can't play multiple cards with different values");
+            throw $this->createRuleException('card.values.not_same');
         }
 
         [$card] = $cards;
@@ -227,7 +222,7 @@ final class PresidentGameMode extends AbstractGameMode
         }
 
         if (!$this->isLegacyHigher($card, $currentCard)) {
-            throw new RuleException($this->getGameMode(), 'Cards with a higher or same value must be played');
+            throw $this->createRuleException('card.values.higher');
         }
     }
 

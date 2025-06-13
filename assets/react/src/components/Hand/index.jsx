@@ -10,6 +10,7 @@ export default forwardRef(({ hand, canPlay, gameActions = null }, ref) => {
     const { roomId, currentPlayer } = useContext(GameContext);
     const { getCardAsset } = useContext(AssetsContext);
     const [selectedCards, setSelectedCards] = useState([]);
+    const [error, setError] = useState(null);
 
     const handleCard = (card) => {
         if (selectedCards.includes(card)) {
@@ -19,8 +20,14 @@ export default forwardRef(({ hand, canPlay, gameActions = null }, ref) => {
         setSelectedCards([...selectedCards, card]);
     }
 
-    const handlePlay = (data = {}) => {
-        api.game.play(roomId, { cards: selectedCards, player: currentPlayer, data });
+    const handlePlay = async (data = {}) => {
+        setError(null);
+        const response = await api.game.play(roomId, { cards: selectedCards, player: currentPlayer, data });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            setError(errorData.error);
+        }
 
         setSelectedCards([]);
     }
@@ -38,6 +45,7 @@ export default forwardRef(({ hand, canPlay, gameActions = null }, ref) => {
             .map(([key, element]) => (
                 <React.Fragment key={key}>{element}</React.Fragment>
             ))}
+        {error && <div className='error'>{error}</div>}
         <div className='hand'>
             {hand.map((card) => {
                 return <Card onClick={handleCard} selected={selectedCards.includes(card)} key={`${card.rank}-${card.suit}`} card={card} img={getCardAsset(card)} angle={0} />

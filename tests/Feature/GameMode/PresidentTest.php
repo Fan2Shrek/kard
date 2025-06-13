@@ -1,5 +1,6 @@
 <?php
 
+use App\Domain\Exception\RuleException;
 use App\Entity\GameMode;
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
@@ -84,7 +85,7 @@ describe('Président: règles basiques', function () {
             [7, 'c'],
             [7, 'd'],
         ]);
-    })->throws('Invalid number of cards played');
+    })->throws('card.count.invalid');
 
     test('La dame de coeur commence', function () {
         $hands = [
@@ -250,7 +251,7 @@ describe('Président: carte simple', function () {
 
         // Act
         Act::playCard(3, 's');
-    })->throws('A card with a higher or same value must be played');
+    })->throws('card.value.higher');
 
     test('On ne peut pas jouer un double sur une carte simple', function () {
         // Arrange
@@ -261,7 +262,7 @@ describe('Président: carte simple', function () {
             [7, 's'],
             [7, 'h'],
         ]);
-    })->throws('Incorrect number of cards played');
+    })->throws('card.count.invalid');
 });
 
 describe('Président: cartes doubles', function () {
@@ -290,7 +291,7 @@ describe('Président: cartes doubles', function () {
         ]);
 
         Act::playcards([[3], [3]]);
-    })->throws('Cards with a higher or same value must be played');
+    })->throws('card.values.higher');
 
     test('On ne peut pas jouer un double avec deux valeurs différentes', function () {
         Arrange::setcurrentcards([
@@ -299,7 +300,7 @@ describe('Président: cartes doubles', function () {
         ]);
 
         Act::playcards([[5], [7]]);
-    })->throws("Can't play multiple cards with different values");
+    })->throws('card.values.not_same');
 
     test('On ne peut pas jouer une carte simple sur un double', function () {
         Arrange::setcurrentcards([
@@ -308,7 +309,7 @@ describe('Président: cartes doubles', function () {
         ]);
 
         Act::playCard(3, 's');
-    })->throws('Incorrect number of cards played');
+    })->throws('card.count.invalid');
 });
 
 describe('Président: cartes triples', function () {
@@ -330,7 +331,7 @@ describe('Président: cartes triples', function () {
         ]);
 
         Act::playcards([[3], [3], [3]]);
-    })->throws('Cards with a higher or same value must be played');
+    })->throws('card.values.higher');
 
     test('On ne peut pas jouer un triple avec des valeurs différentes', function () {
         Arrange::setcurrentcards([
@@ -340,7 +341,7 @@ describe('Président: cartes triples', function () {
         ]);
 
         Act::playcards([[5], [6], [7]]);
-    })->throws("Can't play multiple cards with different values");
+    })->throws('card.values.not_same');
 
     test('On ne peut pas jouer une carte simple sur un triple', function () {
         Arrange::setcurrentcards([
@@ -350,7 +351,7 @@ describe('Président: cartes triples', function () {
         ]);
 
         Act::playCard(3, 's');
-    })->throws('Incorrect number of cards played');
+    })->throws('card.count.invalid');
 });
 
 describe('Président: début de partie', function () {
@@ -370,7 +371,7 @@ describe('Président: début de partie', function () {
 
     test('On peut pas commencer une partie en jouant rien', function () {
         Act::playCard(null);
-    })->throws('First turn must have at least one card');
+    })->throws('turn.first.at_least_one_card');
 
     test('On peut commencer une partie avec un double de cartes à la même valeur', function () {
         Act::playCards([
@@ -392,7 +393,7 @@ describe('Président: début de partie', function () {
             [7, 's'],
             [8, 'h'],
         ]);
-    })->throws("Can't play multiple cards with different values");
+    })->throws('card.values.not_same');
 });
 
 describe('Président: carte ou rien', function () {
@@ -406,7 +407,7 @@ describe('Président: carte ou rien', function () {
         Arrange::setRound([[7], [7]]);
 
         Act::playCard(9, 'h');
-    })->throws('Can not play "9" when "7" or nothing.');
+    })->throws('card.or_nothing');
 
     test("On ne peut pas jouer de mauvaise valeur une carte ou rien au milieu d'un round", function () {
         Arrange::setRound([
@@ -417,7 +418,25 @@ describe('Président: carte ou rien', function () {
         ]);
 
         Act::playCard(9, 'h');
-    })->throws('Can not play "9" when "7" or nothing.');
+    })->throws('card.or_nothing');
+
+    test("Les valeurs des cartes sont passé à l'exception", function () {
+        Arrange::setRound([
+            [3],
+            [5],
+            [7],
+            [7],
+        ]);
+
+        try {
+            Act::playCard(9, 'h');
+        } catch (RuleException $e) {
+            expect($e->getParams())->toBe([
+                '%played_card%' => '9',
+                '%actual_card%' => '7',
+            ]);
+        }
+    });
 
     test('Passer son tour annule la carte ou rien', function () {
         Arrange::setRound([
@@ -441,7 +460,7 @@ describe('Président: carte ou rien', function () {
         ]);
 
         Act::playCard(9, 'h');
-    })->throws('Can not play "9" when "7" or nothing.');
+    })->throws('card.or_nothing');
 
     test("Passer son tour et remmetre la même valeur relance l'effet", function () {
         Arrange::setRound([
@@ -454,7 +473,7 @@ describe('Président: carte ou rien', function () {
         ]);
 
         Act::playCard(9, 'h');
-    })->throws('Can not play "9" when "7" or nothing.');
+    })->throws('card.or_nothing');
 });
 
 describe('Président: fin de tour', function () {

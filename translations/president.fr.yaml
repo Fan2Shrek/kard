@@ -1,0 +1,13 @@
+card:
+  count:
+    invalid: "Le nombre de cartes jouées est incorrect."
+  value:
+    higher: "Une carte de valeur égale ou supérieure doit être jouée."
+  values:
+    not_same: "Les valeurs des cartes jouées ne sont pas les mêmes."
+    higher: "Des cartes de valeurs égales ou supérieures doivent être jouées."
+  or_nothing: 'Impossible de jouer un %played_card% sur un %actual_card% ou rien'
+
+turn:
+  first:
+    at_least_one_card: "Au premier tour au moins une carte doit être jouée."

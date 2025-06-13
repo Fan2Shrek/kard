@@ -30,6 +30,7 @@ final class GameController extends AbstractController
     #[Route('/{id}/play', name: 'play', methods: ['POST'])]
     public function play(Room $room, Request $request): Response
     {
+        $request->attributes->set('_format', 'json');
         $user = $this->getUser();
         $card = $request->toArray()['cards'];
         $data = $request->toArray()['data'];

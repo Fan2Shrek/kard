@@ -4,6 +4,6 @@ export default class Game {
     }
 
     async play(game, body) {
-        return this.client.post(`/api/game/${game}/play`, body);
+        return this.client.post(`/api/game/${game}/play`, body, false);
     }
 }
