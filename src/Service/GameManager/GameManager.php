@@ -110,6 +110,8 @@ final class GameManager implements ServiceSubscriberInterface
                 $order,
             ),
         );
+
+        $this->gameContextProvider->save($ctx);
     }
 
     /**

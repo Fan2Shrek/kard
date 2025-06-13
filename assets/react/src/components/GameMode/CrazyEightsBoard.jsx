@@ -33,7 +33,7 @@ export default ({ ctx, hand, player }) => {
                 <div className='middle'>
                     <div id='middle'>
                         <Stack cards={ctx.round.turns.map(t => t.cards).flat()} />
-                        <DrawPile cards={ctx.drawPile} />
+                        <Stack cards={ctx.drawPile} style='drawPile'/>
                     </div>
                 </div>
                 <div className='bottom'>
