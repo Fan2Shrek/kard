@@ -14,7 +14,7 @@ trait CardsHelperTrait
             throw new \Exception(\sprintf('The card rank "%s" or the current card rank "%s" is not in the RANKS constant', __METHOD__, !in_array($card->rank, $ranks, true) ? $card->rank->value : $currentCard->rank->value));
         }
 
-        return array_search($card->rank, $ranks) > array_search($currentCard->rank, $ranks);
+        return array_search($card->rank, $ranks, true) > array_search($currentCard->rank, $ranks, true);
     }
 
     private function isHigher(Card $card, Card $currentCard): bool

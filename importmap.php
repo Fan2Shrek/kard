@@ -16,14 +16,17 @@ return [
         'path' => './assets/app.js',
         'entrypoint' => true,
     ],
-    '@hotwired/stimulus' => [
-        'version' => '3.2.2',
-    ],
     '@symfony/stimulus-bundle' => [
         'path' => './vendor/symfony/stimulus-bundle/assets/dist/loader.js',
     ],
+    '@symfony/ux-react' => [
+        'path' => './vendor/symfony/ux-react/assets/dist/loader.js',
+    ],
+    '@hotwired/stimulus' => [
+        'version' => '3.2.2',
+    ],
     '@hotwired/turbo' => [
-        'version' => '7.3.0',
+        'version' => '8.0.13',
     ],
     'react' => [
         'version' => '18.3.1',
@@ -34,25 +37,22 @@ return [
     'scheduler' => [
         'version' => '0.23.2',
     ],
-    '@symfony/ux-react' => [
-        'path' => './vendor/symfony/ux-react/assets/dist/loader.js',
-    ],
     '@react-spring/web' => [
-        'version' => '9.7.5',
+        'version' => '10.0.1',
     ],
     '@react-spring/core' => [
-        'version' => '9.7.5',
+        'version' => '10.0.1',
     ],
     '@react-spring/shared' => [
-        'version' => '9.7.5',
+        'version' => '10.0.1',
     ],
     '@react-spring/animated' => [
-        'version' => '9.7.5',
+        'version' => '10.0.1',
     ],
     '@react-spring/types' => [
-        'version' => '9.7.5',
+        'version' => '10.0.1',
     ],
     '@react-spring/rafz' => [
-        'version' => '9.7.5',
+        'version' => '10.0.1',
     ],
 ];

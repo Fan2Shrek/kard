@@ -2,7 +2,6 @@
 
 namespace App\Service\GameManager;
 
-use App\Domain\Exception\RuleException;
 use App\Entity\Result;
 use App\Entity\Room;
 use App\Entity\User;
@@ -55,6 +54,7 @@ final class GameManager implements ServiceSubscriberInterface
 
         $gameContext = $this->gameContextProvider->provide($room);
         $gameContext->setDrawPile($drawPile);
+
         $players = array_reduce($gameContext->getPlayers(), function (array $carry, Player $player) {
             $carry[$player->id] = $player;
 
@@ -77,7 +77,7 @@ final class GameManager implements ServiceSubscriberInterface
 
         $hands = array_reduce(
             $players,
-            function ($acc, $player) use ($ctx) {
+            function (array $acc, $player) use ($ctx) {
                 $acc[$player->id] = $this->handRepository->get($player->id, $ctx->getRoom());
 
                 return $acc;
@@ -87,7 +87,7 @@ final class GameManager implements ServiceSubscriberInterface
 
         $players = array_reduce(
             $players,
-            function ($acc, $player) {
+            function (array $acc, $player) {
                 $acc[$player->id] = $player;
 
                 return $acc;
@@ -134,19 +134,13 @@ final class GameManager implements ServiceSubscriberInterface
 
         $gameMode = $this->getGameMode($room->getGameMode()->getValue());
 
-        try {
-            $gameMode->play($cards, $ctx, $hand, $data);
-        } catch (RuleException $e) {
-            /* @todo do something */
-            throw $e;
-            /* return; */
-        }
+        $gameMode->play($cards, $ctx, $hand, $data);
 
         $this->handRepository->save($user, $room, $hand);
 
         $player = current(array_filter(
             $ctx->getPlayers(),
-            fn (Player $p) => $p->id === $user->getId()->toString(),
+            fn (Player $p): bool => $p->id === $user->getId()->toString(),
         ));
         $player->cardsCount = count($hand);
 

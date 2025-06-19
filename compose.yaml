@@ -1,6 +1,6 @@
 services:
   db:
-    image: mariadb:10.4
+    image: mariadb:11.8
     ports:
       - "3307:3306"
     environment:
@@ -27,7 +27,7 @@ services:
     image: redis:7
 
   node:
-    image: node:23
+    image: node:24-alpine
     ports:
       - "3000:3000"
     volumes:
@@ -56,7 +56,7 @@ services:
       - "8025:8025"
 
   rabbitmq:
-    image: rabbitmq:3.12.4-management
+    image: rabbitmq:4-management-alpine
     ports:
       - "15672:15672"
 

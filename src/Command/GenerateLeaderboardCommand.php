@@ -42,6 +42,7 @@ final class GenerateLeaderboardCommand extends Command
 
             return self::SUCCESS;
         }
+
         $user = $this->userRepository->find($data['user']);
 
         $leaderboard = new Leaderboard(player: $user, winsNumber: $data['wins']);

@@ -14,12 +14,12 @@ class UserFixtures extends AbstractFixtures
     ) {
     }
 
-    public function getEntityClass(): string
+    protected function getEntityClass(): string
     {
         return User::class;
     }
 
-    public function getData(): iterable
+    protected function getData(): iterable
     {
         yield [
             'username' => 'admin',

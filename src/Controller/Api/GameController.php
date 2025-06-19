@@ -35,7 +35,7 @@ final class GameController extends AbstractController
         $card = $request->toArray()['cards'];
         $data = $request->toArray()['data'];
 
-        $cards = array_map(fn ($card) => new Card(Suit::from($card['suit']), Rank::from($card['rank'])), $card);
+        $cards = array_map(fn ($card): Card => new Card(Suit::from($card['suit']), Rank::from($card['rank'])), $card);
 
         $this->gameManager->play($room, $user, $cards, $data);
 
