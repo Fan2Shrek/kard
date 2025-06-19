@@ -29,6 +29,7 @@ final class RemoveGameSubscriber implements EventSubscriberInterface
             if ($room->getId() === $event->room->getId()) {
                 continue;
             }
+
             $this->roomRepository->remove($room);
         }
     }

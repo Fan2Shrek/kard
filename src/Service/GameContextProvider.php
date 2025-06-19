@@ -35,7 +35,7 @@ final class GameContextProvider
 
     private function createContext(Room $room): GameContext
     {
-        $players = array_map(fn ($u) => Player::fromUser($u), $room->getPlayers()->toArray());
+        $players = array_map(fn ($u): Player => Player::fromUser($u), $room->getPlayers()->toArray());
 
         return new GameContext(
             $room->getId(),

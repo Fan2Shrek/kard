@@ -9,8 +9,11 @@ use App\Model\Card\Deck;
 final class GameContext
 {
     private PlayersList $players;
+
     private GameRound $currentRound;
+
     private ?Player $winner = null;
+
     private Deck $drawPill;
 
     /**
@@ -216,7 +219,7 @@ class PlayersList
         private array $players,
         private Player $currentPlayer,
     ) {
-        $this->currentIndex = array_search($currentPlayer, $players);
+        $this->currentIndex = array_search($currentPlayer, $players, true);
     }
 
     public function getCurrentPlayer(): Player

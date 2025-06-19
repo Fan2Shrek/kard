@@ -9,12 +9,12 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 class ResultFixtures extends AbstractFixtures implements DependentFixtureInterface
 {
-    public function getEntityClass(): string
+    protected function getEntityClass(): string
     {
         return Result::class;
     }
 
-    public function getData(): iterable
+    protected function getData(): iterable
     {
         for ($i = 0; $i < 10; ++$i) {
             yield [

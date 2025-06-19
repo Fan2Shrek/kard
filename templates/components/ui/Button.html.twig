@@ -1,14 +1,14 @@
 {% if href is not null %}
     <a
         href="{{ href }}"
-        class="{{ button.apply({size, unstyled, variant}, attributes.render('class')) }}"
+        class="{{ button.apply({size: size, unstyled: unstyled, variant: variant}, attributes.render('class')) }}"
         {{ attributes }}
     >
         {{ _self.buttonContent(text, iconLeft, iconRight) }}
     </a>
 {% else %}
     <button
-        class="{{ button.apply({size, unstyled, variant}, attributes.render('class')) }}"
+        class="{{ button.apply({size: size, unstyled: unstyled, variant: variant}, attributes.render('class')) }}"
         {{ attributes }}
     >
         {{ _self.buttonContent(text, iconLeft, iconRight) }}

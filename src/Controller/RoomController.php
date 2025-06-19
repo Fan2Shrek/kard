@@ -97,7 +97,7 @@ final class RoomController extends AbstractController
         }
 
         $players = array_map(
-            fn ($player) => Player::fromUser($player),
+            fn ($player): Player => Player::fromUser($player),
             $room->getPlayers()->toArray(),
         );
 

@@ -17,6 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class InitDataCommand extends Command
 {
     private int $gameModeCount = 0;
+
     private int $descriptionCount = 0;
 
     public function __construct(
@@ -29,7 +30,6 @@ final class InitDataCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->gameModeCount = $this->descriptionCount = 0;
         foreach (GameModeEnum::cases() as $gm) {
             if ($gameMode = $this->gameModeRepository->findByGameMode($gm)) {
                 $this->createDescription($gameMode);
@@ -39,6 +39,7 @@ final class InitDataCommand extends Command
             $this->entityManager->persist(new GameMode($gm));
             ++$this->gameModeCount;
         }
+
         $this->entityManager->flush();
 
         $output->writeln(sprintf('%d game mode(s) added', $this->gameModeCount));
@@ -52,6 +53,7 @@ final class InitDataCommand extends Command
         if ($description = $this->gameModeDescriptionRepository->findByGameMode($gameMode)) {
             return $description;
         }
+
         ++$this->descriptionCount;
 
         $this->entityManager->persist($gm = new GameModeDescription($gameMode));
