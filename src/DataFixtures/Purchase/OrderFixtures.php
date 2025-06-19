@@ -4,7 +4,9 @@ namespace App\DataFixtures\Purchase;
 
 use App\DataFixtures\AbstractFixtures;
 use App\DataFixtures\UserFixtures;
+use App\Entity\Purchase\OneTimePurchase;
 use App\Entity\Purchase\Order;
+use App\Entity\User;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 final class OrderFixtures extends AbstractFixtures implements DependentFixtureInterface
@@ -17,7 +19,7 @@ final class OrderFixtures extends AbstractFixtures implements DependentFixtureIn
     protected function getData(): iterable
     {
         yield [
-            'user' => $this->getReference('User_1'),
+            'user' => $this->getReference('User_1', User::class),
         ];
     }
 
@@ -27,8 +29,8 @@ final class OrderFixtures extends AbstractFixtures implements DependentFixtureIn
             return;
         }
 
-        $entity->addPurchase($this->getReference('OneTimePurchase_1'));
-        $entity->addPurchase($this->getReference('OneTimePurchase_2'));
+        $entity->addPurchase($this->getReference('OneTimePurchase_1', OneTimePurchase::class));
+        $entity->addPurchase($this->getReference('OneTimePurchase_2', OneTimePurchase::class));
     }
 
     public function getDependencies(): array
