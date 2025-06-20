@@ -115,10 +115,6 @@ final class PresidentGameMode extends AbstractGameMode
             throw $this->createRuleException('card.value.higher');
         }
 
-        if (Rank::TWO === $card->rank) {
-            $this->handleRoundEnd();
-        }
-
         $nonSkippedTurns = array_values(array_filter($previousTurns, fn ($turn): bool => !empty($turn->getCards())));
 
         [$lastTurn, $beforeLastTurn] = [$nonSkippedTurns[0]->getCards() ?? null, ($nonSkippedTurns[1] ?? null)?->getCards() ?? null]; // @phpstan-ignore-line
@@ -128,6 +124,10 @@ final class PresidentGameMode extends AbstractGameMode
         }
 
         if (null === $beforeLastTurn) {
+            if (Rank::TWO === $card->rank) {
+                $this->handleRoundEnd();
+            }
+
             return;
         }
 
@@ -146,6 +146,12 @@ final class PresidentGameMode extends AbstractGameMode
                 $this->handleRoundEnd();
             }
         }
+
+        if (Rank::TWO === $card->rank) {
+            $this->handleRoundEnd();
+        }
+
+        return;
     }
 
     /**

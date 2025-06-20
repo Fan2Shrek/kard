@@ -620,6 +620,22 @@ describe('Président: mercure', function () {
 
             expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', '9 ou rien');
         });
+
+        test("Si un deux est joué par dessus une carte ou rien, la fin de tour n'est pas envoyé", function () {
+            Arrange::setRound([
+                [3],
+                [5],
+                [7],
+                [7],
+            ]);
+
+            try {
+                Act::playCard(2, 'h');
+            } catch (RuleException $e) {
+            }
+
+            expect(HubSpy::$published)->toHaveCount(0);
+        });
     });
 
     describe("Fin d'un tour", function () {
