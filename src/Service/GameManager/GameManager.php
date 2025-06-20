@@ -122,8 +122,21 @@ final class GameManager implements ServiceSubscriberInterface
     {
         $ctx = $this->gameContextProvider->provide($room);
 
-        if ($ctx->getCurrentPlayer()->id !== $user->getId()->toString()) {
+        if (!$ctx->getData('fastPlay') && $ctx->getCurrentPlayer()->id !== $user->getId()->toString()) {
             throw new \InvalidArgumentException('Not your turn');
+        }
+
+        if ($ctx->getData('fastPlay')) {
+            if ($ctx->getCurrentPlayer()->id !== $user->getId()->toString() && [] === $cards) {
+                return;
+            }
+
+            $ctx->setCurrentPlayer(
+                current(array_filter(
+                    $ctx->getPlayers(),
+                    fn (Player $p): bool => $p->id === $user->getId()->toString(),
+                )),
+            );
         }
 
         $hand = $this->handRepository->get($user, $room);
@@ -146,6 +159,19 @@ final class GameManager implements ServiceSubscriberInterface
 
         $this->gameContextProvider->save($ctx);
 
+        $this->hub->publish(new Update(
+            sprintf('room-%s', $room->getId()),
+            $this->serializer->serialize([
+                'action' => 'play',
+                'data' => $ctx,
+            ], 'json'),
+        ));
+
+        $this->hub->publish(new Update(
+            sprintf('room-%s-%s', $room->getId(), $player->id),
+            $this->serializer->serialize($hand, 'json'),
+        ));
+
         if ($gameMode->isGameFinished($ctx)) {
             $this->hub->publish(new Update(
                 sprintf('room-%s', $room->getId()),
@@ -165,19 +191,6 @@ final class GameManager implements ServiceSubscriberInterface
 
             return;
         }
-
-        $this->hub->publish(new Update(
-            sprintf('room-%s', $room->getId()),
-            $this->serializer->serialize([
-                'action' => 'play',
-                'data' => $ctx,
-            ], 'json'),
-        ));
-
-        $this->hub->publish(new Update(
-            sprintf('room-%s-%s', $room->getId(), $player->id),
-            $this->serializer->serialize($hand, 'json'),
-        ));
     }
 
     public function getGameMode(GameModeEnum $gameModeEnum): GameModeInterface

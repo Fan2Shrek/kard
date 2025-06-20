@@ -51,6 +51,14 @@ describe('Président: règles basiques', function () {
         Act::playCard(8, 's');
     })->throwsNoExceptions();
 
+    test('Par défaut, il y a un ordre des joueurs', function () {
+        Arrange::setCurrentCard(7);
+
+        Act::playCard(8, 's');
+
+        expect(Act::get('gameContext')->getData('fastPlay'))->toBeFalse();
+    });
+
     test('Il est possible de jouer 2 cartes', function () {
         // Arrange
         Arrange::setCurrentCards([7, 7]);
@@ -275,6 +283,17 @@ describe('Président: cartes doubles', function () {
         Act::playcards([[8], [8]]);
     })->throwsNoExceptions();
 
+    test("Lorsqu'un double est joué, tous les joueurs peuvent joué", function () {
+        Arrange::setcurrentcards([
+            3,
+            3,
+        ]);
+
+        Act::playcards([[7], [7]]);
+
+        expect(Act::get('gameContext')->getData('fastPlay'))->toBeTrue();
+    });
+
     test('On peut jouer un double sur un double de même valeur', function () {
         Arrange::setcurrentcards([
             7,
@@ -380,6 +399,15 @@ describe('Président: début de partie', function () {
         ]);
     })->throwsNoExceptions();
 
+    test('Commencer avec un double, permet le carré rapide', function () {
+        Act::playCards([
+            [7, 's'],
+            [7, 'h'],
+        ]);
+
+        expect(Act::get('gameContext')->getData('fastPlay'))->toBeTrue();
+    });
+
     test('On peut commencer une partie avec un triple de cartes à la même valeur', function () {
         Act::playCards([
             [7, 's'],
@@ -474,6 +502,54 @@ describe('Président: carte ou rien', function () {
 
         Act::playCard(9, 'h');
     })->throws('card.or_nothing');
+
+    test("Lors de l'appel aux quatre, n'importe quelle joueur peut jouer", function () {
+        Arrange::setRound([
+            [3],
+            [5],
+            [7],
+            [7],
+        ]);
+
+        Act::playCard(7, 'h');
+
+        expect(Act::get('gameContext')->getData('fastPlay'))->toBeTrue();
+    });
+
+    test("Apres l'appel aux quatre, le jeu reprends dans l'ordre", function () {
+        Arrange::setRound([
+            [3],
+            [5],
+            [7],
+            [7],
+        ]);
+
+        Act::playCard(7, 'h');
+        Act::playCard(7, 'c');
+        Act::playCard(4, 'h');
+
+        expect(Act::get('gameContext')->getData('fastPlay'))->toBeFalse();
+    });
+
+    test('Après un appel aux quatres, le joueurs qui a fini reprends', function () {
+        Arrange::setPlayers([
+            new Player('1', 'Player 1'),
+            new Player('2', 'Player 2'),
+            new Player('3', 'Player 3'),
+        ]);
+        Arrange::setGameStarted();
+        Arrange::setRound([
+            [3],
+            [5],
+            [7],
+            [7],
+            [7],
+        ]);
+
+        Act::playCard(7, 's');
+
+        expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('1');
+    });
 });
 
 describe('Président: fin de tour', function () {
@@ -581,6 +657,21 @@ describe('Président: fin de tour', function () {
 
         expect(Act::get('gameContext'))->toHaveNewRound();
     });
+
+    test('Un carré de double fini le tour, même avec des tours entre deux', function () {
+        Arrange::setRound([
+            [3, 3],
+            [4, 4],
+            [],
+        ]);
+
+        Act::playCards([
+            [4],
+            [4],
+        ]);
+
+        expect(Act::get('gameContext'))->toHaveNewRound();
+    });
 });
 
 describe('Président: mercure', function () {
@@ -635,6 +726,28 @@ describe('Président: mercure', function () {
             }
 
             expect(HubSpy::$published)->toHaveCount(0);
+        });
+
+        test("Lors de l'appel aux quatre, un évenement est envoyé", function () {
+            Arrange::setRound([
+                [9],
+                [9],
+            ]);
+
+            Act::playCard(9, 'h');
+
+            expect(HubSpy::$published)->toHaveCount(1);
+        });
+
+        test("Lors de l'appel aux quatre, l'évènement possède un message", function () {
+            Arrange::setRound([
+                [9],
+                [9],
+            ]);
+
+            Act::playCard(9, 'h');
+
+            expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'Appel aux quatre');
         });
     });
 

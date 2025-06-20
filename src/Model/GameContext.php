@@ -199,6 +199,11 @@ final class GameContext
         $this->players[] = $player;
     }
 
+    public function setCurrentPlayer(Player $player): void
+    {
+        $this->players->setCurrentPlayer($player);
+    }
+
     public function nextPlayer(): void
     {
         $this->players->nextPlayer();
@@ -234,6 +239,12 @@ class PlayersList
         }
 
         return $this->players[$this->currentIndex + 1];
+    }
+
+    public function setCurrentPlayer(Player $player): void
+    {
+        $this->currentPlayer = $player;
+        $this->currentIndex = array_search($player, $this->players, true);
     }
 
     public function nextPlayer(): void

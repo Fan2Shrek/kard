@@ -97,7 +97,11 @@ abstract /* static */ class Arrange
     private static function createGameContext($turns): GameContext
     {
         if (null === $players = Act::get('gameContextPlayers')) {
-            $players = [new Player('player-id', 'Player 1')];
+            $players = [
+                new Player('player-id', 'Player 1'),
+                new Player('player2-id', 'Player 2'),
+                new Player('player3-id', 'Player 3'),
+            ];
         }
 
         return new GameContext(
