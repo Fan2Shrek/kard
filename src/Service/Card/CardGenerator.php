@@ -42,15 +42,24 @@ final class CardGenerator
         $deck = $this->generateShuffled();
 
         if (0 === $cards) {
-            $cards = $deck->count() / $handsCount;
+            $baseCards = intdiv($deck->count(), $handsCount);
+            $remainder = $deck->count() % $handsCount;
+
+            $cardsPerHand = array_fill(0, $handsCount, $baseCards);
+
+            for ($i = 0; $i < $remainder; ++$i) {
+                ++$cardsPerHand[$i];
+            }
+        } else {
+            $cardsPerHand = array_fill(0, $handsCount, $cards);
         }
 
         $hands = [];
 
-        for ($i = 0; $i < $handsCount; ++$i) {
+        foreach ($cardsPerHand as $cards) {
             $hand = new Hand();
 
-            for ($j = 0; $j < $cards; ++$j) {
+            foreach (range(0, $cards - 1) as $j) {
                 $hand->add($deck->draw());
             }
 
