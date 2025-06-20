@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription{% endblock %}
+
+{% block body %}
+    <main class="login bg-card-image">
+        <twig:FloatingBackground />
+
+        <twig:BlackCard>
+            <twig:ColorsHeader />
+            <h2>Créer un compte</h2>
+
+            {% if form_errors(registrationForm) %}
+                <div class="alert">
+                    <twig:UX:Icon name="ri:error-warning-line" />
+                    {{ form_errors(registrationForm) }}
+                </div>
+            {% endif %}
+
+            {{ form_start(registrationForm, {attr: {id: 'registration-form'}}) }}
+            <div class="form-section">
+                <label for="registration_form_username">Nom d'utilisateur</label>
+                <div class="input-group">
+                    <twig:UX:Icon name="lucide:user" />
+                    {{ form_widget(registrationForm.username, {attr: {placeholder: 'Votre pseudo', autocomplete: 'username'}}) }}
+                </div>
+            </div>
+
+            <div class="form-section">
+                <label for="registration_form_plainPassword">Mot de passe</label>
+                <div class="input-group">
+                    <twig:UX:Icon name="lucide:lock" />
+                    {{ form_widget(registrationForm.plainPassword, {attr: {placeholder: '••••••••', autocomplete: 'new-password'}}) }}
+                </div>
+            </div>
+
+            <div>
+                {{ form_widget(registrationForm.agreeTerms) }}
+                {{ form_label(registrationForm.agreeTerms) }}
+            </div>
+            {{ form_end(registrationForm) }}
+
+            <twig:Button
+                    type="submit"
+                    form="registration-form"
+                    text="Créer mon compte"
+                    iconLeft="lucide:user-plus"
+                    variant="success"
+            />
+        </twig:BlackCard>
+    </main>
+{% endblock %}
