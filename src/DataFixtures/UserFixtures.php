@@ -35,6 +35,12 @@ class UserFixtures extends AbstractFixtures
         ];
 
         yield [
+            'username' => 'aaa',
+            'email' => 'aaa@gmail.fr',
+            'password' => self::USER_PASSWORD,
+        ];
+
+        yield [
             'username' => 'banned',
             'email' => 'banned@kard.fr',
             'password' => self::USER_PASSWORD,

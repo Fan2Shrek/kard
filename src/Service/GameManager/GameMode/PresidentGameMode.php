@@ -61,7 +61,16 @@ final class PresidentGameMode extends AbstractGameMode
     {
         $this->cards = $cards;
         $this->gameContext = $gameContext;
+        $gameContext->addData('fastPlay', false); // reset
         $currentCards = $gameContext->getCurrentCards();
+        $previousTurns = array_reverse($this->gameContext->getRound()->getTurns());
+        $nonSkippedTurns = array_values(array_filter($previousTurns, fn ($turn): bool => !empty($turn->getCards())));
+
+        if (0 === \count($nonSkippedTurns)) {
+            $currentCards = [];
+        } else {
+            $currentCards = $nonSkippedTurns[0]->getCards();
+        }
 
         if ([] === $cards) {
             if ([] === $gameContext->getRound()->getTurns()) {
@@ -99,40 +108,41 @@ final class PresidentGameMode extends AbstractGameMode
 
     /**
      * @param Card[] $cards
-     * @param Card[] $currentCard
+     * @param Card[] $currentCards
      */
-    private function handleOneCard(array $cards, array $currentCard): void
+    private function handleOneCard(array $cards, array $currentCards): void
     {
         if (1 !== count($cards)) {
             throw $this->createRuleException('card.count.invalid');
         }
 
-        $previousTurns = array_reverse($this->gameContext->getRound()->getTurns());
-
         $card = $cards[0];
 
-        if (!$this->isLegacyHigher($card, $currentCard[0]) && !$this->isSameRank($card, $currentCard[0])) {
+        if (!$this->isLegacyHigher($card, $currentCards[0]) && !$this->isSameRank($card, $currentCards[0])) {
             throw $this->createRuleException('card.value.higher');
         }
 
+        $previousTurns = array_reverse($this->gameContext->getRound()->getTurns());
         $nonSkippedTurns = array_values(array_filter($previousTurns, fn ($turn): bool => !empty($turn->getCards())));
 
-        [$lastTurn, $beforeLastTurn] = [$nonSkippedTurns[0]->getCards() ?? null, ($nonSkippedTurns[1] ?? null)?->getCards() ?? null]; // @phpstan-ignore-line
-
-        if ($this->isSameRank($card, $currentCard[0])) {
-            $this->dispatchMercureEvent('message', \sprintf('%s ou rien', $card->rank->value));
-        }
-
-        if (null === $beforeLastTurn) {
-            if (Rank::TWO === $card->rank) {
-                $this->handleRoundEnd();
-            }
-
+        if ([] === $previousTurns[0]->getCards()) {
             return;
         }
 
+        $lastTurn = $currentCards;
+        $beforeLastTurn = ($nonSkippedTurns[1] ?? null)?->getCards() ?? null;
+
+        if ($this->isSameRank($card, $currentCards[0])) {
+            $message =
+                null !== $beforeLastTurn && $lastTurn[0]->rank === $beforeLastTurn[0]->rank ?
+                'Appel aux quatre'
+                : \sprintf('%s ou rien', $card->rank->value);
+            // maybe use translation here too
+            $this->dispatchMercureEvent('message', $message);
+        }
+
         // Rank or nothing :p
-        if ($lastTurn[0]->rank === $beforeLastTurn[0]->rank) {
+        if ($beforeLastTurn && $lastTurn[0]->rank === $beforeLastTurn[0]->rank) {
             // assert skip turn
             if ($card->rank !== $lastTurn[0]->rank) {
                 throw $this->createRuleException('card.or_nothing', ['%played_card%' => $card->rank->value, '%actual_card%' => $lastTurn[0]->rank->value]);
@@ -144,14 +154,14 @@ final class PresidentGameMode extends AbstractGameMode
 
             if (3 === count($count)) {
                 $this->handleRoundEnd();
+            } else {
+                $this->gameContext->addData('fastPlay', true);
             }
         }
 
         if (Rank::TWO === $card->rank) {
             $this->handleRoundEnd();
         }
-
-        return;
     }
 
     /**
@@ -167,6 +177,12 @@ final class PresidentGameMode extends AbstractGameMode
 
         if (Rank::TWO === $card->rank) {
             $this->handleRoundEnd();
+        }
+
+        if (2 === count($cards)) {
+            $this->gameContext->addData('fastPlay', true);
+
+            return;
         }
     }
 
@@ -200,6 +216,8 @@ final class PresidentGameMode extends AbstractGameMode
         if (!$this->isLegacyHigher($card, $currentCard)) {
             throw $this->createRuleException('card.values.higher');
         }
+
+        $this->gameContext->addData('fastPlay', true);
     }
 
     /**
