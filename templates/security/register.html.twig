@@ -34,10 +34,7 @@
                 </div>
             </div>
 
-            <div>
-                {{ form_widget(registrationForm.agreeTerms) }}
-                {{ form_label(registrationForm.agreeTerms) }}
-            </div>
+            {{ form_errors(registrationForm.plainPassword) }}
             {{ form_end(registrationForm) }}
 
             <twig:Button
