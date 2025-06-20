@@ -33,7 +33,7 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
         },
         end: (data) => {
             setCtx(data.context);
-            displayText(`${data.context.currentPlayer.username} a gagné`);
+            displayText(`${data.context.data.lastPlayer} a gagné`);
 
             setTimeout(() => {
                 window.location.href = data.url;
