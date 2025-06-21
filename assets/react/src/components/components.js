@@ -14,10 +14,11 @@ export { default as CrazyEightsBoard } from './GameMode/CrazyEightsBoard.js';
 // Hand
 export { default as Hand } from './Hand/Hand.js';
 export { default as HiddenHand } from './Hand/HiddenHand.js';
+export { default as SortButton } from './Hand/SortButton.js';
 
 // Player
 export { default as PlayerList } from './Player/PlayerList.js';
 
-import { default as Game } from './Game.js';
+export { default as Game } from './Game.js';
 
 export default () => <></>;
