@@ -1,0 +1,58 @@
+.sort-button {
+    position: absolute;
+    bottom: 100px;
+    right: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+
+    button {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: var(--button-blue);
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s;
+
+        .bar {
+            width: 30px;
+            height: 4px;
+            background-color: white;
+            margin: 6px auto;
+            border-radius: 2px;
+        }
+    }
+
+    &__menu {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        transition: opacity 0.3s;
+
+        &.active {
+            opacity: 1;
+        }
+
+        button {
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            background-color: var(--button-blue);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+
+            .bar {
+                width: 30px;
+                height: 4px;
+                background-color: white;
+                margin: 6px auto;
+                border-radius: 2px;
+            }
+        }
+    }
+}

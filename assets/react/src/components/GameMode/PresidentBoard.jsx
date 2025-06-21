@@ -38,7 +38,7 @@ export default ({ ctx, hand, player }) => {
                     </div>
                 </div>
                 <div className='bottom'>
-                    <Hand ref={handRef} hand={hand} canPlay={ctx.currentPlayer.id === player.id || ctx.data.fastPlay} />
+                    <Hand ref={handRef} order={['3', '4', '5', '6', '7', '8', '9', '10', 'j', 'q', 'k', '1', '2']} hand={hand} canPlay={ctx.currentPlayer.id === player.id || ctx.data.fastPlay} />
                 </div>
             </div>
         </div>

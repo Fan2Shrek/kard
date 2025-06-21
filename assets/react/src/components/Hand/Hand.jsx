@@ -1,16 +1,17 @@
 import React, { forwardRef, useContext, useState } from 'react';
 
-import { Card } from '../components.js';
+import { Card, SortButton } from '../components.js';
 import { GameContext } from '../../Context/GameContext.js';
 import { AssetsContext } from '../../Context/AssetsContext.js';
 import api from '../../lib/api.js';
 
 import './hand.css';
 
-export default forwardRef(({ hand, canPlay, gameActions = null }, ref) => {
+export default forwardRef(({ hand, canPlay, order=null, gameActions = null }, ref) => {
     const { roomId, currentPlayer } = useContext(GameContext);
     const { getCardAsset } = useContext(AssetsContext);
     const [selectedCards, setSelectedCards] = useState([]);
+    const [cards, setCards] = useState(hand);
     const [error, setError] = useState(null);
 
     const handleCard = (card) => {
@@ -48,9 +49,11 @@ export default forwardRef(({ hand, canPlay, gameActions = null }, ref) => {
             ))}
         {error && <div className='error'>{error}</div>}
         <div className='hand'>
-            {hand.map((card) => {
+            {cards.map((card) => {
                 return <Card onClick={handleCard} selected={selectedCards.includes(card)} key={`${card.rank}-${card.suit}`} card={card} img={getCardAsset(card)} angle={0} />
             })}
         </div>
+        { order && <SortButton setCallback={setCards} rankOrder={order} />}
+        { !order && <SortButton setCallback={setCards} />}
     </div>;
 });
