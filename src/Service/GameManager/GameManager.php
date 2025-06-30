@@ -61,7 +61,7 @@ final class GameManager implements ServiceSubscriberInterface
             return $carry;
         }, []);
 
-        foreach ($room->getPlayers() as $k => $player) {
+        foreach ($room->getParticipants() as $k => $player) {
             $this->handRepository->save($player, $room, $hands[$k]);
             $players[$player->getId()->toString()]->cardsCount = count($hands[$k]);
         }
@@ -215,8 +215,8 @@ final class GameManager implements ServiceSubscriberInterface
         $gameMode = $this->getGameMode($room->getGameMode()->getValue());
 
         return $this->container->get('card_generator')->generateHands(
-            count($room->getPlayers()),
-            $gameMode->getCardsCount(count($room->getPlayers())) ?: 0,
+            count($room->getParticipants()),
+            $gameMode->getCardsCount(count($room->getParticipants())) ?: 0,
         );
     }
 }

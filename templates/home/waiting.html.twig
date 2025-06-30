@@ -16,7 +16,7 @@
         <div class="links-row">
             {% if room.owner == app.user %}
                 <twig:Button
-					onClick='window.location.href = "{{ path("game_start", {"id": room.id}) }}"'
+                    onClick='window.location.href = "{{ path('game_start', {id: room.id}) }}"'
                     text="Lancer la partie"
                     iconLeft="lucide:circle-play"
                     variant="success"
