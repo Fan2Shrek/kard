@@ -50,7 +50,7 @@ final class RoomController extends AbstractController
             $user = $this->getUser();
             $room = new Room($gameMode);
             $room->setOwner($user);
-            $room->addPlayer($user);
+            $room->addParticipant($user);
 
             $this->roomRepository->save($room);
 
@@ -77,7 +77,7 @@ final class RoomController extends AbstractController
     {
         $user = $this->getUser();
         $hasJoined = false;
-        foreach ($room->getPlayers() as $player) {
+        foreach ($room->getParticipants() as $player) {
             if ($player->getUsername() === $user->getUsername()) {
                 $hasJoined = true;
                 break;
@@ -85,7 +85,7 @@ final class RoomController extends AbstractController
         }
 
         if (!$hasJoined) {
-            $room->addPlayer($user);
+            $room->addParticipant($user);
             $this->roomRepository->save($room);
 
             $this->hub->publish(new Update(
@@ -98,7 +98,7 @@ final class RoomController extends AbstractController
 
         $players = array_map(
             fn ($player): Player => Player::fromUser($player),
-            $room->getPlayers()->toArray(),
+            $room->getParticipants()->toArray(),
         );
 
         return $this->render('home/waiting.html.twig', [

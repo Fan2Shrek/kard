@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Enum\GameStatusEnum;
+use App\Model\Player;
 use App\Repository\RoomRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -28,7 +29,7 @@ class Room
      * @var Collection<int, User>
      */
     #[ORM\ManyToMany(targetEntity: User::class)]
-    private Collection $players;
+    private Collection $participants;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -47,7 +48,7 @@ class Room
             $this->id = $id;
         }
 
-        $this->players = new ArrayCollection();
+        $this->participants = new ArrayCollection();
         $this->gameMode = $gameMode;
         $this->status = $status ?? GameStatusEnum::WAITING;
     }
@@ -72,23 +73,27 @@ class Room
     /**
      * @return Collection<int, User>
      */
-    public function getPlayers(): Collection
+    public function getParticipants(): Collection
     {
-        return $this->players;
+        return $this->participants;
     }
 
-    public function addPlayer(User $player): static
+    /**
+     * @return Player[]
+     */
+    public function getPlayers(): array
     {
-        if (!$this->players->contains($player)) {
-            $this->players->add($player);
+        return array_map(
+            fn (User $user): Player => Player::fromUser($user),
+            $this->participants->toArray(),
+        );
+    }
+
+    public function addParticipant(User $player): static
+    {
+        if (!$this->participants->contains($player)) {
+            $this->participants->add($player);
         }
-
-        return $this;
-    }
-
-    public function removePlayer(User $player): static
-    {
-        $this->players->removeElement($player);
 
         return $this;
     }
