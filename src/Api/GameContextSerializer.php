@@ -23,6 +23,7 @@ final class GameContextSerializer implements DenormalizerInterface, Denormalizer
                 $player['id'],
                 $player['username'],
                 $player['cardsCount'],
+                $player['isBot'] ?? false,
             );
         }
 
@@ -49,7 +50,7 @@ final class GameContextSerializer implements DenormalizerInterface, Denormalizer
     public function getSupportedTypes(?string $format): array
     {
         return [
-            GameContext::class => true,
+            GameContext::class => false,
         ];
     }
 }

@@ -96,10 +96,7 @@ final class RoomController extends AbstractController
             ));
         }
 
-        $players = array_map(
-            fn ($player): Player => Player::fromUser($player),
-            $room->getParticipants()->toArray(),
-        );
+        $players = $room->getPlayers();
 
         return $this->render('home/waiting.html.twig', [
             'room' => $room,

@@ -10,6 +10,7 @@ final class Player
         public readonly string $id,
         public readonly string $username,
         public int $cardsCount = 0,
+        public readonly bool $isBot = false,
     ) {
     }
 

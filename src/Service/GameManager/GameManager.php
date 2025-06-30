@@ -13,6 +13,7 @@ use App\Repository\ResultRepository;
 use App\Repository\UserRepository;
 use App\Service\Card\CardGenerator;
 use App\Service\Card\HandRepositoryInterface;
+use App\Service\GameAI;
 use App\Service\GameContextProvider;
 use App\Service\GameManager\GameMode\GameModeEnum;
 use App\Service\GameManager\GameMode\GameModeInterface;
@@ -46,6 +47,7 @@ final class GameManager implements ServiceSubscriberInterface
             'result_repository' => ResultRepository::class,
             'card_generator' => CardGenerator::class,
             'user_repository' => UserRepository::class,
+            'game_ai' => GameAI::class,
         ];
     }
 
@@ -62,9 +64,9 @@ final class GameManager implements ServiceSubscriberInterface
             return $carry;
         }, []);
 
-        foreach ($room->getParticipants() as $k => $player) {
-            $this->handRepository->save($player, $room, $hands[$k]);
-            $players[$player->getId()->toString()]->cardsCount = count($hands[$k]);
+        foreach ($room->getPlayers() as $k => $player) {
+            $this->handRepository->save($player->id, $room, $hands[$k]);
+            $players[$player->id]->cardsCount = count($hands[$k]);
         }
 
         $this->gameContextProvider->save($gameContext);
@@ -191,6 +193,10 @@ final class GameManager implements ServiceSubscriberInterface
 
             return;
         }
+
+        if ($ctx->getCurrentPlayer()->isBot) {
+            $this->container->get('game_ai')->playAsBot($ctx->getCurrentPlayer(), $ctx, $this->handRepository->get($user, $room));
+        }
     }
 
     public function getGameMode(GameModeEnum $gameModeEnum): GameModeInterface
@@ -213,10 +219,11 @@ final class GameManager implements ServiceSubscriberInterface
     private function drawHands(Room $room): array
     {
         $gameMode = $this->getGameMode($room->getGameMode()->getValue());
+        $players = $room->getPlayers();
 
         return $this->container->get('card_generator')->generateHands(
-            count($room->getParticipants()),
-            $gameMode->getCardsCount(count($room->getParticipants())) ?: 0,
+            count($players),
+            $gameMode->getCardsCount(count($players)) ?: 0,
         );
     }
 }

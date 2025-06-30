@@ -4,7 +4,6 @@ namespace App\Service;
 
 use App\Entity\Room;
 use App\Model\GameContext;
-use App\Model\Player;
 use App\Service\Redis\RedisConnection;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -35,7 +34,7 @@ final class GameContextProvider
 
     private function createContext(Room $room): GameContext
     {
-        $players = array_map(fn ($u): Player => Player::fromUser($u), $room->getParticipants()->toArray());
+        $players = $room->getPlayers();
 
         return new GameContext(
             $room->getId(),
