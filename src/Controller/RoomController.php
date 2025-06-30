@@ -122,6 +122,7 @@ final class RoomController extends AbstractController
             ),
             $room->getParticipants()->toArray(),
         );
+        $players = $room->getPlayers();
 
         return $this->render('home/waiting.html.twig', [
             'room' => $room,

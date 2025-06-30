@@ -11,6 +11,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mercure\HubInterface;
+use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/api/game')]
@@ -51,6 +53,26 @@ final class GameController extends AbstractController
         $data = $request->toArray()['data'];
 
         $this->gameManager->play($room, $user, $cards, $data);
+
+        return new JsonResponse();
+    }
+
+    #[Route('/{id}/add_ai', name: 'add_ai', methods: ['POST'])]
+    public function addAi(
+        Room $room,
+        HubInterface $hub,
+        RoomRepository $roomRepository,
+    ): Response {
+        $player = GameAI::create();
+        $room->addBot($player->id, $player);
+        $roomRepository->save($room);
+
+        $hub->publish(new Update(
+            'waiting',
+            $this->renderView('components/turbo/player-join.html.twig', [
+                'player' => $player,
+            ])
+        ));
 
         return new JsonResponse();
     }

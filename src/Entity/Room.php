@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity(repositoryClass: RoomRepository::class)]
 class Room
@@ -31,6 +32,16 @@ class Room
      */
     #[ORM\ManyToMany(targetEntity: User::class)]
     private Collection $participants;
+
+    /**
+     * @var array<string, array{
+     * 	id: string,
+     * 	username: string,
+     * 	isBot: bool
+     * }>
+     */
+    #[ORM\Column(type: Types::JSON)]
+    private array $bots = [];
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -80,6 +91,52 @@ class Room
     public function getParticipants(): Collection
     {
         return $this->participants;
+    }
+
+    /**
+     * string $id require for seriliazer somehow.
+     */
+    public function addBot(string $id, Player $bot): static
+    {
+        $this->bots[$id] = [
+            'id' => $id,
+            'username' => $bot->username,
+            'isBot' => true,
+        ];
+
+        return $this;
+    }
+
+    /**
+     * @return array<string, array{
+     * 	id: string,
+     * 	username: string,
+     * 	isBot: bool
+     * }>
+     * public function getBots(): array
+     * {
+     * return $this->bots;
+     * }
+     * @return Player[]
+     */
+    #[Ignore]
+    public function getPlayers(): array
+    {
+        return array_values(array_merge(
+            array_map(
+                fn (User $user): Player => Player::fromUser($user),
+                $this->participants->toArray(),
+            ),
+            array_reduce(
+                array_keys($this->bots),
+                function (array $acc, string $id) {
+                    $acc[$id] = new Player(...$this->bots[$id]);
+
+                    return $acc;
+                },
+                [],
+            ),
+        ));
     }
 
     public function addParticipant(User $player): static
