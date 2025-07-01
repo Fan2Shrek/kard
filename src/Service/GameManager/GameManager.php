@@ -4,13 +4,13 @@ namespace App\Service\GameManager;
 
 use App\Entity\Result;
 use App\Entity\Room;
-use App\Entity\User;
 use App\Enum\GameStatusEnum;
 use App\Model\Card\Card;
 use App\Model\Card\Hand;
 use App\Model\GameContext;
 use App\Model\Player;
 use App\Repository\ResultRepository;
+use App\Repository\UserRepository;
 use App\Service\Card\CardGenerator;
 use App\Service\Card\HandRepositoryInterface;
 use App\Service\GameContextProvider;
@@ -45,6 +45,7 @@ final class GameManager implements ServiceSubscriberInterface
             'router' => RouterInterface::class,
             'result_repository' => ResultRepository::class,
             'card_generator' => CardGenerator::class,
+            'user_repository' => UserRepository::class,
         ];
     }
 
@@ -118,28 +119,28 @@ final class GameManager implements ServiceSubscriberInterface
      * @param array<Card>          $cards
      * @param array<string, mixed> $data
      */
-    public function play(Room $room, User $user, array $cards, array $data = []): void
+    public function play(Room $room, Player $player, array $cards, array $data = []): void
     {
         $ctx = $this->gameContextProvider->provide($room);
 
-        if (!$ctx->getData('fastPlay') && $ctx->getCurrentPlayer()->id !== $user->getId()->toString()) {
+        if (!$ctx->getData('fastPlay') && $ctx->getCurrentPlayer()->id !== $player->id) {
             throw new \InvalidArgumentException('Not your turn');
         }
 
         if ($ctx->getData('fastPlay')) {
-            if ($ctx->getCurrentPlayer()->id !== $user->getId()->toString() && [] === $cards) {
+            if ($ctx->getCurrentPlayer()->id !== $player->id && [] === $cards) {
                 return;
             }
 
             $ctx->setCurrentPlayer(
                 current(array_filter(
                     $ctx->getPlayers(),
-                    fn (Player $p): bool => $p->id === $user->getId()->toString(),
+                    fn (Player $p): bool => $p->id === $player->id,
                 )),
             );
         }
 
-        $hand = $this->handRepository->get($user, $room);
+        $hand = $this->handRepository->get($player->id, $room);
 
         if (!empty($cards) && !$hand->hasCards($cards)) {
             throw new \InvalidArgumentException('Card not found in player hand');
@@ -149,12 +150,8 @@ final class GameManager implements ServiceSubscriberInterface
 
         $gameMode->play($cards, $ctx, $hand, $data);
 
-        $this->handRepository->save($user, $room, $hand);
+        $this->handRepository->save($player->id, $room, $hand);
 
-        $player = current(array_filter(
-            $ctx->getPlayers(),
-            fn (Player $p): bool => $p->id === $user->getId()->toString(),
-        ));
         $player->cardsCount = count($hand);
 
         $this->gameContextProvider->save($ctx);
@@ -186,7 +183,10 @@ final class GameManager implements ServiceSubscriberInterface
 
             $room->setStatus(GameStatusEnum::FINISHED);
 
-            $result = new Result($user, $room->getGameMode());
+            $result = new Result(
+                $this->container->get('user_repository')->find($player->id),
+                $room->getGameMode()
+            );
             $this->container->get('result_repository')->save($result);
 
             return;
