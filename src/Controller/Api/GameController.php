@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
 use App\Model\Card\Card;
+use App\Model\Player;
 use App\Service\GameManager\GameManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -36,8 +37,16 @@ final class GameController extends AbstractController
         $data = $request->toArray()['data'];
 
         $cards = array_map(fn ($card): Card => new Card(Suit::from($card['suit']), Rank::from($card['rank'])), $card);
+        $player = current(array_filter(
+            $room->getPlayers(),
+            fn (Player $p): bool => $p->id === $user->getId()->toString(),
+        ));
 
-        $this->gameManager->play($room, $user, $cards, $data);
+        if (false === $player) {
+            return new JsonResponse(['error' => 'Player not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $this->gameManager->play($room, $player, $cards, $data);
 
         return new JsonResponse();
     }
