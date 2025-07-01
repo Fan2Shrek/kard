@@ -6,6 +6,8 @@ use App\Domain\DTO\GameStateDTO;
 use App\Entity\Room;
 use App\Entity\User;
 use App\Game\GameManager;
+use App\Repository\RoomRepository;
+use App\Service\Bot\GameAI;
 use App\Game\StateProvider\GameStateProviderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
