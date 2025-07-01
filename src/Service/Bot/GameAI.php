@@ -2,11 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Service\Bot;
 
+use App\Enum\Card\Rank;
+use App\Enum\Card\Suit;
+use App\Model\Card\Card;
 use App\Model\Card\Hand;
 use App\Model\GameContext;
 use App\Model\Player;
+use App\Service\GameManager\GameManager;
+use Symfony\Component\Serializer\SerializerInterface;
 
 final class GameAI
 {
@@ -34,6 +39,13 @@ final class GameAI
         'Gnome',
     ];
 
+    public function __construct(
+        private BotClient $botClient,
+        private SerializerInterface $serializer,
+        private GameManager $gameManager,
+    ) {
+    }
+
     public static function create(): Player
     {
         $name = self::ADJECTIVE[array_rand(self::ADJECTIVE)].' '.self::NOUN[array_rand(self::NOUN)];
@@ -48,10 +60,13 @@ final class GameAI
 
     public function playAsBot(Player $bot, GameContext $ctx, Hand $hand): void
     {
-        dd('Bot is playing', [
-            'bot' => $bot,
-            'ctx' => $ctx,
-            'hand' => $hand,
+        $move = $this->botClient->play([
+            'ctx' => $this->serializer->serialize($ctx, 'json'),
+            'hand' => $this->serializer->serialize($hand, 'json'),
         ]);
+
+        $cards = array_map(fn ($card): Card => new Card(Suit::from($card['suit']), Rank::from($card['rank'])), $move['cards'] ?? []);
+
+        $this->gameManager->play($ctx->getRoom(), $bot, $cards, $move['data'] ?? []);
     }
 }

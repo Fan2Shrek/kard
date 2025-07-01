@@ -11,9 +11,9 @@ use App\Model\GameContext;
 use App\Model\Player;
 use App\Repository\ResultRepository;
 use App\Repository\UserRepository;
+use App\Service\Bot\GameAI;
 use App\Service\Card\CardGenerator;
 use App\Service\Card\HandRepositoryInterface;
-use App\Service\GameAI;
 use App\Service\GameContextProvider;
 use App\Service\GameManager\GameMode\GameModeEnum;
 use App\Service\GameManager\GameMode\GameModeInterface;
@@ -194,8 +194,8 @@ final class GameManager implements ServiceSubscriberInterface
             return;
         }
 
-        if ($ctx->getCurrentPlayer()->isBot) {
-            $this->container->get('game_ai')->playAsBot($ctx->getCurrentPlayer(), $ctx, $this->handRepository->get($user, $room));
+        if ($ctx->getcurrentplayer()->isBot) {
+            $this->container->get('game_ai')->playAsBot($ctx->getCurrentPlayer(), $ctx, $this->handRepository->get($ctx->getCurrentPlayer()->id, $room));
         }
     }
 

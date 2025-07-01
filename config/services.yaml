@@ -44,3 +44,7 @@ services:
         arguments:
             $apiKey: '%env(STRIPE_API_KEY)%'
             $baseUrl: '%env(STRIPE_URL)%'
+
+    App\Service\Bot\BotClient:
+        arguments:
+            $botServer: '%env(BOT_SERVER)%'

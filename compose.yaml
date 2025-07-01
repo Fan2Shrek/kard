@@ -71,6 +71,16 @@ services:
       - .:/app
     command: "php -d memory_limit=-1 bin/console messenger:consume async"
 
+  bot:
+    build:
+      context: ./python
+    image: ghcr.io/fan2shrek/kard:${VERSION:-latest}
+    working_dir: /app
+    volumes:
+      - ./python:/app
+    ports:
+      - "5000:5000"
+
 volumes:
   db_data:
   mercure_data:
