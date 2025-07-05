@@ -1,4 +1,4 @@
-import React, { forwardRef, useContext, useState } from 'react';
+import React, { forwardRef, useContext, useEffect, useState } from 'react';
 
 import { Card, SortButton } from '../components.js';
 import { GameContext } from '../../Context/GameContext.js';
@@ -13,6 +13,10 @@ export default forwardRef(({ hand, canPlay, order=null, gameActions = null }, re
     const [selectedCards, setSelectedCards] = useState([]);
     const [cards, setCards] = useState(hand);
     const [error, setError] = useState(null);
+
+	useEffect(() => {
+		setCards(hand);
+	}, [hand]);
 
     const handleCard = (card) => {
         if (selectedCards.includes(card)) {
@@ -35,6 +39,8 @@ export default forwardRef(({ hand, canPlay, order=null, gameActions = null }, re
     }
 
     const actions = gameActions && gameActions(handlePlay) || {};
+
+	console.log('qsdqds', hand, cards);
 
     return <div ref={ref} className='hand__container'>
         {selectedCards.length > 0 && canPlay && <a class="button button--medium" onClick={() => handlePlay()}>Jouer</a>}
