@@ -15,7 +15,7 @@ export default forwardRef(({ hand, canPlay, order=null, gameActions = null }, re
     const [error, setError] = useState(null);
 
 	useEffect(() => {
-		setCards(hand);
+		setCards(cards => cards.filter((card) => hand.some(c => c.rank === card.rank && c.suit === card.suit)));
 	}, [hand]);
 
     const handleCard = (card) => {
@@ -39,8 +39,6 @@ export default forwardRef(({ hand, canPlay, order=null, gameActions = null }, re
     }
 
     const actions = gameActions && gameActions(handlePlay) || {};
-
-	console.log('qsdqds', hand, cards);
 
     return <div ref={ref} className='hand__container'>
         {selectedCards.length > 0 && canPlay && <a class="button button--medium" onClick={() => handlePlay()}>Jouer</a>}
