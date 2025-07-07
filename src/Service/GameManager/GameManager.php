@@ -122,6 +122,10 @@ final class GameManager implements ServiceSubscriberInterface
     public function play(Room $room, Player $player, array $cards, array $data = []): void
     {
         $ctx = $this->gameContextProvider->provide($room);
+		$player = current(array_filter(
+			$ctx->getPlayers(),
+			fn (Player $p): bool => $p->id === $player->id,
+		));
 
         if (!$ctx->getData('fastPlay') && $ctx->getCurrentPlayer()->id !== $player->id) {
             throw new \InvalidArgumentException('Not your turn');
