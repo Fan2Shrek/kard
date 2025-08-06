@@ -84,7 +84,7 @@ describe('Président: règles basiques', function () {
 
     test('Il est impossible de jouer 4 cartes ou plus', function () {
         // Arrange
-        Arrange::setCurrentCard(7);
+        Arrange::setCurrentCards([6, 6, 6, 6]);
 
         // Act
         Act::playCards([

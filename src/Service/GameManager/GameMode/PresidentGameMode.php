@@ -62,11 +62,9 @@ final class PresidentGameMode extends AbstractGameMode
         $this->cards = $cards;
         $this->gameContext = $gameContext;
 
-		$cardsCount = \count($cards);
-
-		if (0 < $cardsCount && $cardsCount > 3) {
-			throw $this->createRuleException('card.count.invalid');
-		}
+        if (\count($cards) > 3) {
+            throw $this->createRuleException('card.count.invalid');
+        }
 
         $gameContext->addData('fastPlay', false); // reset
         $currentCards = $gameContext->getCurrentCards();
@@ -95,7 +93,7 @@ final class PresidentGameMode extends AbstractGameMode
             return;
         }
 
-        match (\count($currentCards)) {
+        match (\count($currentCards)) { // @phpstan-ignore-line
             0 => $this->handleStart($cards),
             1 => $this->handleOneCard($cards, $currentCards),
             2 => $this->handleTwoCards($cards, $currentCards),
