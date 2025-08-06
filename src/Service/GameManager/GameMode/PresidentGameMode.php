@@ -61,6 +61,13 @@ final class PresidentGameMode extends AbstractGameMode
     {
         $this->cards = $cards;
         $this->gameContext = $gameContext;
+
+		$cardsCount = \count($cards);
+
+		if (0 < $cardsCount && $cardsCount > 3) {
+			throw $this->createRuleException('card.count.invalid');
+		}
+
         $gameContext->addData('fastPlay', false); // reset
         $currentCards = $gameContext->getCurrentCards();
         $previousTurns = array_reverse($this->gameContext->getRound()->getTurns());
@@ -93,7 +100,6 @@ final class PresidentGameMode extends AbstractGameMode
             1 => $this->handleOneCard($cards, $currentCards),
             2 => $this->handleTwoCards($cards, $currentCards),
             3 => $this->handleThreeCards($cards, $currentCards),
-            default => throw $this->createRuleException('card.count.invalid'),
         };
 
         $hand->removeCards($cards);
