@@ -65,6 +65,10 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
     {
         if (empty($cards)) {
             $hand->addMultipleCards($gameContext->draw(1));
+			$this->dispatchMercureEvent(
+				'message',
+				\sprintf('%s pioche une carte', $gameContext->getCurrentPlayer()->username),
+			);
             $gameContext->nextPlayer();
 
             return;
