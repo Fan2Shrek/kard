@@ -464,6 +464,24 @@ describe('Huit américain: mercure', function () {
             expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'Le joueur Player 2 pioche 4 cartes');
         });
     });
+
+    test("Lors qu'un joueur pioche un message est envoyé", function () {
+        Arrange::setDrawPillSize(3);
+        Arrange::setPlayers([
+            new Player('1', 'Player 1'),
+            new Player('2', 'Player 2'),
+        ]);
+        Arrange::setHands([
+            '1' => [[5, 's']],
+            '2' => [[6, 's']],
+        ]);
+        Arrange::setCurrentCard(5, 's');
+
+        Act::playCard(null);
+
+		expectMercureMessage(current(HubSpy::$published))->toBeAction('message');
+		expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'Player 1 pioche une carte');
+    });
 });
 
 describe('Huit américan: fin de partie', function () {
