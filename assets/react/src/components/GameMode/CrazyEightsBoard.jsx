@@ -1,15 +1,33 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useContext, useEffect } from 'react';
 
 import {
     Hand,
     HiddenHand,
-    PlayedCard,
     PlayerList,
     Stack,
 } from '../components.js';
+import { AnimationContext } from '../../Context/AnimationContext.js';
+import { GameContext } from '../../Context/GameContext.js';
 import { suitsIcons } from '../../enum.js';
+import StackedPlayedCard from '../Card/Stack/StackedPlayedCard.js';
 
 export default ({ ctx, hand, player }) => {
+    const { gameContext: { currentCards } } = useContext(GameContext);
+    const { animateCards, getHandRef } = useContext(AnimationContext);
+
+    const lastPlayerHandRef = ctx.data.lastPlayer && getHandRef(ctx.data.lastPlayer);
+
+    const playedCardRef = useRef();
+    const handRef = useRef();
+
+    useEffect(() => {
+        if (animateCards && playedCardRef.current)  {
+            const fromDiv = ctx.data.lastPlayer === player.id ? handRef : lastPlayerHandRef;
+
+            fromDiv && fromDiv.current && animateCards(currentCards, fromDiv.current, playedCardRef.current );
+        }
+    }, [animateCards, currentCards]);
+
     const gameActions = useMemo(() => (handlePlay) => ({
         8: (
             <div>
@@ -29,15 +47,14 @@ export default ({ ctx, hand, player }) => {
     return <div className='game'>
             <PlayerList players={ctx.players} currentPlayer={ctx.currentPlayer} />
             <div className='game__right'>
-                {ctx.players.map(player => player.id !== ctx.currentPlayer.id && <HiddenHand count={player.cardsCount} /> )}
                 <div className='middle'>
                     <div id='middle'>
-                        <Stack cards={ctx.round.turns.map(t => t.cards).flat()} />
+                        <StackedPlayedCard ref={playedCardRef} turns={ctx.round.turns} />
                         <Stack cards={ctx.drawPile} style='drawPile'/>
                     </div>
                 </div>
                 <div className='bottom'>
-                    <Hand hand={hand} order={['3', '4', '5', '6', '7', '9', '10', 'q', 'k', '1', '2', 'j', '8']} canPlay={ctx.currentPlayer.id === player.id} gameActions={gameActions} />
+                    <Hand ref={handRef} hand={hand} order={['3', '4', '5', '6', '7', '9', '10', 'q', 'k', '1', '2', 'j', '8']} canPlay={ctx.currentPlayer.id === player.id} gameActions={gameActions} />
                 </div>
             </div>
         </div>

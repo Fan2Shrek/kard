@@ -99,6 +99,7 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
             $hand->removeCards($cards);
             $gameContext->addData('suit', $newSuit);
             $gameContext->setCurrentCards($cards);
+			$gameContext->addData('lastPlayer', $gameContext->getCurrentPlayer()->id); // @pest-mutate-ignore flemme
             $gameContext->nextPlayer();
 
             return;
@@ -155,6 +156,7 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
 
         $hand->removeCards($cards);
         $gameContext->setCurrentCards($cards);
+        $gameContext->addData('lastPlayer', $gameContext->getCurrentPlayer()->id); // @pest-mutate-ignore flemme
         $gameContext->nextPlayer();
     }
 }
