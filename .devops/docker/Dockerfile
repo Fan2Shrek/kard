@@ -12,10 +12,12 @@ FROM php:8.4-fpm-alpine AS main
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
-RUN install-php-extensions pdo_mysql redis intl amqp opcache
+RUN install-php-extensions pdo_mysql redis intl amqp opcache brotli zstd
 
 RUN apk add --no-cache \
     nginx \
+    nginx-mod-http-brotli \
+    nginx-mod-http-zstd \
     multirun
 
 COPY .devops/docker/default.conf /etc/nginx/http.d/default.conf
