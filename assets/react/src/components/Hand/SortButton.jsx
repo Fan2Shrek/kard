@@ -1,18 +1,11 @@
 import React, { useState, useCallback } from 'react';
 
+import {sortByRank, sortBySuit} from '../../lib/sort.js';
+
 import './sortButton.css';
 
-export default ({ setCallback, rankOrder = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'j', 'q', 'k', '1'] }) => {
+export default ({ setCallback, setCurrentSort, rankOrder = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'j', 'q', 'k', '1'] }) => {
     const [isOpen, setIsOpen] = useState(false);
-
-    const sortByRank = useCallback((a, b) => {
-        const rankA = rankOrder.indexOf(a.rank);
-        const rankB = rankOrder.indexOf(b.rank);
-
-        return rankA - rankB;
-    }, []);
-
-    const sortBySuit = useCallback((a, b) => a.suit.localeCompare(b.suit), []);
 
     return <div className="sort-button">
         <button className="sort-button__toggle" onClick={() => setIsOpen(!isOpen)}>
@@ -23,11 +16,13 @@ export default ({ setCallback, rankOrder = ['2', '3', '4', '5', '6', '7', '8', '
         {isOpen &&
             <div className="sort-button__menu">
                 <button onClick={() => {
-                    setCallback(cards => [...cards].sort(sortByRank));
+                    setCallback(cards => sortByRank(cards, rankOrder));
+					setCurrentSort(() => (cards) => sortByRank(cards, rankOrder))
                     setIsOpen(false);
                 }}>Trier par valeur</button>
                 <button onClick={() => {
-                    setCallback(cards => [...cards].sort(sortBySuit));
+                    setCallback(cards => sortBySuit(cards));
+					setCurrentSort(() => (cards) => sortBySuit(cards))
                     setIsOpen(false);
                 }}>Trier par couleur</button>
             </div>

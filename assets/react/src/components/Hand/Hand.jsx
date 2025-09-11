@@ -13,9 +13,10 @@ export default forwardRef(({ hand, canPlay, order=null, gameActions = null }, re
     const [selectedCards, setSelectedCards] = useState([]);
     const [cards, setCards] = useState(hand);
     const [error, setError] = useState(null);
+	const [currentSort, setCurrentSort] = useState(null);
 
 	useEffect(() => {
-		setCards(cards => cards.filter((card) => hand.some(c => c.rank === card.rank && c.suit === card.suit)));
+		setCards(currentSort ? currentSort(hand) : hand);
 	}, [hand]);
 
     const handleCard = (card) => {
@@ -57,7 +58,7 @@ export default forwardRef(({ hand, canPlay, order=null, gameActions = null }, re
                 return <Card onClick={handleCard} selected={selectedCards.includes(card)} key={`${card.rank}-${card.suit}`} card={card} img={getCardAsset(card)} angle={0} />
             })}
         </div>
-        { order && <SortButton setCallback={setCards} rankOrder={order} />}
-        { !order && <SortButton setCallback={setCards} />}
+        { order && <SortButton setCallback={setCards} setCurrentSort={setCurrentSort} rankOrder={order} />}
+        { !order && <SortButton setCallback={setCards} setCurrentSort={setCurrentSort} />}
     </div>;
 });
