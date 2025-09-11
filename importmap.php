@@ -55,4 +55,7 @@ return [
     '@react-spring/rafz' => [
         'version' => '10.0.1',
     ],
+    'react-dom/client' => [
+        'version' => '18.3.1',
+    ],
 ];
