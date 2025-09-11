@@ -68,7 +68,7 @@
                             <tr>
                                 <td>{{ game.gameMode.value.value|capitalize }}</td>
                                 <td>{{ game.owner.username }}</td>
-                                <td>{{ game.players.count }}</td>
+                                <td>{{ game.participants.count }}</td>
                                 <td>
                                     <twig:Button
                                         :href="path('waiting', {id: game.id})"
