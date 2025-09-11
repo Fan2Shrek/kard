@@ -37,7 +37,7 @@ export default ({ ctx, hand, player }) => {
                     </div>
                 </div>
                 <div className='bottom'>
-                    <Hand hand={hand} canPlay={ctx.currentPlayer.id === player.id} gameActions={gameActions} />
+                    <Hand hand={hand} order={['3', '4', '5', '6', '7', '9', '10', 'q', 'k', '1', '2', 'j', '8']} canPlay={ctx.currentPlayer.id === player.id} gameActions={gameActions} />
                 </div>
             </div>
         </div>
