@@ -29,7 +29,7 @@ return [
         'version' => '8.0.13',
     ],
     'react' => [
-        'version' => '18.3.1',
+        'version' => '18.1.0',
     ],
     'react-dom' => [
         'version' => '18.3.1',
@@ -57,5 +57,17 @@ return [
     ],
     'react-dom/client' => [
         'version' => '18.3.1',
+    ],
+    'react-sortablejs' => [
+        'version' => '6.1.4',
+    ],
+    'sortablejs' => [
+        'version' => '1.15.6',
+    ],
+    'classnames' => [
+        'version' => '2.3.1',
+    ],
+    'tiny-invariant' => [
+        'version' => '1.2.0',
     ],
 ];

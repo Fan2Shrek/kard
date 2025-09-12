@@ -1,4 +1,4 @@
-import React, { forwardRef, useContext, useCallback } from 'react';
+import React, { forwardRef, useContext, useCallback, useState } from 'react';
 
 import './stack.css';
 import { Card } from '../../components.js';
@@ -6,6 +6,7 @@ import { AssetsContext } from '../../../Context/AssetsContext.js';
 
 export default forwardRef(({ cards, style = 'stack' }, ref) => {
     const { getCardAsset, getBackAsset } = useContext(AssetsContext);
+	const [styleDict, setStyleDict] = useState({});
 
     const params = useCallback((card, i) => {
         if (style === 'drawPile') {
@@ -18,12 +19,20 @@ export default forwardRef(({ cards, style = 'stack' }, ref) => {
         }
 
         if (style === 'stack') {
+			if (!styleDict[card.rank + card.suit]) {
+				styleDict[card.rank + card.suit] = {
+					angle: Math.floor(Math.random() * 181),
+					xOffset: Math.floor(Math.random() * 10),
+					yOffset: Math.floor(Math.random() * 10),
+				};
+				setStyleDict({ ...styleDict });
+			}
             return {
                 clickable: false,
                 img: getCardAsset(card),
-                angle: Math.floor(Math.random() * 181),
-                xOffset: Math.floor(Math.random() * 10),
-                yOffset: Math.floor(Math.random() * 10),
+                angle: styleDict[card.rank + card.suit].angle,
+                xOffset: styleDict[card.rank + card.suit].xOffset,
+                yOffset: styleDict[card.rank + card.suit].yOffset
             };
         }
     }, [style]);
