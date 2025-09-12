@@ -479,8 +479,8 @@ describe('Huit américain: mercure', function () {
 
         Act::playCard(null);
 
-		expectMercureMessage(current(HubSpy::$published))->toBeAction('message');
-		expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'Player 1 pioche une carte');
+        expectMercureMessage(current(HubSpy::$published))->toBeAction('message');
+        expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'Player 1 pioche une carte');
     });
 });
 

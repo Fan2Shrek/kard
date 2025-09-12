@@ -138,13 +138,13 @@ final class RoomController extends AbstractController
     ): Response {
         $user = $this->getUser();
 
-		if (!\in_array($user, $room->getParticipants()->toArray(), true)) {
-			return $this->render('home/game.html.twig', [
-				'assets' => $assetsProvider->getAllCardsAssets(),
-				'game' => $serializer->serialize($gameContextProvider->provide($room), 'json'),
-				'room' => $room,
-			]);
-		}
+        if (!\in_array($user, $room->getParticipants()->toArray(), true)) {
+            return $this->render('home/game.html.twig', [
+                'assets' => $assetsProvider->getAllCardsAssets(),
+                'game' => $serializer->serialize($gameContextProvider->provide($room), 'json'),
+                'room' => $room,
+            ]);
+        }
 
         return $this->render('home/game.html.twig', [
             'assets' => $assetsProvider->getAllCardsAssets(),
