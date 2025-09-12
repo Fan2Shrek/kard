@@ -17,7 +17,10 @@ export default forwardRef(({ hand, canPlay, order = null, gameActions = null }, 
 	const [currentSort, setCurrentSort] = useState(null);
 
 	useEffect(() => {
-		setCards(currentSort ? currentSort(hand) : hand);
+		setCards(oldHand => (currentSort ? currentSort(hand) : [
+			...oldHand.filter((card) => hand.some(c => c.rank === card.rank && c.suit === card.suit)),
+			...hand.filter((card) => !oldHand.some(c => c.rank === card.rank && c.suit === card.suit)),
+		]));
 	}, [hand]);
 
 	const handleCard = (card) => {
