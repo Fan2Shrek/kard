@@ -21,7 +21,7 @@ export default ({ ctx, hand, player }) => {
     const handRef = useRef();
 
     useEffect(() => {
-        if (animateCards && playedCardRef.current)  {
+        if (player && animateCards && playedCardRef.current)  {
             const fromDiv = ctx.data.lastPlayer === player.id ? handRef : lastPlayerHandRef;
 
             fromDiv && fromDiv.current && animateCards(currentCards, fromDiv.current, playedCardRef.current );
@@ -54,7 +54,7 @@ export default ({ ctx, hand, player }) => {
                     </div>
                 </div>
                 <div className='bottom'>
-                    <Hand ref={handRef} hand={hand} order={['3', '4', '5', '6', '7', '9', '10', 'q', 'k', '1', '2', 'j', '8']} canPlay={ctx.currentPlayer.id === player.id} gameActions={gameActions} />
+					{player && <Hand ref={handRef} hand={hand} order={['3', '4', '5', '6', '7', '9', '10', 'q', 'k', '1', '2', 'j', '8']} canPlay={ctx.currentPlayer.id === player.id} gameActions={gameActions} />}
                 </div>
             </div>
         </div>

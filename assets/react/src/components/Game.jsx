@@ -19,7 +19,7 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
 
     const player = JSON.parse(user);
     const gameUrl = useMemo(() => JSON.parse(document.getElementById('mercure-game-url').textContent), []);
-    const playerUrl = useMemo(() => JSON.parse(document.getElementById('mercure-game-player').textContent), []);
+    const playerUrl = useMemo(() => player ? JSON.parse(document.getElementById('mercure-game-player').textContent) : null, []);
 
     const boardRef = useRef(null);
 
@@ -49,7 +49,7 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
 
     return <>
         <GameContext gameContext={ctx} player={player} currentPlayer={ctx.currentPlayer}>
-            <Board ref={boardRef} players={ctx.players.filter((player) => player.id !== ctx.currentPlayer.id)}>
+            <Board ref={boardRef} players={ctx.players.filter((gamePlayer) => player?.id !== gamePlayer.id)}>
                 { ctx.room.gameMode.value === 'president' && <PresidentBoard ctx={ctx} hand={hand} player={player} /> }
                 { ctx.room.gameMode.value === 'crazy_eights' && <CrazyEightsBoard ctx={ctx} hand={hand} player={player} /> }
             </Board>
