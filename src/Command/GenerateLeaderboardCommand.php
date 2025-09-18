@@ -27,7 +27,7 @@ final class GenerateLeaderboardCommand extends Command
         private EntityManagerInterface $entityManager,
         private ResultRepository $resultRepository,
         private UserRepository $userRepository,
-        private MessageBusInterface $messageBus,
+        /* private MessageBusInterface $messageBus, */
     ) {
         parent::__construct();
     }
