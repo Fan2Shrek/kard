@@ -75,6 +75,10 @@ final class RoomController extends AbstractController
     #[Route('/waiting/{id}', name: 'waiting')]
     public function waiting(Room $room): Response
     {
+        if (GameStatusEnum::PLAYING === $room->getStatus()) {
+            return $this->redirectToRoute('game', ['id' => $room->getId()]);
+        }
+
         $user = $this->getUser();
         $hasJoined = false;
         foreach ($room->getParticipants() as $player) {
