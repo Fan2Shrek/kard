@@ -41,4 +41,46 @@
             }
         }
     }
+
+    .game {
+        background-color: var(--bg-game-card);
+
+        &__background {
+            position: absolute;
+            border: 5px solid white;
+            border-radius: 10px;
+            color: white;
+            height: 75vh;
+            width: 90vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            top: 50%;
+            left: 50%;
+            opacity: 0.1;
+            transform: translate(-50%, -50%);
+
+            .title {
+                font-size: 10rem;
+                font-family: "Nabla", system-ui;
+                font-optical-sizing: auto;
+                font-weight: 400;
+                font-style: normal;
+                font-variation-settings:
+                    "EDPT" 100,
+                    "EHLT" 12;
+            }
+
+            .subtitle {
+                font-size: 2rem;
+                margin-top: -20px;
+            }
+
+            .quote {
+                font-size: 1rem;
+                font-style: italic;
+            }
+        }
+    }
 }

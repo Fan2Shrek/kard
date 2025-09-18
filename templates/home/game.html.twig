@@ -1,5 +1,11 @@
 {% extends 'base.html.twig' %}
 
+{% block head %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nabla&display=swap" rel="stylesheet">
+{% endblock %}
+
 {% block body %}
     <div {{ react_component('App', {assets: assets, gameContext: game, hand: hand ?? null, player: player ?? null}) }}></div>
 {% endblock %}

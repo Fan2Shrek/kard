@@ -44,7 +44,7 @@ export default ({ ctx, hand, player }) => {
         ),
     }), []);
 
-    return <div className='game'>
+    return <>
             <PlayerList players={ctx.players} currentPlayer={ctx.currentPlayer} />
             <div className='game__right'>
                 <div className='middle'>
@@ -57,6 +57,6 @@ export default ({ ctx, hand, player }) => {
 					{player && <Hand ref={handRef} hand={hand} order={['3', '4', '5', '6', '7', '9', '10', 'q', 'k', '1', '2', 'j', '8']} canPlay={ctx.currentPlayer.id === player.id} gameActions={gameActions} />}
                 </div>
             </div>
-        </div>
+        </>
     ;
 }
