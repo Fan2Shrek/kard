@@ -14,6 +14,7 @@ import './game.css';
 export default ({ gameContext, hand: currentHand, player: user }) => {
     const [ctx, setCtx] = useState(JSON.parse(gameContext));
     const [hand, setHand] = useState(currentHand);
+	const [animate, setAnimate] = useState(false);
 
     const { displayText } = useContext(AnimationContext);
 
@@ -34,6 +35,7 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
         end: (data) => {
             setCtx(data.context);
             displayText(`${data.context.winner.username} a gagné`);
+			setAnimate(true);
 
             setTimeout(() => {
                 window.location.href = data.url;
@@ -47,12 +49,12 @@ export default ({ gameContext, hand: currentHand, player: user }) => {
         setHand(data.cards);
     });
 
-    return <>
+    return <div class={`board${animate ? ' bordel': ''}`}>
         <GameContext gameContext={ctx} player={player} currentPlayer={ctx.currentPlayer}>
             <Board ref={boardRef} players={ctx.players.filter((gamePlayer) => player?.id !== gamePlayer.id)}>
                 { ctx.room.gameMode.value === 'president' && <PresidentBoard ctx={ctx} hand={hand} player={player} /> }
                 { ctx.room.gameMode.value === 'crazy_eights' && <CrazyEightsBoard ctx={ctx} hand={hand} player={player} /> }
             </Board>
         </GameContext>
-    </>;
+    </div>;
 }

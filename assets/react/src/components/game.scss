@@ -44,6 +44,43 @@
 
   .middle {
     position: relative;
-    top: 25%
+    top: 25%;
   }
+}
+
+@keyframes rotatelascar {
+  to {
+    rotate: 2turn;
+  }
+}
+
+@keyframes scalelascar {
+  0% {
+    transform: scaleY(1) scaleX(1);
+  }
+  25% {
+    transform: scaleX(0.1) scaleY(1);
+  }
+  50% {
+    transform: scaleX(1) scaleY(1);
+  }
+  75% {
+    transform: scaleX(1) scaleY(0.1);
+  }
+  100% {
+    transform: scaleY(1) scaleX(1);
+  }
+}
+
+@keyframes filterlascar {
+  50% {
+    filter: blur(7px);
+  }
+  100% {
+    filter: blur(0);
+  }
+}
+
+.bordel  * {
+    animation: rotatelascar 2s linear infinite, scalelascar 2s ease-in-out infinite, filterlascar 2s ease-in-out infinite;
 }

@@ -10,6 +10,8 @@ export default ({ text }) => {
     const letters = text.split('');
 	const fontSize = `clamp(2rem, ${100 / text.length}vw, 10rem)`;
 
+	letters[0] = letters[0].toUpperCase();
+
     const trail = useTrail(letters.length, {
         from: { transform: 'translateY(0px)' },
         to: { transform: 'translateY(-40px)' },
