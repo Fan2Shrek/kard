@@ -47,8 +47,8 @@
             </div> #}
         </twig:BlackCard>
 
-        <section class="games">
-            <div class="games-title">
+        <section class="games table">
+            <div class="games-title table-title">
                 <twig:UX:Icon name="lucide:users" color="white" />
                 <h2>Parties en cours</h2>
             </div>
@@ -85,5 +85,35 @@
                 <p>Il n'y a aucune partie en cours</p>
             {% endif %}
         </section>
+
+        {% if playerLeaderboard is not empty %}
+            <section class="leaderboard table">
+                <div class="leaderboard-title table-title">
+                    <twig:UX:Icon name="lucide:biceps-flexed" color="white" />
+                    <h2>Tableau des meilleurs</h2>
+                </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Parties jouée</th>
+                                <th>Parties gagnés</th>
+                                <th>Ratio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for player in playerLeaderboard %}
+                                <tr>
+                                    <td>{{ player.player.username|capitalize }}</td>
+                                    <td>{{ player.gamesCount }}</td>
+                                    <td>{{ player.winsCount }}</td>
+                                    <td>{{ player.winRate }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+            </section>
+        {% endif %}
     </main>
 {% endblock %}

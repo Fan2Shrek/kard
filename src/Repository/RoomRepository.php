@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Room;
+use App\Entity\User;
 use App\Enum\GameStatusEnum;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -26,6 +27,21 @@ class RoomRepository extends ServiceEntityRepository
             ['status' => GameStatusEnum::WAITING],
             ['id' => 'DESC'],
         );
+    }
+
+    /**
+     * @return Room[]
+     */
+    public function findAllRoomWithPlayer(User $player): array
+    {
+        return $this->createQueryBuilder('r')
+            ->where('r.status = :status')
+            ->orWhere('r.owner = :player')
+            ->orWhere(':player MEMBER OF r.participants')
+            ->setParameter('player', $player)
+            ->setParameter('status', GameStatusEnum::FINISHED)
+            ->getQuery()
+            ->getResult();
     }
 
     public function save(Room $room): void
