@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Enum\GameStatusEnum;
 use App\Repository\ResultRepository;
 use App\Repository\RoomRepository;
 use App\Repository\UserRepository;
@@ -22,7 +23,7 @@ final class HomeController extends AbstractController
         $playerLeaderboard = [];
 
         foreach ($userRepository->findAll() as $user) {
-            $gamesCount = count($roomRepository->findAllRoomWithPlayer($user));
+            $gamesCount = count(array_filter($roomRepository->findAllRoomWithPlayer($user), fn ($room) => GameStatusEnum::FINISHED === $room->getStatus()));
             $winsCount = count($resultRepository->findBy(['winner' => $user]));
             $playerLeaderboard[] = [
                 'player' => $user,

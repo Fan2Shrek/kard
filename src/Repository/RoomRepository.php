@@ -36,10 +36,9 @@ class RoomRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('r')
             ->where('r.status = :status')
-            ->orWhere('r.owner = :player')
-            ->orWhere(':player MEMBER OF r.participants')
-            ->setParameter('player', $player)
+            ->andWhere(':player MEMBER OF r.participants')
             ->setParameter('status', GameStatusEnum::FINISHED)
+            ->setParameter('player', $player)
             ->getQuery()
             ->getResult();
     }

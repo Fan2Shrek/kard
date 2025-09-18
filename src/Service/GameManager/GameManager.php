@@ -189,7 +189,7 @@ final class GameManager implements ServiceSubscriberInterface
 
             $result = new Result(
                 $this->container->get('user_repository')->find($player->id),
-                $room->getGameMode()
+                $room,
             );
             $this->container->get('result_repository')->save($result);
 

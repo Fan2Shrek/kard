@@ -20,17 +20,22 @@ class Result
     #[ORM\JoinColumn(nullable: false)]
     private User $winner;
 
+    // Compatibility, remove someday
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?GameMode $gameMode = null;
+
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private GameMode $gameMode;
+    private Room $room;
 
     #[ORM\Column(type: 'datetime')]
     private \DateTimeInterface $date;
 
-    public function __construct(User $winner, GameMode $gameMode)
+    public function __construct(User $winner, Room $room)
     {
         $this->winner = $winner;
-        $this->gameMode = $gameMode;
+        $this->room = $room;
         $this->date = new \DateTimeImmutable();
     }
 
@@ -44,9 +49,9 @@ class Result
         return $this->winner;
     }
 
-    public function getGameMode(): ?GameMode
+    public function getRoom(): Room
     {
-        return $this->gameMode;
+        return $this->room;
     }
 
     public function getDate(): \DateTimeInterface
