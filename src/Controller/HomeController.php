@@ -33,7 +33,7 @@ final class HomeController extends AbstractController
             ];
         }
 
-        usort($playerLeaderboard, fn ($a, $b) => $b['winRate'] <=> $a['winRate']);
+        usort($playerLeaderboard, fn ($a, $b) => $b['winsCount'] <=> $a['winsCount']);
         $playerLeaderboard = array_slice($playerLeaderboard, 0, 10);
 
         return $this->render('home/index.html.twig', [
