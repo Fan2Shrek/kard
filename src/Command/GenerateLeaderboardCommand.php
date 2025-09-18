@@ -59,7 +59,7 @@ final class GenerateLeaderboardCommand extends Command
             ->text('You are the best player of the day!')
         ;
 
-        $this->messageBus->dispatch(new SendEmailCommand($email));
+        /* $this->messageBus->dispatch(new SendEmailCommand($email)); */
 
         $style->success('Leaderboard generated successfully.');
 
