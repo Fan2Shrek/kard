@@ -10,7 +10,7 @@ use App\Model\Card\Hand;
 use App\Service\Redis\RedisConnection;
 use Symfony\Component\Serializer\SerializerInterface;
 
-class HandRepository implements HandRepositoryInterface
+class HandRepository implements CachedHandRepositoryInterface
 {
     public function __construct(
         private readonly RedisConnection $redisConnection,
@@ -54,6 +54,13 @@ class HandRepository implements HandRepositoryInterface
         }
 
         $this->redisConnection->set($this->getKey($player, $room), $this->serializer->serialize($hand, 'json'));
+    }
+
+    public function deleteAllHandForRoom(Room $room): void
+    {
+        foreach ($room->getParticipants() as $participant) {
+            $this->redisConnection->del($this->getKey((string) $participant->getId(), $room));
+        }
     }
 
     private function getKey(string $player, Room $room): string

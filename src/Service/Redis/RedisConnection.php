@@ -18,4 +18,9 @@ final class RedisConnection
     {
         $this->connection->set($key, $value);
     }
+
+    public function del(string $key): void
+    {
+        $this->connection->del($key);
+    }
 }

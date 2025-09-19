@@ -11,6 +11,7 @@ use App\Model\GameContext;
 use App\Model\Player;
 use App\Repository\ResultRepository;
 use App\Repository\UserRepository;
+use App\Service\Card\CachedHandRepositoryInterface;
 use App\Service\Card\CardGenerator;
 use App\Service\Card\HandRepositoryInterface;
 use App\Service\GameContextProvider;
@@ -191,6 +192,10 @@ final class GameManager implements ServiceSubscriberInterface
                 $this->container->get('user_repository')->find($player->id),
                 $room,
             );
+            if ($this->handRepository instanceof CachedHandRepositoryInterface) {
+                $this->handRepository->deleteAllHandForRoom($room);
+            }
+            $this->gameContextProvider->clear($room);
             $this->container->get('result_repository')->save($result);
 
             return;

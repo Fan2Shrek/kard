@@ -33,6 +33,11 @@ final class GameContextProvider
         $this->redis->set($this->getKey($ctx->getRoom()), $this->serializer->serialize($ctx, 'json'));
     }
 
+    public function clear(Room $room): void
+    {
+        $this->redis->del($this->getKey($room));
+    }
+
     private function createContext(Room $room): GameContext
     {
         $players = array_map(fn ($u): Player => Player::fromUser($u), $room->getParticipants()->toArray());

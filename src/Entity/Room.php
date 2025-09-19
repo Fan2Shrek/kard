@@ -98,7 +98,7 @@ class Room
         return $this;
     }
 
-	// weird naming due to serialization b*llsh*t
+    // weird naming due to serialization b*llsh*t
     public function removeParticipantBlaBlaBla(User $player): static
     {
         $this->participants->removeElement($player);
