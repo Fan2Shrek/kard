@@ -141,7 +141,7 @@ final class RoomController extends AbstractController
                 return $this->redirectToRoute('home');
             }
 
-            $room->removeParticipant($user);
+            $room->removeParticipantBlaBlaBla($user);
             $this->roomRepository->save($room);
 
             $this->hub->publish(new Update(
