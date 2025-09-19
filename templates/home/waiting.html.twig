@@ -1,11 +1,13 @@
 {% extends 'base.html.twig' %}
 
+{% set mercure_room_url = 'game-' ~ room.id %}
+
 {% block body %}
     <main class="waiting bg-card-image">
         <div class="waiting__header black-card">
             <h1>En attente de joueurs !</h1>
         </div>
-        <div {{ stimulus_controller('stream', {url: mercure('waiting')}) }}></div>
+        <div {{ stimulus_controller('stream', {url: mercure(mercure_room_url ~ '-waiting')}) }}></div>
         <div id="player-join">
             <h2>Joueurs</h2>
             {% for player in players %}
@@ -14,6 +16,12 @@
         </div>
 
         <div class="links-row">
+            <twig:Button
+                text="Quitter la partie"
+                iconLeft="lucide:arrow-big-left-dash"
+                onClick='window.location.href = "{{ path('game_leave', {id: room.id}) }}"'
+                variant="danger"
+            />
             {% if room.owner == app.user %}
                 <twig:Button
                     onClick='window.location.href = "{{ path('game_start', {id: room.id}) }}"'
@@ -33,7 +41,7 @@
 {% endblock %}
 {% block endscript %}
     <script type="application/json" id="mercure-url">
-        {{ mercure('game-' ~ room.id, {subscribe: 'game-' ~ room.id})|json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_TAG'))|raw }}
+        {{ mercure(mercure_room_url, {subscribe: mercure_room_url})|json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_TAG'))|raw }}
     </script>
     <script>
         const copyLink = () => {

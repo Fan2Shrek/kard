@@ -98,6 +98,13 @@ class Room
         return $this;
     }
 
+    public function removeParticipant(User $player): static
+    {
+        $this->participants->removeElement($player);
+
+        return $this;
+    }
+
     public function getGameMode(): ?GameMode
     {
         return $this->gameMode;

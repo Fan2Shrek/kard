@@ -1,6 +1,6 @@
 <turbo-stream action='append' target='player-join'>
     <template>
-        <div class="player">
+        <div class="player" id="player-{{ player.id }}">
             <twig:UX:Icon name="bi:person-fill" />
             <h2>{{ player.username }}</h2>
         </div>

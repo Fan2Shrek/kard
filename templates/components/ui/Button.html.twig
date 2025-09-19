@@ -1,6 +1,7 @@
 {% if href is not null %}
     <a
         href="{{ href }}"
+        data-turbo-prefetch="false"
         class="{{ button.apply({size: size, unstyled: unstyled, variant: variant}, attributes.render('class')) }}"
         {{ attributes }}
     >

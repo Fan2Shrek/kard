@@ -93,7 +93,7 @@ final class RoomController extends AbstractController
             $this->roomRepository->save($room);
 
             $this->hub->publish(new Update(
-                'waiting',
+                \sprintf('game-%s-waiting', $room->getId()),
                 $this->renderView('components/turbo/player-join.html.twig', [
                     'player' => Player::fromUser($user),
                 ])
@@ -109,6 +109,48 @@ final class RoomController extends AbstractController
             'room' => $room,
             'players' => $players,
         ]);
+    }
+
+    #[Route('/leave/{id}', name: 'game_leave')]
+    public function leave(Room $room): Response
+    {
+        if (GameStatusEnum::PLAYING === $room->getStatus()) {
+            return $this->redirectToRoute('game', ['id' => $room->getId()]);
+        }
+
+        $user = $this->getUser();
+        $isInGame = false;
+        foreach ($room->getParticipants() as $player) {
+            if ($player->getUsername() === $user->getUsername()) {
+                $isInGame = true;
+                break;
+            }
+        }
+
+        if ($isInGame) {
+            if ($room->getOwner() === $user) {
+                $this->hub->publish(new Update(
+                    sprintf('game-%s', $room->getId()),
+                    json_encode([
+                        'url' => $this->generateUrl('home'),
+                    ])
+                ));
+
+                $this->roomRepository->remove($room);
+
+                return $this->redirectToRoute('home');
+            }
+
+            $room->removeParticipant($user);
+            $this->roomRepository->save($room);
+
+            $this->hub->publish(new Update(
+                \sprintf('game-%s-waiting', $room->getId()),
+                "<turbo-stream action=\"remove\" target=\"player-{$user->getId()}\"></turbo-stream>"
+            ));
+        }
+
+        return $this->redirectToRoute('home');
     }
 
     #[Route('/start/{id}', name: 'game_start')]
