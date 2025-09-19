@@ -70,4 +70,7 @@ return [
     'tiny-invariant' => [
         'version' => '1.2.0',
     ],
+    'phaser' => [
+        'version' => '3.90.0',
+    ],
 ];

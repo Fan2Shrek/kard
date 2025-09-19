@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block body %}
-    <div {{ react_component('App', {assets: assets, gameContext: game, hand: hand ?? null, player: player ?? null}) }}></div>
+    <div {{ react_component('AppV2', {assets: assets, gameContext: game, hand: hand ?? null, player: player ?? null}) }}></div>
 {% endblock %}
 {% block endscript %}
     <script type="application/json" id="mercure-game-url">
