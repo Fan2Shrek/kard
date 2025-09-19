@@ -1,0 +1,17 @@
+<turbo-stream action='append' target='current-games'>
+    <template>
+        <tr id="game-{{ game.id }}">
+            <td>{{ game.gameMode.value.value|capitalize }}</td>
+            <td>{{ game.owner.username }}</td>
+            <td>{{ game.participants.count }}</td>
+            <td>
+                <twig:Button
+                    :href="path('waiting', {id: game.id})"
+                    text="Rejoindre"
+                    iconLeft="ri:arrow-right-s-line"
+                    size="small"
+                />
+            </td>
+        </tr>
+    </template>
+</turbo-stream>

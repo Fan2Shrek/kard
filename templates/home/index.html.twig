@@ -63,21 +63,10 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="current-games">
+                        <div {{ stimulus_controller('stream', {url: mercure('current_games')}) }}></div>
                         {% for game in currentGames %}
-                            <tr>
-                                <td>{{ game.gameMode.value.value|capitalize }}</td>
-                                <td>{{ game.owner.username }}</td>
-                                <td>{{ game.participants.count }}</td>
-                                <td>
-                                    <twig:Button
-                                        :href="path('waiting', {id: game.id})"
-                                        text="Rejoindre"
-                                        iconLeft="ri:arrow-right-s-line"
-                                        size="small"
-                                    />
-                                </td>
-                            </tr>
+                            {{ include('components/turbo/game-details.html.twig') }}
                         {% endfor %}
                     </tbody>
                 </table>

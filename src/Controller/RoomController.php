@@ -53,8 +53,12 @@ final class RoomController extends AbstractController
             $room->addParticipant($user);
 
             $this->roomRepository->save($room);
-
             $this->eventDispatcher->dispatch(new RoomEvent($room), 'room.created');
+
+            $this->hub->publish(new Update(
+                'current_games',
+                $this->renderView('components/turbo/game-details.html.twig', ['game' => $room])
+            ));
 
             return $this->redirectToRoute('waiting', ['id' => $room->getId()]);
         }
@@ -136,7 +140,13 @@ final class RoomController extends AbstractController
                     ])
                 ));
 
+                $id = $room->getId()->toString();
                 $this->roomRepository->remove($room);
+
+                $this->hub->publish(new Update(
+                    'current_games',
+                    "<turbo-stream action=\"remove\" target=\"game-{$id}\"></turbo-stream>"
+                ));
 
                 return $this->redirectToRoute('home');
             }
@@ -163,6 +173,11 @@ final class RoomController extends AbstractController
 
         $this->gameManager->start($gameContext);
         $this->roomRepository->save($room);
+
+        $this->hub->publish(new Update(
+            'current_games',
+            "<turbo-stream action=\"remove\" target=\"game-{$room->getId()}\"></turbo-stream>"
+        ));
 
         $this->hub->publish(new Update(
             sprintf('game-%s', $room->getId()),
