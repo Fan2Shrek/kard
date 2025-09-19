@@ -5,6 +5,7 @@ namespace App\Service\GameManager;
 use App\Entity\Result;
 use App\Entity\Room;
 use App\Enum\GameStatusEnum;
+use App\Event\GameFinishedEvent;
 use App\Model\Card\Card;
 use App\Model\Card\Hand;
 use App\Model\GameContext;
@@ -21,8 +22,8 @@ use App\Service\GameManager\GameMode\SetupGameModeInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 final class GameManager implements ServiceSubscriberInterface
@@ -43,10 +44,10 @@ final class GameManager implements ServiceSubscriberInterface
     public static function getSubscribedServices(): array
     {
         return [
-            'router' => RouterInterface::class,
             'result_repository' => ResultRepository::class,
             'card_generator' => CardGenerator::class,
             'user_repository' => UserRepository::class,
+            'event_dispatcher' => EventDispatcherInterface::class,
         ];
     }
 
@@ -175,17 +176,6 @@ final class GameManager implements ServiceSubscriberInterface
         ));
 
         if ($gameMode->isGameFinished($ctx)) {
-            $this->hub->publish(new Update(
-                sprintf('room-%s', $room->getId()),
-                $this->serializer->serialize([
-                    'action' => 'end',
-                    'data' => [
-                        'context' => $ctx,
-                        'url' => $this->container->get('router')->generate('home'),
-                    ],
-                ], 'json'),
-            ));
-
             $room->setStatus(GameStatusEnum::FINISHED);
 
             $result = new Result(
@@ -196,6 +186,8 @@ final class GameManager implements ServiceSubscriberInterface
                 $this->handRepository->deleteAllHandForRoom($room);
             }
             $this->gameContextProvider->clear($room);
+
+            $this->container->get('event_dispatcher')->dispatch(new GameFinishedEvent($room, $ctx));
             $this->container->get('result_repository')->save($result);
 
             return;
