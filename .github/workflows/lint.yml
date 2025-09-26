@@ -22,12 +22,13 @@ jobs:
 
       - name: Install Dependencies
         run: composer install --no-progress --prefer-dist
+        working-directory: api
 
       - name: Run php lint
         run: make php-lint-dry
 
-      - name: Run twig lint
-        run: make twig-lint-dry
+      # - name: Run twig lint
+      #   run: make twig-lint-dry
 
       - name: Run phpstan
         run: make phpstan

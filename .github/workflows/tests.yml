@@ -23,9 +23,12 @@ jobs:
 
       - name: Install Dependencies
         run: composer install --no-progress --prefer-dist
+        working-directory: api
 
       - name: Run tests
         run: ${PHP} vendor/bin/pest --parallel
+        working-directory: api
 
       - name: Run mutation testing
         run: ${PHP} vendor/bin/pest --mutate --parallel --min=100
+        working-directory: api
