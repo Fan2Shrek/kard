@@ -4,14 +4,14 @@ COMPOSE=$(shell which docker) compose
 ifeq ($(WITH_DOCKER), 1)
 	PHP=$(COMPOSE) exec php
 else
-	PHP=
+	PHP=cd api &&
 endif
 
 CONSOLE=$(PHP) php bin/console
 
 .PHONY: start up vendor db fixtures cc assets assets-watch stop perm php-lint twig-lint migration sh phpstan
 
-PHP_FIXER=$(PHP) sh -c 'PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix --config=./.devops/.php-cs-fixer.php'
+PHP_FIXER=$(PHP) sh -c 'PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php'
 TWIG_FIXER=$(PHP) vendor/bin/twig-cs-fixer --config=./.devops/.twig-cs-fixer.php
 
 start: up vendor db cc assets perm
