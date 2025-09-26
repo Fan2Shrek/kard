@@ -16,6 +16,9 @@ TWIG_FIXER=$(PHP) vendor/bin/twig-cs-fixer --config=./.devops/.twig-cs-fixer.php
 
 start: up vendor db cc assets perm
 
+install: start
+	$(MAKE) jwt
+
 up:
 	docker kill $$(docker ps -q) || true
 	$(COMPOSE) build --force-rm
@@ -79,3 +82,6 @@ twig-lint:
 
 twig-lint-dry:
 	$(TWIG_FIXER) --report=github
+
+jwt:
+	$(CONSOLE) lexik:jwt:generate-keypair --overwrite
