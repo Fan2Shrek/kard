@@ -13,8 +13,7 @@ services:
 
   php:
     build:
-      context: .
-      dockerfile: .devops/docker/Dockerfile
+      context: ./api
       target: ${BUILD_TARGET:-dev}
     image: ghcr.io/fan2shrek/kard:${VERSION:-latest}
     ports:

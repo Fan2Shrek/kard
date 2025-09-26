@@ -20,7 +20,7 @@ RUN apk add --no-cache \
     nginx-mod-http-zstd \
     multirun
 
-COPY .devops/docker/default.conf /etc/nginx/http.d/default.conf
+COPY ./nginx.conf /etc/nginx/http.d/default.conf
 
 COPY . /app
 WORKDIR /app
