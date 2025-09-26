@@ -21,7 +21,7 @@ services:
       - "8000:80"
     working_dir: /app
     volumes:
-      - .:/app
+      - ./api:/app
 
   redis:
     image: redis:7
