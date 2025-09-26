@@ -1,10 +1,12 @@
-# Kard
+# Préparation de la V2 de Kard
+TODO:
 
-Kard est un jeu de cartes en ligne. Il permet de jouer à plusieurs jeux de cartes en direct avec d'autres joueurs.
-
-## Contexte
-
-Devoir pour l'ESGI et @BaptisteVasseur ([sujet](https://github.com/BaptisteVasseur/cours-symfony/blob/main/sujet-projet-symfony.md))
+- [ ] Faire le front
+- [ ] Adapter les controller en mode api
+- [ ] Refactorer le code lié aux jeux
+- [ ] Refaire les tests
+- [ ] Si possible: ajouter les replays
+- [ ] Si replay fait: tests sur avec des replays
 
 ## Installation
 
@@ -23,13 +25,3 @@ make start
 | banned | aaa      | ROLE_BANNED |
 
 Ensuite allez sur [localhost:8000](http://localhost:8000) et vous êtes prêt à jouer !
-
-## Stack technique
-
-- Symfony 7
-- React (avec Symfony UX)
-- Stimulus
-- Turbo
-- Mercure
-- Docker
-- EasyAdmin
