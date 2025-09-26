@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Security;
 
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 final class JWTAuthenticationSuccessHandler
@@ -18,14 +18,14 @@ final class JWTAuthenticationSuccessHandler
         $this->jwtManager = $jwtManager;
     }
 
-    public function __invoke(UserInterface $user, string $firewallName, array $data): JsonResponse
+    public function __invoke(UserInterface $user): JsonResponse
     {
         $token = $this->jwtManager->create($user);
 
         $response = new JsonResponse(['success' => true]);
 
         $response->headers->setCookie(
-            Cookie::create('auth_token', $token, time() + 3600, '/', null, true, true, false, 'Strict')
+            Cookie::create('auth_token', $token, time() + 3600, '/', null, true, true, false, 'strict')
         );
 
         return $response;

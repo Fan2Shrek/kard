@@ -4,13 +4,12 @@ on:
   push:
   pull_request:
 
+env:
+  WITH_DOCKER: 0
+
 jobs:
   validate:
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: front
 
     steps:
       - name: Checkout repository
@@ -24,10 +23,10 @@ jobs:
           cache-dependency-path: front/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: make npm-ci
 
       - name: Lint
-        run: npm run lint
+        run: make js-lint-dry
 
       - name: Build the app
-        run: npm run build
+        run: make front-build

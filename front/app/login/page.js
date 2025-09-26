@@ -1,19 +1,35 @@
-'use client';
+"use client";
 
-import api from "@/lib/api/api";
 import { useState } from "react";
+import api from "@/lib/api/api";
+
+import styles from "./page.module.scss";
 
 export default () => {
-	const [login, setLogin] = useState(null);
-	const [password, setPassword] = useState(null);
+    const [login, setLogin] = useState(null);
+    const [password, setPassword] = useState(null);
 
-	const handleSubmit = () => {
-		api().user.login(login, password);
-	};
+    const handleSubmit = () => {
+        api().user.login(login, password);
+    };
 
-	return <div>
-		<input type="text" placeholder="Login" onChange={(e) => setLogin(e.target.value)} />
-		<input type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
-		<button onClick={handleSubmit}>Login</button>
-	</div>;
-}
+    return (
+        <div className={styles.login}>
+            <form>
+                <input
+                    type="text"
+                    placeholder="Nom d'utilisateur"
+                    onChange={(e) => setLogin(e.target.value)}
+                />
+                <input
+                    type="password"
+                    placeholder="Mot de passe"
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+                <button type="button" onClick={handleSubmit}>
+                    Se connecter
+                </button>
+            </form>
+        </div>
+    );
+};

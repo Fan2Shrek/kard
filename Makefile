@@ -6,8 +6,13 @@ ifeq ($(WITH_DOCKER), 1)
 else
 	PHP=cd api &&
 endif
-
 CONSOLE=$(PHP) php bin/console
+
+ifeq ($(WITH_DOCKER), 1)
+	NPM=$(COMPOSE) exec front npm
+else
+	NPM=cd front && npm
+endif
 
 .PHONY: start up vendor db fixtures cc assets assets-watch stop perm php-lint twig-lint migration sh phpstan
 
@@ -82,6 +87,18 @@ twig-lint:
 
 twig-lint-dry:
 	$(TWIG_FIXER) --report=github
+
+js-lint:
+	$(NPM) run format
+
+js-lint-dry:
+	$(NPM) run lint
+
+npm-ci:
+	$(NPM) ci
+
+front-build:
+	$(NPM) run build
 
 jwt:
 	$(CONSOLE) lexik:jwt:generate-keypair --overwrite
