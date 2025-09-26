@@ -36,8 +36,8 @@ services:
 
   node:
     image: node:24-alpine
-    ports:
-      - "3000:3000"
+    # ports:
+    #   - "3000:3000"
     volumes:
       - ./assets/react/:/app
     working_dir: /app/build

@@ -5,3 +5,11 @@ lexik_jwt_authentication:
 
     api_platform:
         check_path: /api/login
+
+    token_extractors:
+        cookie:
+            enabled: true
+            name: auth_token
+
+    set_cookies:
+        auth_token: ~
