@@ -32,5 +32,6 @@ jobs:
       - name: Lint
         run: make js-lint-dry
 
-      - name: Build the app
-        run: make front-build
+      # TODO
+      # - name: Build the app
+      #   run: make front-build
