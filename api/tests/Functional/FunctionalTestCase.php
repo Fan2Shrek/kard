@@ -8,6 +8,7 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Symfony\Bundle\Test\Client;
 use App\Entity\User;
 use App\Tests\Functional\User\UserTrait;
+use App\Tests\There\ThereIs;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -28,6 +29,7 @@ class FunctionalTestCase extends ApiTestCase
         $this->client->disableReboot();
 
         static::getContainer()->get(Connection::class)->beginTransaction();
+        ThereIs::setContainer(static::getContainer());
 
         if (static::$requestsWithAuthentication) {
             $this->client->loginUser($this->currentUser = $this->createUser());

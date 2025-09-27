@@ -1,0 +1,33 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Tests\There\Resources;
+
+use App\Entity\User;
+
+/**
+ * @extends AbstractBuilder<User>
+ */
+final class UserBuilder extends AbstractBuilder
+{
+    public const string DEFAULT_PASSWORD = 'password';
+
+    public function __construct($container)
+    {
+        parent::__construct($container, User::class);
+    }
+
+    protected function getParams(): array
+    {
+        return [
+            'username' => 'user_'.uniqid(),
+            'email' => 'user_'.uniqid().'@there.test',
+        ];
+    }
+
+    protected function afterBuild(object $entity): void
+    {
+        $entity->setPassword($this->container->get('security.password_hasher')->hashPassword($entity, self::DEFAULT_PASSWORD));
+    }
+}

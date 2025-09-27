@@ -3,5 +3,5 @@ const getSSRValue = (CSRValue, SSRValue) =>
 
 export const API_URL = getSSRValue(
     process.env.NEXT_PUBLIC_API_URL,
-    process.env.API_URL,
+    process.env.API_SSR_URL,
 );

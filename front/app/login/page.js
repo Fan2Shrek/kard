@@ -10,7 +10,7 @@ export default () => {
     const [password, setPassword] = useState(null);
 
     const handleSubmit = () => {
-        api().user.login(login, password);
+        api().user().login(login, password);
     };
 
     return (

@@ -2,6 +2,10 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\QueryParameter;
 use App\Enum\GameStatusEnum;
 use App\Model\Player;
 use App\Repository\RoomRepository;
@@ -12,7 +16,17 @@ use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 use Ramsey\Uuid\UuidInterface;
 
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            parameters: [
+                'status' => new QueryParameter(filter: new ExactFilter()),
+            ],
+        ),
+    ],
+)]
 #[ORM\Entity(repositoryClass: RoomRepository::class)]
+// todo add owner in __construct
 class Room
 {
     #[ORM\Id]

@@ -1,8 +1,6 @@
 <?php
 
-use Doctrine\DBAL\DriverManager;
 use Symfony\Component\Dotenv\Dotenv;
-use Doctrine\ORM\Tools\SchemaTool;
 
 require dirname(__DIR__).'/vendor/autoload.php';
 

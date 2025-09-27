@@ -106,3 +106,5 @@ front-build:
 
 jwt:
 	$(CONSOLE) lexik:jwt:generate-keypair --overwrite
+
+lint: php-lint js-lint
