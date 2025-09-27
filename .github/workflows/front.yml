@@ -2,8 +2,8 @@ name: Validate front Build
 
 on:
   push:
-    paths:
-      - 'front/**'
+    # paths:
+    #   - 'front/**'
   pull_request:
     paths:
       - 'front/**'
@@ -32,6 +32,40 @@ jobs:
       - name: Lint
         run: make js-lint-dry
 
-      # TODO
-      # - name: Build the app
-      #   run: make front-build
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      DOCKER_TARGET: test
+      COMPOSE_COMMAND: docker compose
+
+    services:
+      docker:
+        image: docker:20.10.24
+        options: --privileged
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Up containers
+        run: ${COMPOSE_COMMAND} up -d php db
+
+      - name: Set up Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
+      - name: Setup containers
+        run: |
+          ${COMPOSE_COMMAND} exec php composer install
+          ${COMPOSE_COMMAND} exec php bin/console doctrine:database:create --if-not-exists
+          ${COMPOSE_COMMAND} exec php bin/console doctrine:schema:update --force
+
+      - name: Install deps
+        run: cd front && npm i
+
+      - name: Build the app
+        run: make front-build
