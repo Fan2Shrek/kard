@@ -2,7 +2,11 @@ name: Validate front Build
 
 on:
   push:
+    paths:
+      - 'front/**'
   pull_request:
+    paths:
+      - 'front/**'
 
 env:
   WITH_DOCKER: 0

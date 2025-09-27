@@ -14,22 +14,20 @@ export default () => {
     };
 
     return (
-        <div className={styles.login}>
-            <form>
-                <input
-                    type="text"
-                    placeholder="Nom d'utilisateur"
-                    onChange={(e) => setLogin(e.target.value)}
-                />
-                <input
-                    type="password"
-                    placeholder="Mot de passe"
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-                <button type="button" onClick={handleSubmit}>
-                    Se connecter
-                </button>
-            </form>
-        </div>
+        <form className={styles.login}>
+            <input
+                type="text"
+                placeholder="Nom d'utilisateur"
+                onChange={(e) => setLogin(e.target.value)}
+            />
+            <input
+                type="password"
+                placeholder="Mot de passe"
+                onChange={(e) => setPassword(e.target.value)}
+            />
+            <button type="button" onClick={handleSubmit}>
+                Se connecter
+            </button>
+        </form>
     );
 };
