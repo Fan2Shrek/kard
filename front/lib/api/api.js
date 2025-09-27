@@ -38,6 +38,7 @@ class Api {
             headers: {
                 "Content-Type": "application/json",
             },
+            cache: "no-store",
         };
 
         if (body) {
