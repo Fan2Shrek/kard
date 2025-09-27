@@ -1,18 +1,29 @@
 import { API_URL } from "../env";
+import { RoomResource } from "./resources/game";
 import UserResource from "./resources/user";
 
 class Api {
     constructor(baseUrl) {
         this.baseUrl = baseUrl;
 
-        this.user = new UserResource(this);
+        this.userResource = new UserResource(this);
+        this.roomResource = new RoomResource(this);
     }
 
     user() {
-        return this.user;
+        return this.roomResource;
     }
 
-    async get(url) {
+    room() {
+        return this.roomResource;
+    }
+
+    async get(url, filters = {}) {
+        if (filters && Object.keys(filters).length > 0) {
+            const queryString = new URLSearchParams(filters).toString();
+            url += `?${queryString}`;
+        }
+
         return this._request("GET", url);
     }
 

@@ -3,8 +3,8 @@ export default class Resource {
         this.client = client;
     }
 
-    async get(url) {
-        return await this.client.get(url);
+    async get(url, filters = {}) {
+        return await this.client.get(url, filters);
     }
 
     async post(url, body) {

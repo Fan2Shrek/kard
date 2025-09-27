@@ -1,10 +1,16 @@
 import Image from "next/image";
+import api from "@/lib/api/api";
 import styles from "./page.module.css";
 
-export default function Home() {
+export default async function Home() {
+    const rooms = await api().room().getAll({ status: "waiting" });
+
     return (
         <div className={styles.page}>
             <h1>Kard Kard Kard Kard Kard</h1>
+            {rooms.member.map((room) => (
+                <p key={room.id}>{room.owner.username}</p>
+            ))}
             <main className={styles.main}>
                 <Image
                     className={styles.logo}

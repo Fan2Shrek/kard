@@ -1,9 +1,9 @@
 <?php
 
 use App\Model\Player;
+use App\Tests\Functional\FunctionalTestCase;
 use Pest\Expectation;
 use Symfony\Component\Mercure\Update;
-use App\Tests\Functional\FunctionalTestCase;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /*
@@ -18,7 +18,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 */
 
 // pest()->extend(Tests\TestCase::class)->in('Feature');
-pest()->extend(FunctionalTestCase::class)->in('Functional');
+pest()->extend(FunctionalTestCase::class)->group('Functional')->in('Functional');
 pest()->group('GameMode')->in('Feature/GameMode');
 
 /*
@@ -68,27 +68,35 @@ expect()->extend('toHaveWinner', function (Player|string $player) {
 });
 
 expect()->extend('toBeSuccessful', function () {
-	if (!$this->value instanceof ResponseInterface) {
-		throw new InvalidArgumentException('The value must be an instance of ResponseInterface');
-	}
+    if (!$this->value instanceof ResponseInterface) {
+        throw new InvalidArgumentException('The value must be an instance of ResponseInterface');
+    }
 
     expect($this->value->getStatusCode())->toBe(200);
 });
 
 expect()->extend('toHaveStatusCode', function (int $code) {
-	if (!$this->value instanceof ResponseInterface) {
-		throw new InvalidArgumentException('The value must be an instance of ResponseInterface');
-	}
+    if (!$this->value instanceof ResponseInterface) {
+        throw new InvalidArgumentException('The value must be an instance of ResponseInterface');
+    }
 
     expect($this->value->getStatusCode(false))->toBe($code);
 });
 
 expect()->extend('toHaveHeader', function (string $header) {
-	if (!$this->value instanceof ResponseInterface) {
-		throw new InvalidArgumentException('The value must be an instance of ResponseInterface');
-	}
+    if (!$this->value instanceof ResponseInterface) {
+        throw new InvalidArgumentException('The value must be an instance of ResponseInterface');
+    }
 
-	expect($this->value->getHeaders(false))->toHaveKey($header);
+    expect($this->value->getHeaders(false))->toHaveKey($header);
+});
+
+expect()->intercept('toHaveCount', ResponseInterface::class, function (int $count) {
+    if (!$this->value instanceof ResponseInterface) {
+        throw new InvalidArgumentException('The value must be an instance of ResponseInterface');
+    }
+
+    expect($this->value->toArray()['member'])->toHaveCount($count);
 });
 
 /*
@@ -111,6 +119,6 @@ function expectMercureMessage(Update $update): Expectation
 
 function commitDTB(): never
 {
-	\DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver::commit();
-    die;
+    DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver::commit();
+    exit;
 }
