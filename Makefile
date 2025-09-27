@@ -73,6 +73,10 @@ perm:
 	sudo chown -R www-data:$(USER) ./var ./public/
 	sudo chmod -R g+rwx .
 
+pretests:
+	$(MAKE) db
+	$(CONSOLE) lexik:jwt:generate-keypair --overwrite -n -etest
+
 sh:
 	$(PHP) sh
 

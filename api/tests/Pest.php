@@ -1,5 +1,11 @@
 <?php
 
+use App\Model\Player;
+use Pest\Expectation;
+use Symfony\Component\Mercure\Update;
+use App\Tests\Functional\FunctionalTestCase;
+use Symfony\Contracts\HttpClient\ResponseInterface;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -12,6 +18,8 @@
 */
 
 // pest()->extend(Tests\TestCase::class)->in('Feature');
+pest()->extend(FunctionalTestCase::class)->in('Functional');
+pest()->group('GameMode')->in('Feature/GameMode');
 
 /*
 |--------------------------------------------------------------------------
@@ -23,10 +31,6 @@
 | to assert different things. Of course, you may extend the Expectation API at any time.
 |
 */
-
-use App\Model\Player;
-use Pest\Expectation;
-use Symfony\Component\Mercure\Update;
 
 expect()->extend('toBeAction', function (string $type) {
     if (!\is_array($this->value)) {
@@ -63,6 +67,30 @@ expect()->extend('toHaveWinner', function (Player|string $player) {
     expect($this->value->getWinner()->username)->toBe($player);
 });
 
+expect()->extend('toBeSuccessful', function () {
+	if (!$this->value instanceof ResponseInterface) {
+		throw new InvalidArgumentException('The value must be an instance of ResponseInterface');
+	}
+
+    expect($this->value->getStatusCode())->toBe(200);
+});
+
+expect()->extend('toHaveStatusCode', function (int $code) {
+	if (!$this->value instanceof ResponseInterface) {
+		throw new InvalidArgumentException('The value must be an instance of ResponseInterface');
+	}
+
+    expect($this->value->getStatusCode(false))->toBe($code);
+});
+
+expect()->extend('toHaveHeader', function (string $header) {
+	if (!$this->value instanceof ResponseInterface) {
+		throw new InvalidArgumentException('The value must be an instance of ResponseInterface');
+	}
+
+	expect($this->value->getHeaders(false))->toHaveKey($header);
+});
+
 /*
 |--------------------------------------------------------------------------
 | Functions
@@ -79,4 +107,10 @@ function expectMercureMessage(Update $update): Expectation
     $data = $update->getData();
 
     return expect(json_decode($data, true));
+}
+
+function commitDTB(): never
+{
+	\DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver::commit();
+    die;
 }

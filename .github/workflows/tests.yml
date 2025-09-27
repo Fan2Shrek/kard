@@ -3,6 +3,8 @@ name: PHP tests
 on:
   push:
   pull_request:
+    paths:
+      - 'api/**'
 
 env:
   PHP: php
@@ -10,6 +12,20 @@ env:
 jobs:
   tests:
     runs-on: ubuntu-latest
+
+    env:
+      WITH_DOCKER: 0
+      DATABASE_URL: mysql://root:root@127.0.0.1:3306/app?serverVersion=10.4.34-MariaDB&charset=utf8mb4
+      APP_ENV: test
+
+    services:
+      mariadb:
+        image: mariadb:10.4
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: app
 
     steps:
       - name: Checkout code
@@ -25,10 +41,17 @@ jobs:
         run: composer install --no-progress --prefer-dist
         working-directory: api
 
+      - name: Run pretests
+        run: make pretests
+
       - name: Run tests
-        run: ${PHP} vendor/bin/pest --parallel
+        run: ${PHP} vendor/bin/pest --exclude-group=GameMode
+        working-directory: api
+
+      - name: Run GameMode tests
+        run: ${PHP} vendor/bin/pest --parallel --group=GameMode
         working-directory: api
 
       - name: Run mutation testing
-        run: ${PHP} vendor/bin/pest --mutate --parallel --min=100
+        run: ${PHP} vendor/bin/pest --mutate --parallel --min=100 --group=GameMode
         working-directory: api
