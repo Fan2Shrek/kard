@@ -14,12 +14,12 @@ else
 	NPM=cd front && npm
 endif
 
-.PHONY: start up vendor db fixtures cc assets assets-watch stop perm php-lint twig-lint migration sh phpstan
+.PHONY: start up vendor db db-data fixtures cc assets assets-watch stop perm php-lint twig-lint migration sh phpstan
 
 PHP_FIXER=$(PHP) sh -c 'PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php'
 TWIG_FIXER=$(PHP) vendor/bin/twig-cs-fixer --config=./.devops/.twig-cs-fixer.php
 
-start: up vendor db cc assets perm
+start: up vendor db-data cc assets perm
 
 install: start
 	$(MAKE) jwt
@@ -49,6 +49,8 @@ db:
 	$(CONSOLE) d:d:d --if-exists --force
 	$(CONSOLE) d:d:c --if-not-exists
 	$(CONSOLE) d:m:m --allow-no-migration -n
+
+db-data: db
 	$(MAKE) fixtures
 	$(CONSOLE) app:data:init
 

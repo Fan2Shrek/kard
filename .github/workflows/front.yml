@@ -2,8 +2,8 @@ name: Validate front Build
 
 on:
   push:
-    # paths:
-    #   - 'front/**'
+    paths:
+      - 'front/**'
   pull_request:
     paths:
       - 'front/**'
