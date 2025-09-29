@@ -11,7 +11,7 @@ class Api {
     }
 
     user() {
-        return this.roomResource;
+        return this.userResource;
     }
 
     room() {
