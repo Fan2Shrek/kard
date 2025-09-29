@@ -12,46 +12,55 @@ use App\Tests\There\ThereIs;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class FunctionalTestCase extends ApiTestCase
 {
-    use JsonAssertionTrait;
-    use UserTrait;
+	use JsonAssertionTrait;
+	use UserTrait;
 
-    protected static ?bool $alwaysBootKernel = true;
-    protected static bool $requestsWithAuthentication = false;
-    protected Client $client;
-    private ?User $currentUser = null;
+	public static PropertyAccessor $propertyAccessor;
 
-    protected function setUp(): void
-    {
-        $this->client = self::createClient();
-        $this->client->disableReboot();
+	protected static ?bool $alwaysBootKernel = true;
+	protected static bool $requestsWithAuthentication = false;
+	protected Client $client;
 
-        static::getContainer()->get(Connection::class)->beginTransaction();
-        ThereIs::setContainer(static::getContainer());
+	private ?User $currentUser = null;
 
-        if (static::$requestsWithAuthentication) {
-            $this->client->loginUser($this->currentUser = $this->createUser());
-        }
+	protected function setUp(): void
+	{
+		$this->client = self::createClient();
+		$this->client->disableReboot();
+		self::$propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
+			->enableExceptionOnInvalidIndex()
+			->getPropertyAccessor()
+		;
 
-        parent::setUp();
-    }
+		static::getContainer()->get(Connection::class)->beginTransaction();
+		ThereIs::setContainer(static::getContainer());
 
-    protected function tearDown(): void
-    {
-        static::getContainer()->get(Connection::class)->rollBack();
+		if (static::$requestsWithAuthentication) {
+			$this->client->loginUser($this->currentUser = $this->createUser());
+		}
 
-        parent::tearDown();
-    }
+		parent::setUp();
+	}
 
-    protected static function getEM(): EntityManagerInterface
-    {
-        return static::getContainer()->get(ManagerRegistry::class)->getManager();
-    }
+	protected function tearDown(): void
+	{
+		static::getContainer()->get(Connection::class)->rollBack();
 
-    protected function getCurrentUser(): ?User
-    {
-        return $this->currentUser;
-    }
+		parent::tearDown();
+	}
+
+	protected static function getEM(): EntityManagerInterface
+	{
+		return static::getContainer()->get(ManagerRegistry::class)->getManager();
+	}
+
+	protected function getCurrentUser(): ?User
+	{
+		return $this->currentUser;
+	}
 }

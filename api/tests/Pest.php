@@ -91,6 +91,17 @@ expect()->extend('toHaveHeader', function (string $header) {
     expect($this->value->getHeaders(false))->toHaveKey($header);
 });
 
+expect()->intercept('toMatch', ResponseInterface::class, function (string $property, mixed $value) {
+    if (!$this->value instanceof ResponseInterface) {
+        throw new InvalidArgumentException('The value must be an instance of ResponseInterface');
+    }
+
+	expect(FunctionalTestCase::$propertyAccessor->getValue(
+		$this->value->toArray(false)['member'],
+		$property
+	))->toBe($value);
+});
+
 expect()->intercept('toHaveCount', ResponseInterface::class, function (int $count) {
     if (!$this->value instanceof ResponseInterface) {
         throw new InvalidArgumentException('The value must be an instance of ResponseInterface');

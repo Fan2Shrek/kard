@@ -41,6 +41,9 @@ abstract class AbstractBuilder
         return [];
     }
 
+    /**
+     * @param T $entity
+     */
     protected function afterBuild(object $entity): void
     {
     }

@@ -23,6 +23,11 @@ final class ThereIs
         return new Resources\UserBuilder(self::$container);
     }
 
+	public static function aResult(): Resources\ResultBuilder
+	{
+		return new Resources\ResultBuilder(self::$container);
+	}
+
     public static function aRoom(): Resources\RoomBuilder
     {
         return new Resources\RoomBuilder(self::$container);

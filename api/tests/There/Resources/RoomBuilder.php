@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\There\Resources;
 
 use App\Entity\Room;
+use App\Entity\User;
 use App\Enum\GameStatusEnum;
 use App\Tests\There\ThereIs;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -15,6 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 final class RoomBuilder extends AbstractBuilder
 {
     private GameStatusEnum $status = GameStatusEnum::WAITING;
+	private ?User $owner = null;
+	private array $participants = [];
 
     public function __construct(ContainerInterface $container)
     {
@@ -32,6 +35,21 @@ final class RoomBuilder extends AbstractBuilder
         return $this;
     }
 
+	public function withOwner(User $owner): self
+	{
+		$this->owner = $owner;
+		$this->addParticipant($owner);
+
+		return $this;
+	}
+
+	public function addParticipant(User $participant): self
+	{
+		$this->participants[] = $participant;
+
+		return $this;
+	}
+
     protected function getParams(): array
     {
         return [
@@ -42,6 +60,9 @@ final class RoomBuilder extends AbstractBuilder
 
     protected function afterBuild(object $entity): void
     {
-        $entity->setOwner(ThereIs::aUser()->build());
+        $entity->setOwner($this->owner ??= ThereIs::aUser()->build());
+		foreach ($this->participants as $participant) {
+			$entity->addParticipant($participant);
+		}
     }
 }
