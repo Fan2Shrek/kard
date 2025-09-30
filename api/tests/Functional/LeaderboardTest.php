@@ -4,7 +4,7 @@ use App\Tests\There\ThereIs;
 
 describe('Leaderboard', function () {
     test('Il est possible de voir le leaderbaord', function () {
-		ThereIs::aUser()->build();
+		ThereIs::a()->User()->build();
 
 		$response = $this->client->request('GET', '/api/leaderboard');
 
@@ -12,8 +12,7 @@ describe('Leaderboard', function () {
     });
 
     test('Chaque utilisateur apparait', function () {
-		ThereIs::aUser()->build();
-		ThereIs::aUser()->build();
+		ThereIs::some(2)->User()->build();
 
 		$response = $this->client->request('GET', '/api/leaderboard');
 
@@ -21,7 +20,7 @@ describe('Leaderboard', function () {
     });
 
     test("Le nom d'utilisateur est renvoyé", function () {
-		ThereIs::aUser()->withUsername('Gorillaz')->build();
+		ThereIs::a()->User()->withUsername('Gorillaz')->build();
 
 		$response = $this->client->request('GET', '/api/leaderboard');
 
@@ -29,8 +28,8 @@ describe('Leaderboard', function () {
     });
 
     test("Le nombre de victoire est renvoyée", function () {
-		$user = ThereIs::aUser()->build();
-		ThereIs::aResult()->withWinner($user)->build();
+		$user = ThereIs::a()->User()->build();
+		ThereIs::a()->Result()->withWinner($user)->build();
 
 		$response = $this->client->request('GET', '/api/leaderboard');
 
@@ -38,9 +37,9 @@ describe('Leaderboard', function () {
     });
 
     test("Le nombre de partie jouée est renvoyée", function () {
-		$user = ThereIs::aUser()->build();
-		ThereIs::aRoom()->withStatus('finished')->withOwner($user)->build();
-		ThereIs::aRoom()->withStatus('finished')->withOwner($user)->build();
+		$user = ThereIs::a()->User()->build();
+		ThereIs::a()->Room()->withStatus('finished')->withOwner($user)->build();
+		ThereIs::a()->Room()->withStatus('finished')->withOwner($user)->build();
 
 		$response = $this->client->request('GET', '/api/leaderboard');
 
@@ -48,9 +47,9 @@ describe('Leaderboard', function () {
     });
 
     test('Seules les parties finis sont comptés', function () {
-		$user = ThereIs::aUser()->build();
-		ThereIs::aRoom()->withStatus('finished')->withOwner($user)->build();
-		ThereIs::aRoom()->withStatus('waiting')->withOwner($user)->build();
+		$user = ThereIs::a()->User()->build();
+		ThereIs::a()->Room()->withStatus('finished')->withOwner($user)->build();
+		ThereIs::a()->Room()->withStatus('waiting')->withOwner($user)->build();
 
 		$response = $this->client->request('GET', '/api/leaderboard');
 
@@ -58,12 +57,12 @@ describe('Leaderboard', function () {
     });
 
     test('Le ratio de victoire est renvoyé', function () {
-		$user = ThereIs::aUser()->build();
-		$seconUser = ThereIs::aUser()->build();
-		ThereIs::aResult()->withWinner($user)->build();
-		$room = ThereIs::aRoom()->withStatus('finished')->withOwner($user)->addParticipant($seconUser)->build();
-		ThereIs::aResult()->withWinner($seconUser)->withRoom($room)->build();
-		ThereIs::aResult()->withWinner($seconUser)->withRoom($room)->build();
+		$user = ThereIs::a()->User()->build();
+		$seconUser = ThereIs::a()->User()->build();
+		ThereIs::a()->Result()->withWinner($user)->build();
+		$room = ThereIs::a()->Room()->withStatus('finished')->withOwner($user)->addParticipant($seconUser)->build();
+		ThereIs::a()->Result()->withWinner($seconUser)->withRoom($room)->build();
+		ThereIs::a()->Result()->withWinner($seconUser)->withRoom($room)->build();
 
 		$response = $this->client->request('GET', '/api/leaderboard');
 
@@ -71,11 +70,11 @@ describe('Leaderboard', function () {
     });
 
 	test('Le classement se fait en fonction du nombre de vitoire', function () {
-		$user = ThereIs::aUser()->withUsername('Eminem')->build();
-		$seconUser = ThereIs::aUser()->withUsername('Without me')->build();
-		ThereIs::aResult()->withWinner($user)->build();
-		ThereIs::aResult()->withWinner($user)->build();
-		ThereIs::aResult()->withWinner($seconUser)->build();
+		$user = ThereIs::a()->User()->withUsername('Eminem')->build();
+		$seconUser = ThereIs::a()->User()->withUsername('Without me')->build();
+		ThereIs::a()->Result()->withWinner($user)->build();
+		ThereIs::a()->Result()->withWinner($user)->build();
+		ThereIs::a()->Result()->withWinner($seconUser)->build();
 
 		$response = $this->client->request('GET', '/api/leaderboard');
 
@@ -84,21 +83,7 @@ describe('Leaderboard', function () {
 	});
 
 	test('Le classement se limite à 10 joueurs', function () {
-		ThereIs::aUser()->build();
-		ThereIs::aUser()->build();
-		ThereIs::aUser()->build();
-		ThereIs::aUser()->build();
-		ThereIs::aUser()->build();
-		ThereIs::aUser()->build();
-		ThereIs::aUser()->build();
-		ThereIs::aUser()->build();
-		ThereIs::aUser()->build();
-		ThereIs::aUser()->build();
-		ThereIs::aUser()->build();
-		ThereIs::aUser()->build();
-		ThereIs::aUser()->build();
-		ThereIs::aUser()->build();
-		ThereIs::aUser()->build();
+		ThereIs::some(12)->User()->build();
 
 		$response = $this->client->request('GET', '/api/leaderboard');
 
