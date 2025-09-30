@@ -22,8 +22,8 @@ final class ResultBuilder extends AbstractBuilder
 	public function getParams(): array
 	{
 		return [
-			'winner' => $this->winner ??= ThereIs::aUser()->build(),
-			'room' => $this->room ??= ThereIs::aRoom()->withStatus('finished')->withOwner($this->winner)->build(),
+			'winner' => $this->winner ??= ThereIs::a()->User()->build(),
+			'room' => $this->room ??= ThereIs::a()->Room()->withStatus('finished')->withOwner($this->winner)->build(),
 		];
 	}
 

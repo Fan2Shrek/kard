@@ -53,14 +53,14 @@ final class RoomBuilder extends AbstractBuilder
     protected function getParams(): array
     {
         return [
-            'gameMode' => ThereIs::aGameMode()->build(),
+            'gameMode' => ThereIs::a()->GameMode()->build(),
             'status' => $this->status,
         ];
     }
 
     protected function afterBuild(object $entity): void
     {
-        $entity->setOwner($this->owner ??= ThereIs::aUser()->build());
+        $entity->setOwner($this->owner ??= ThereIs::a()->User()->build());
 		foreach ($this->participants as $participant) {
 			$entity->addParticipant($participant);
 		}
