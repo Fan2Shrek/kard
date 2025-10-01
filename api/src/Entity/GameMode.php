@@ -2,11 +2,19 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use App\Api\State\Provider\GameModeProvider;
 use App\Repository\GameModeRepository;
 use App\Service\GameManager\GameMode\GameModeEnum;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: GameModeRepository::class)]
+#[ApiResource(operations: [
+    new GetCollection(
+        provider: GameModeProvider::class,
+    ),
+])]
 class GameMode
 {
     #[ORM\Id]

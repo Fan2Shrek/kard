@@ -16,8 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 final class RoomBuilder extends AbstractBuilder
 {
     private GameStatusEnum $status = GameStatusEnum::WAITING;
-	private ?User $owner = null;
-	private array $participants = [];
+    private ?User $owner = null;
+    private array $participants = [];
 
     public function __construct(ContainerInterface $container)
     {
@@ -35,20 +35,20 @@ final class RoomBuilder extends AbstractBuilder
         return $this;
     }
 
-	public function withOwner(User $owner): self
-	{
-		$this->owner = $owner;
-		$this->addParticipant($owner);
+    public function withOwner(User $owner): self
+    {
+        $this->owner = $owner;
+        $this->addParticipant($owner);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	public function addParticipant(User $participant): self
-	{
-		$this->participants[] = $participant;
+    public function addParticipant(User $participant): self
+    {
+        $this->participants[] = $participant;
 
-		return $this;
-	}
+        return $this;
+    }
 
     protected function getParams(): array
     {
@@ -61,8 +61,8 @@ final class RoomBuilder extends AbstractBuilder
     protected function afterBuild(object $entity): void
     {
         $entity->setOwner($this->owner ??= ThereIs::a()->User()->build());
-		foreach ($this->participants as $participant) {
-			$entity->addParticipant($participant);
-		}
+        foreach ($this->participants as $participant) {
+            $entity->addParticipant($participant);
+        }
     }
 }

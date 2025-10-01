@@ -12,15 +12,37 @@ use App\Service\GameManager\GameMode\GameModeEnum;
  */
 final class GameModeBuilder extends AbstractBuilder
 {
+    private bool $isActive = true;
+    private GameModeEnum $gameMode = GameModeEnum::PRESIDENT;
+
     public function __construct($container)
     {
         parent::__construct($container, GameMode::class);
     }
 
+    public function inactive(): self
+    {
+        $this->isActive = false;
+
+        return $this;
+    }
+
+    public function for(GameModeEnum $gameMode): self
+    {
+        $this->gameMode = $gameMode;
+
+        return $this;
+    }
+
     protected function getParams(): array
     {
         return [
-            GameModeEnum::PRESIDENT,
+            $this->gameMode,
         ];
+    }
+
+    protected function afterBuild(object $entity): void
+    {
+        $entity->setActive($this->isActive);
     }
 }
