@@ -9,83 +9,89 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 final class ThereIs
 {
-	private static ContainerInterface $container;
+    private static ContainerInterface $container;
 
-	private AbstractBuilder $builder;
+    private AbstractBuilder $builder;
 
-	public function __construct(
-		private int $count,
-	) {}
+    public function __construct(
+        private int $count,
+    ) {
+    }
 
-	public static function setContainer(ContainerInterface $container): void
-	{
-		self::$container = $container;
-	}
+    public static function setContainer(ContainerInterface $container): void
+    {
+        self::$container = $container;
+    }
 
-	public static function a(): self
-	{
-		return new self(1);
-	}
+    public static function a(): self
+    {
+        return new self(1);
+    }
 
-	public static function an(): self
-	{
-		return self::a();
-	}
+    public static function an(): self
+    {
+        return self::a();
+    }
 
-	public static function some(int $count): self
-	{
-		return new self($count);
-	}
+    public static function some(int $count): self
+    {
+        return new self($count);
+    }
 
-	public function GameMode()
-	{
-		return $this->assignBuilder(new Resources\GameModeBuilder(self::$container));
-	}
+    public function GameMode()
+    {
+        return $this->assignBuilder(new Resources\GameModeBuilder(self::$container));
+    }
 
-	public function User()
-	{
-		return $this->assignBuilder(new Resources\UserBuilder(self::$container));
-	}
+    public function GameModeDescription()
+    {
+        return $this->assignBuilder(new Resources\GameModeDescriptionBuilder(self::$container));
+    }
 
-	public function Result()
-	{
-		return $this->assignBuilder(new Resources\ResultBuilder(self::$container));
-	}
+    public function User()
+    {
+        return $this->assignBuilder(new Resources\UserBuilder(self::$container));
+    }
 
-	public function Room()
-	{
-		return $this->assignBuilder(new Resources\RoomBuilder(self::$container));
-	}
+    public function Result()
+    {
+        return $this->assignBuilder(new Resources\ResultBuilder(self::$container));
+    }
 
-	public function build(): object
-	{
-		for ($i = 1; $i < $this->count; $i++) {
-			$clone = clone $this->builder;
-			$clone->build();
-		}
+    public function Room()
+    {
+        return $this->assignBuilder(new Resources\RoomBuilder(self::$container));
+    }
 
-		return $this->builder->build();
-	}
+    public function build(): object
+    {
+        for ($i = 1; $i < $this->count; ++$i) {
+            $clone = clone $this->builder;
+            $clone->build();
+        }
 
-	public function __call(string $name, array $arguments): self
-	{
-		if (!isset($this->builder)) {
-			throw new \LogicException('You must call a builder method before calling any with* method.');
-		}
+        return $this->builder->build();
+    }
 
-		if (!method_exists($this->builder, $name)) {
-			throw new \BadMethodCallException(\sprintf('Method "%s" does not exist on builder "%s".', $name, get_class($this->builder)));
-		}
+    public function __call(string $name, array $arguments): self
+    {
+        if (!isset($this->builder)) {
+            throw new \LogicException('You must call a builder method before calling any with* method.');
+        }
 
-		$this->builder->$name(...$arguments);
+        if (!method_exists($this->builder, $name)) {
+            throw new \BadMethodCallException(\sprintf('Method "%s" does not exist on builder "%s".', $name, get_class($this->builder)));
+        }
 
-		return $this;
-	}
+        $this->builder->$name(...$arguments);
 
-	private function assignBuilder(AbstractBuilder $builder): self
-	{
-		$this->builder = $builder;
+        return $this;
+    }
 
-		return $this;
-	}
+    private function assignBuilder(AbstractBuilder $builder): self
+    {
+        $this->builder = $builder;
+
+        return $this;
+    }
 }

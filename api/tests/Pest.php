@@ -33,81 +33,81 @@ pest()->group('GameMode')->in('Feature/GameMode');
 */
 
 expect()->extend('toBeAction', function (string $type) {
-	if (!\is_array($this->value)) {
-		throw new InvalidArgumentException('The value must be a string');
-	}
+    if (!\is_array($this->value)) {
+        throw new InvalidArgumentException('The value must be a string');
+    }
 
-	$this->toHaveKey('action');
-	expect($this->value['action'])->toBe($type);
+    $this->toHaveKey('action');
+    expect($this->value['action'])->toBe($type);
 });
 
 expect()->extend('toBeHaveData', function (string $key, string $expected) {
-	if (!\is_array($this->value)) {
-		throw new InvalidArgumentException('The value must be a string');
-	}
+    if (!\is_array($this->value)) {
+        throw new InvalidArgumentException('The value must be a string');
+    }
 
-	$this->toHaveKey('data');
-	expect($this->value['data'])->toHaveKey($key);
-	expect($this->value['data'][$key])->toBe($expected);
+    $this->toHaveKey('data');
+    expect($this->value['data'])->toHaveKey($key);
+    expect($this->value['data'][$key])->toBe($expected);
 });
 
 expect()->extend('toHaveTurns', function (int $count) {
-	expect($this->value->getRound()->getTurns())->toHaveCount($count);
+    expect($this->value->getRound()->getTurns())->toHaveCount($count);
 });
 
 expect()->extend('toHaveNewRound', function () {
-	expect($this->value)->toHaveTurns(0);
+    expect($this->value)->toHaveTurns(0);
 });
 
 expect()->extend('toHaveWinner', function (Player|string $player) {
-	if ($player instanceof Player) {
-		$player = $player->username;
-	}
+    if ($player instanceof Player) {
+        $player = $player->username;
+    }
 
-	expect($this->value->getWinner()->username)->toBe($player);
+    expect($this->value->getWinner()->username)->toBe($player);
 });
 
 expect()->extend('toBeSuccessful', function () {
-	if (!$this->value instanceof ResponseInterface) {
-		throw new InvalidArgumentException('The value must be an instance of ResponseInterface');
-	}
+    if (!$this->value instanceof ResponseInterface) {
+        throw new InvalidArgumentException('The value must be an instance of ResponseInterface');
+    }
 
-	expect($this->value->getStatusCode())->toBe(200);
+    expect($this->value->getStatusCode())->toBe(200);
 });
 
 expect()->extend('toHaveStatusCode', function (int $code) {
-	if (!$this->value instanceof ResponseInterface) {
-		throw new InvalidArgumentException('The value must be an instance of ResponseInterface');
-	}
+    if (!$this->value instanceof ResponseInterface) {
+        throw new InvalidArgumentException('The value must be an instance of ResponseInterface');
+    }
 
-	expect($this->value->getStatusCode(false))->toBe($code);
+    expect($this->value->getStatusCode(false))->toBe($code);
 });
 
 expect()->extend('toHaveHeader', function (string $header) {
-	if (!$this->value instanceof ResponseInterface) {
-		throw new InvalidArgumentException('The value must be an instance of ResponseInterface');
-	}
+    if (!$this->value instanceof ResponseInterface) {
+        throw new InvalidArgumentException('The value must be an instance of ResponseInterface');
+    }
 
-	expect($this->value->getHeaders(false))->toHaveKey($header);
+    expect($this->value->getHeaders(false))->toHaveKey($header);
 });
 
 expect()->intercept('toMatch', ResponseInterface::class, function (string $property, mixed $value) {
-	if (!$this->value instanceof ResponseInterface) {
-		throw new InvalidArgumentException('The value must be an instance of ResponseInterface');
-	}
+    if (!$this->value instanceof ResponseInterface) {
+        throw new InvalidArgumentException('The value must be an instance of ResponseInterface');
+    }
 
-	expect(FunctionalTestCase::$propertyAccessor->getValue(
-		$this->value->toArray(false)['member'],
-		$property
-	))->toBe($value);
+    expect(FunctionalTestCase::$propertyAccessor->getValue(
+        $this->value->toArray(false)['member'],
+        $property
+    ))->toBe($value);
 });
 
 expect()->intercept('toHaveCount', ResponseInterface::class, function (int $count) {
-	if (!$this->value instanceof ResponseInterface) {
-		throw new InvalidArgumentException('The value must be an instance of ResponseInterface');
-	}
+    if (!$this->value instanceof ResponseInterface) {
+        throw new InvalidArgumentException('The value must be an instance of ResponseInterface');
+    }
 
-	expect($this->value->toArray()['member'])->toHaveCount($count);
+    expect($this->value->toArray()['member'])->toHaveCount($count);
 });
 
 /*
@@ -123,13 +123,13 @@ expect()->intercept('toHaveCount', ResponseInterface::class, function (int $coun
 
 function expectMercureMessage(Update $update): Expectation
 {
-	$data = $update->getData();
+    $data = $update->getData();
 
-	return expect(json_decode($data, true));
+    return expect(json_decode($data, true));
 }
 
 function commitDTB(): never
 {
-	DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver::commit();
-	exit;
+    DAMA\DoctrineTestBundle\Doctrine\DBAL\StaticDriver::commit();
+    exit;
 }

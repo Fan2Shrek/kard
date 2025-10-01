@@ -7,13 +7,12 @@ namespace App\Api\Model;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use App\Api\State\Provider\LeaderboardProvider;
-use App\Entity\User;
 
 #[ApiResource(operations: [
-	new Get(
-		uriTemplate: '/leaderboard',
-		provider: LeaderboardProvider::class,
-	),
+    new Get(
+        uriTemplate: '/leaderboard',
+        provider: LeaderboardProvider::class,
+    ),
 ])]
 final class Leaderboard
 {

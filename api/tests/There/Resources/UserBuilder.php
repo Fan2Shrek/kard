@@ -13,19 +13,19 @@ final class UserBuilder extends AbstractBuilder
 {
     public const string DEFAULT_PASSWORD = 'password';
 
-	private ?string $username = null;
+    private ?string $username = null;
 
     public function __construct($container)
     {
         parent::__construct($container, User::class);
     }
 
-	public function withUsername(string $username): self
-	{
-		$this->username = $username;
+    public function withUsername(string $username): self
+    {
+        $this->username = $username;
 
-		return $this;
-	}
+        return $this;
+    }
 
     protected function getParams(): array
     {

@@ -17,50 +17,50 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class FunctionalTestCase extends ApiTestCase
 {
-	use JsonAssertionTrait;
-	use UserTrait;
+    use JsonAssertionTrait;
+    use UserTrait;
 
-	public static PropertyAccessor $propertyAccessor;
+    public static PropertyAccessor $propertyAccessor;
 
-	protected static ?bool $alwaysBootKernel = true;
-	protected static bool $requestsWithAuthentication = false;
-	protected Client $client;
+    protected static ?bool $alwaysBootKernel = true;
+    protected static bool $requestsWithAuthentication = false;
+    protected Client $client;
 
-	private ?User $currentUser = null;
+    private ?User $currentUser = null;
 
-	protected function setUp(): void
-	{
-		$this->client = self::createClient();
-		$this->client->disableReboot();
-		self::$propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
-			->enableExceptionOnInvalidIndex()
-			->getPropertyAccessor()
-		;
+    protected function setUp(): void
+    {
+        $this->client = self::createClient();
+        $this->client->disableReboot();
+        self::$propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
+            ->enableExceptionOnInvalidIndex()
+            ->getPropertyAccessor()
+        ;
 
-		static::getContainer()->get(Connection::class)->beginTransaction();
-		ThereIs::setContainer(static::getContainer());
+        static::getContainer()->get(Connection::class)->beginTransaction();
+        ThereIs::setContainer(static::getContainer());
 
-		if (static::$requestsWithAuthentication) {
-			$this->client->loginUser($this->currentUser = $this->createUser());
-		}
+        if (static::$requestsWithAuthentication) {
+            $this->client->loginUser($this->currentUser = $this->createUser());
+        }
 
-		parent::setUp();
-	}
+        parent::setUp();
+    }
 
-	protected function tearDown(): void
-	{
-		static::getContainer()->get(Connection::class)->rollBack();
+    protected function tearDown(): void
+    {
+        static::getContainer()->get(Connection::class)->rollBack();
 
-		parent::tearDown();
-	}
+        parent::tearDown();
+    }
 
-	protected static function getEM(): EntityManagerInterface
-	{
-		return static::getContainer()->get(ManagerRegistry::class)->getManager();
-	}
+    protected static function getEM(): EntityManagerInterface
+    {
+        return static::getContainer()->get(ManagerRegistry::class)->getManager();
+    }
 
-	protected function getCurrentUser(): ?User
-	{
-		return $this->currentUser;
-	}
+    protected function getCurrentUser(): ?User
+    {
+        return $this->currentUser;
+    }
 }
