@@ -12,6 +12,9 @@ export default async function Home() {
             {rooms.member.map((room) => (
                 <p key={room.id}>{room.owner.username}</p>
             ))}
+            {leaderboard.member.map(({ player }) => (
+                <p key={player.id}>{player.username}</p>
+            ))}
             <main className={styles.main}>
                 <Image
                     className={styles.logo}

@@ -6,6 +6,8 @@ export default class UserResource extends Resource {
     }
 
     async getLeaderboard() {
-        return await this.get("/api/leaderboard");
+        return await this.get("/api/leaderboard", null, {
+            next: { revalidate: 60 * 60 },
+        });
     }
 }
