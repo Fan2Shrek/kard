@@ -1,5 +1,6 @@
 import { API_URL } from "../env";
-import { RoomResource } from "./resources/game";
+import GameModeResource from "./resources/gameMode";
+import RoomResource from "./resources/room";
 import UserResource from "./resources/user";
 
 class Api {
@@ -8,6 +9,7 @@ class Api {
 
         this.userResource = new UserResource(this);
         this.roomResource = new RoomResource(this);
+        this.gameModeResource = new GameModeResource(this);
     }
 
     user() {
@@ -16,6 +18,10 @@ class Api {
 
     room() {
         return this.roomResource;
+    }
+
+    gameModes() {
+        return this.gameModeResource;
     }
 
     async get(url, filters = {}, options = {}) {
