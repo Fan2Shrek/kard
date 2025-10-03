@@ -119,7 +119,7 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
         }
 
         if (Rank::ACE === $mainCard->rank) {
-            $gameContext->setPlayerOrder(array_reverse($gameContext->getPlayers()));
+            $gameContext->setPlayerOrder(array_reverse($gameContext->getPlayers()), true);
             $this->dispatchMercureEvent(
                 'message',
                 'Changement de sens !',

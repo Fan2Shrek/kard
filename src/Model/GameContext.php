@@ -50,9 +50,9 @@ final class GameContext
     /**
      * @param Player[] $players
      */
-    public function setPlayerOrder(array $players): void
+    public function setPlayerOrder(array $players, bool $keepCurrentPlayer = false): void
     {
-        $this->players = new PlayersList($players, $this->players->getCurrentPlayer());
+        $this->players = new PlayersList($players, $keepCurrentPlayer ? $this->players->getCurrentPlayer() : $players[0]);
     }
 
     public function getNextPlayer(): Player
