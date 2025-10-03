@@ -389,7 +389,7 @@ describe('Huit américain: mercure', function () {
             Act::playCard('j', 'h');
 
             expectMercureMessage(current(HubSpy::$published))->toBeAction('message');
-            expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'Le joueur After The Storm saute son tour');
+            expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'After The Storm saute son tour');
         });
 
         test("Lorsqu'un as est posé, un évenement est envoyé", function () {
@@ -461,7 +461,7 @@ describe('Huit américain: mercure', function () {
             ]);
 
             expectMercureMessage(current(HubSpy::$published))->toBeAction('message');
-            expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'Le joueur Player 2 pioche 4 cartes');
+            expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'Player 2 pioche 4 cartes');
         });
     });
 

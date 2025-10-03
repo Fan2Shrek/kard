@@ -134,7 +134,7 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
 
             $this->dispatchMercureEvent(
                 'message',
-                \sprintf('Le joueur %s pioche %d cartes', $gameContext->getNextPlayer()->username, 2 * count($cards)),
+                \sprintf('%s pioche %d cartes', $gameContext->getNextPlayer()->username, 2 * count($cards)),
             );
 
             $this->getHub()->publish(new Update(
@@ -150,7 +150,7 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
             $gameContext->nextPlayer();
             $this->dispatchMercureEvent(
                 'message',
-                \sprintf('Le joueur %s saute son tour', $gameContext->getCurrentPlayer()->username),
+                \sprintf('%s saute son tour', $gameContext->getCurrentPlayer()->username),
             );
         }
 
