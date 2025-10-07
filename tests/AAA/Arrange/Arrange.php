@@ -104,6 +104,12 @@ abstract /* static */ class Arrange
             ];
         }
 
+        if (null !== $hands = Act::get('hands')) {
+            foreach ($players as $player) {
+                $player->cardsCount = count($hands[$player->id] ?? []);
+            }
+        }
+
         return new GameContext(
             'room-id',
             new Room(

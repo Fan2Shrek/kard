@@ -305,6 +305,23 @@ describe('Huit américain: cartes spéciales', function () {
         expect(Act::get('hands')['2'])->toHaveCount(7);
     });
 
+    test('Poser un deux met à jour le nombre de carte du joueur suivant', function () {
+        Arrange::setDrawPillSize(3);
+        Arrange::setPlayers([
+            new Player('1', 'Player 1'),
+            new Player('2', 'Player 2'),
+        ]);
+        Arrange::setHands([
+            '1' => [[2, 's']],
+            '2' => [[6, 's']],
+        ]);
+        Arrange::setCurrentCard(5, 's');
+
+        Act::playCard(2, 's');
+
+        expect(Act::get('gameContext')->getNextPlayer()->cardsCount)->toBe(3);
+    });
+
     test('Le huit permet de changer de couleur', function () {
         Arrange::setCurrentCard(5, 's');
 

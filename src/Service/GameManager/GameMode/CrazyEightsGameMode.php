@@ -125,9 +125,9 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
                 'Changement de sens !',
             );
 
-			if (2 === count($gameContext->getPlayers())) {
-				$gameContext->nextPlayer();
-			}
+            if (2 === count($gameContext->getPlayers())) {
+                $gameContext->nextPlayer();
+            }
         }
 
         if (Rank::TWO === $mainCard->rank) {
@@ -140,6 +140,8 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
                 'message',
                 \sprintf('%s pioche %d cartes', $gameContext->getNextPlayer()->username, 2 * count($cards)),
             );
+
+            $gameContext->getNextPlayer()->cardsCount += 2 * count($cards);
 
             $this->getHub()->publish(new Update(
                 sprintf('room-%s-%s', $gameContext->getRoom()->getId(), $nextPlayer->id),
