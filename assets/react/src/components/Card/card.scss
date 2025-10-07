@@ -1,6 +1,6 @@
 .card {
-    margin-inline: 10px;
     width: 100px;
+    padding-left: 10px;
 
     img {
         object-fit: contain;
@@ -8,4 +8,8 @@
         border-radius: 0.5rem;
         border: 1px solid black;
     }
+}
+
+.sortable-drag .card {
+    width: auto;
 }
