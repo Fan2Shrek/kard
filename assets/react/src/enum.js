@@ -1,8 +1,8 @@
 export const suits = {
-    HEARTS: 'Hearts',
-    DIAMONDS: 'Diamonds',
-    CLUBS: 'Clubs',
-    SPADES: 'Spades',
+    HEARTS: 'h',
+    DIAMONDS: 'd',
+    CLUBS: 'c',
+    SPADES: 's',
 };
 
 export const suitsIcons = {

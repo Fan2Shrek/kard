@@ -43,6 +43,21 @@
         }
     }
 
+    .info__helper {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: var(--bg-game-card);
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: var(--text-primary);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 100;
+    }
+
     .game {
         background-color: var(--bg-game-card);
 

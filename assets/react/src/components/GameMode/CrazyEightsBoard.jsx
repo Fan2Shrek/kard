@@ -55,6 +55,11 @@ export default ({ ctx, hand, player }) => {
                 </div>
                 <div className='bottom'>
 					{player && <Hand ref={handRef} hand={hand} order={['3', '4', '5', '6', '7', '9', '10', 'q', 'k', '1', '2', 'j', '8']} canPlay={ctx.currentPlayer.id === player.id} gameActions={gameActions} />}
+					{ctx.currentCards[0].rank === '8' &&
+						<div className='info__helper'>
+							Couleur : {suitsIcons[ctx.data.suit]}
+						</div>
+					}
                 </div>
             </div>
         </>
