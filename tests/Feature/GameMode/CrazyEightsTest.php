@@ -223,6 +223,19 @@ describe('Huit américain: cartes spéciales', function () {
         expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('3');
     });
 
+    test("Lorsqu'un as est joué, si le nombre de joueur est de 2, la joueur rejoue", function () {
+        Arrange::setPlayers([
+            new Player('1', 'Player 1'),
+            new Player('2', 'Player 2'),
+        ]);
+        Arrange::setGameStarted();
+        Arrange::setCurrentCard(5, 's');
+
+        Act::playCard(1, 's');
+
+        expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('1');
+    });
+
     test('Le valet saute de tour', function () {
         Arrange::setPlayers([
             new Player('1', 'Player 1'),

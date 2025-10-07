@@ -124,6 +124,10 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
                 'message',
                 'Changement de sens !',
             );
+
+			if (2 === count($gameContext->getPlayers())) {
+				$gameContext->nextPlayer();
+			}
         }
 
         if (Rank::TWO === $mainCard->rank) {
