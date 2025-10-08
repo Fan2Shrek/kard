@@ -105,7 +105,7 @@ final class RoomController extends AbstractController
         }
 
         $players = array_map(
-            fn ($player): Player => Player::fromUser($player),
+            fn (\App\Entity\User $player): Player => Player::fromUser($player),
             $room->getParticipants()->toArray(),
         );
 
@@ -145,7 +145,7 @@ final class RoomController extends AbstractController
 
                 $this->hub->publish(new Update(
                     'current_games',
-                    "<turbo-stream action=\"remove\" target=\"game-{$id}\"></turbo-stream>"
+                    sprintf('<turbo-stream action="remove" target="game-%s"></turbo-stream>', $id)
                 ));
 
                 return $this->redirectToRoute('home');
@@ -156,7 +156,7 @@ final class RoomController extends AbstractController
 
             $this->hub->publish(new Update(
                 \sprintf('game-%s-waiting', $room->getId()),
-                "<turbo-stream action=\"remove\" target=\"player-{$user->getId()}\"></turbo-stream>"
+                sprintf('<turbo-stream action="remove" target="player-%s"></turbo-stream>', $user->getId())
             ));
         }
 
@@ -176,7 +176,7 @@ final class RoomController extends AbstractController
 
         $this->hub->publish(new Update(
             'current_games',
-            "<turbo-stream action=\"remove\" target=\"game-{$room->getId()}\"></turbo-stream>"
+            sprintf('<turbo-stream action="remove" target="game-%s"></turbo-stream>', $room->getId())
         ));
 
         $this->hub->publish(new Update(

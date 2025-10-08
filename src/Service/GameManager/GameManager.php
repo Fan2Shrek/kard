@@ -80,7 +80,7 @@ final class GameManager implements ServiceSubscriberInterface
 
         $hands = array_reduce(
             $players,
-            function (array $acc, $player) use ($ctx) {
+            function (array $acc, $player) use ($ctx): array {
                 $acc[$player->id] = $this->handRepository->get($player->id, $ctx->getRoom());
 
                 return $acc;
@@ -90,7 +90,7 @@ final class GameManager implements ServiceSubscriberInterface
 
         $players = array_reduce(
             $players,
-            function (array $acc, $player) {
+            function (array $acc, $player): array {
                 $acc[$player->id] = $player;
 
                 return $acc;
@@ -107,7 +107,7 @@ final class GameManager implements ServiceSubscriberInterface
 
         $ctx->setPlayerOrder(
             array_map(
-                function ($id) use ($players) {
+                function (string $id) use ($players) {
                     return $players[$id];
                 },
                 $order,
@@ -185,6 +185,7 @@ final class GameManager implements ServiceSubscriberInterface
             if ($this->handRepository instanceof CachedHandRepositoryInterface) {
                 $this->handRepository->deleteAllHandForRoom($room);
             }
+
             $this->gameContextProvider->clear($room);
 
             $this->container->get('event_dispatcher')->dispatch(new GameFinishedEvent($room, $ctx));

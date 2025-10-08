@@ -127,7 +127,7 @@ final class PresidentGameMode extends AbstractGameMode
         }
 
         $previousTurns = array_reverse($this->gameContext->getRound()->getTurns());
-        $nonSkippedTurns = array_values(array_filter($previousTurns, fn ($turn): bool => !empty($turn->getCards())));
+        $nonSkippedTurns = array_values(array_filter($previousTurns, fn (\App\Model\Turn $turn): bool => !empty($turn->getCards())));
 
         if ([] === $previousTurns[0]->getCards()) {
             return;
@@ -154,7 +154,7 @@ final class PresidentGameMode extends AbstractGameMode
 
             // verify if square
             $rank = $lastTurn[0]->rank;
-            $count = array_filter($nonSkippedTurns, fn ($turn): bool => $rank === $turn->getCards()[0]->rank);
+            $count = array_filter($nonSkippedTurns, fn (\App\Model\Turn $turn): bool => $rank === $turn->getCards()[0]->rank);
 
             if (3 === count($count)) {
                 $this->handleRoundEnd();
