@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <main class="profile bg-card-image">
+        <twig:FloatingBackground/>
+        <div class="profile-column">
+            <twig:BlackCard>
+                <twig:ColorsHeader/>
+                <h1>{{ app.user.username|capitalize }}</h1>
+                <p>Email : {{ app.user.email }}</p>
+                <div class="links-row">
+                    <twig:Button
+                            :href="path('home')"
+                            text="Retour à l'accueil"
+                            iconLeft="lucide:arrow-left"
+                    />
+                    <twig:Button
+                            :href="path('app_logout')"
+                            text="Se déconnecter"
+                            iconLeft="lucide:log-out"
+                            variant="danger"
+                    />
+                </div>
+            </twig:BlackCard>
+            <div class="stats-row">
+                <twig:BlackCard>
+                    <p>Parties jouées :</p>
+                    <p>{{ stats.gamesPlayed ?? 'N/A' }}</p>
+                </twig:BlackCard>
+                <twig:BlackCard>
+                    <p>Parties gagnées :</p>
+                    <p>{{ stats.gamesWon ?? 'N/A' }}</p>
+                </twig:BlackCard>
+                <twig:BlackCard>
+                    <p>Ratio :</p>
+                    <p>{{ stats.winRate ?? 'N/A' }}%</p>
+                </twig:BlackCard>
+            </div>
+        </div>
+        <section class="recent-games table">
+            <div class="table-title">
+                <twig:UX:Icon name="lucide:history" color="white"/>
+                <h2>Parties récentes</h2>
+            </div>
+            {% if recentGames is not empty %}
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Mode</th>
+                        <th>Résultat</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for game in recentGames %}
+                        <tr>
+                            <td>{{ game.date|date('d/m/Y H:i') }}</td>
+                            <td>{{ game.gameMode.value|capitalize }}</td>
+                            <td>{{ game.result }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Aucune partie récente</p>
+            {% endif %}
+        </section>
+    </main>
+{% endblock %}
