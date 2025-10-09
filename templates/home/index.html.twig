@@ -2,38 +2,47 @@
 
 {% block body %}
     <main class='home bg-card-image'>
-        <twig:FloatingBackground />
+        <div class="profile-button">
+            <twig:BlackCard>
+                <twig:Button
+                        :href="path('app_profile')"
+                        iconLeft="lucide:user-circle"
+                        variant="transparent"
+                />
+            </twig:BlackCard>
+        </div>
+        <twig:FloatingBackground/>
 
         <twig:BlackCard>
-            <twig:ColorsHeader />
+            <twig:ColorsHeader/>
             <h1>Bienvenue sur Kard</h1>
             <p>Le jeu de cartes en ligne</p>
             <div class="links-row">
                 {% if app.user %}
                     <twig:Button
-                        :href="path('create')"
-                        text="Lancer une partie"
-                        iconLeft="ri:play-circle-line"
-                        variant="success"
+                            :href="path('create')"
+                            text="Lancer une partie"
+                            iconLeft="ri:play-circle-line"
+                            variant="success"
                     />
                     <twig:Button
-                        :href="path('app_logout')"
-                        text="Se déconnecter"
-                        iconLeft="lucide:log-out"
-                        variant="danger"
+                            :href="path('app_logout')"
+                            text="Se déconnecter"
+                            iconLeft="lucide:log-out"
+                            variant="danger"
                     />
                 {% else %}
                     <twig:Button
-                        :href="path('app_login')"
-                        text="Se connecter"
-                        iconLeft="lucide:log-in"
-                        variant="success"
+                            :href="path('app_login')"
+                            text="Se connecter"
+                            iconLeft="lucide:log-in"
+                            variant="success"
                     />
                     <twig:Button
-                        :href="path('app_register')"
-                        text="S'inscrire"
-                        iconLeft="lucide:user-plus"
-                        variant="default"
+                            :href="path('app_register')"
+                            text="S'inscrire"
+                            iconLeft="lucide:user-plus"
+                            variant="default"
                     />
                 {% endif %}
             </div>
@@ -49,25 +58,25 @@
 
         <section class="games table">
             <div class="games-title table-title">
-                <twig:UX:Icon name="lucide:users" color="white" />
+                <twig:UX:Icon name="lucide:users" color="white"/>
                 <h2>Parties en cours</h2>
             </div>
 
             {% if currentGames is not empty %}
                 <table>
                     <thead>
-                        <tr>
-                            <th>Mode de jeu</th>
-                            <th>Propriétaire</th>
-                            <th>Joueurs</th>
-                            <th>Actions</th>
-                        </tr>
+                    <tr>
+                        <th>Mode de jeu</th>
+                        <th>Propriétaire</th>
+                        <th>Joueurs</th>
+                        <th>Actions</th>
+                    </tr>
                     </thead>
                     <tbody id="current-games">
-                        <div {{ stimulus_controller('stream', {url: mercure('current_games')}) }}></div>
-                        {% for game in currentGames %}
-                            {{ include('components/turbo/game-details.html.twig') }}
-                        {% endfor %}
+                    <div {{ stimulus_controller('stream', {url: mercure('current_games')}) }}></div>
+                    {% for game in currentGames %}
+                        {{ include('components/turbo/game-details.html.twig') }}
+                    {% endfor %}
                     </tbody>
                 </table>
             {% else %}
@@ -78,30 +87,30 @@
         {% if playerLeaderboard is not empty %}
             <section class="leaderboard table">
                 <div class="leaderboard-title table-title">
-                    <twig:UX:Icon name="lucide:biceps-flexed" color="white" />
+                    <twig:UX:Icon name="lucide:biceps-flexed" color="white"/>
                     <h2>Tableau des meilleurs</h2>
                 </div>
 
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nom</th>
-                                <th>Parties jouée</th>
-                                <th>Parties gagnés</th>
-                                <th>Ratio</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for player in playerLeaderboard %}
-                                <tr>
-                                    <td>{{ player.player.username|capitalize }}</td>
-                                    <td>{{ player.gamesCount }}</td>
-                                    <td>{{ player.winsCount }}</td>
-                                    <td>{{ player.winRate }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Parties jouée</th>
+                        <th>Parties gagnés</th>
+                        <th>Ratio</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for player in playerLeaderboard %}
+                        <tr>
+                            <td>{{ player.player.username|capitalize }}</td>
+                            <td>{{ player.gamesCount }}</td>
+                            <td>{{ player.winsCount }}</td>
+                            <td>{{ player.winRate }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </section>
         {% endif %}
     </main>

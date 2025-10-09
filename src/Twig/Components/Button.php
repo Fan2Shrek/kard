@@ -14,7 +14,7 @@ class Button
 {
     public ?string $href = null;
 
-    public string $text;
+    public ?string $text = null;
 
     public bool $unstyled = false;
 
@@ -37,6 +37,7 @@ class Button
         $resolver = (new OptionsResolver())
             ->setDefaults([
                 'href' => null,
+                'text' => null,
                 'iconLeft' => null,
                 'iconRight' => null,
                 'size' => 'medium',
@@ -46,9 +47,10 @@ class Button
             ->setAllowedTypes('href', ['null', 'string'])
             ->setAllowedTypes('variant', ['null', 'string'])
             ->setAllowedTypes('size', ['null', 'string'])
+            ->setAllowedTypes('text', ['null', 'string'])
             ->setAllowedTypes('iconLeft', ['null', 'string'])
             ->setAllowedTypes('iconRight', ['null', 'string'])
-            ->setAllowedValues('variant', ['default', 'danger', 'success']) // Add more variants if needed
+            ->setAllowedValues('variant', ['default', 'danger', 'success', 'transparent'])
             ->setAllowedValues('size', [null, 'small', 'medium', 'large'])
             ->setIgnoreUndefined(true)
             ->setNormalizer(
@@ -77,6 +79,7 @@ class Button
                     'default' => '',
                     'danger' => 'button--danger',
                     'success' => 'button--success',
+                    'transparent' => 'button--transparent',
                 ],
                 'size' => [
                     'small' => 'button--small',
