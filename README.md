@@ -8,6 +8,12 @@ TODO:
 - [ ] Si possible: ajouter les replays
 - [ ] Si replay fait: tests sur avec des replays
 
+## Controller à adapter en mode API
+
+- RoomController
+- RegistrationController
+- GameController
+
 ## Installation
 
 ```bash

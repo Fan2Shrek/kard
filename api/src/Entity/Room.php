@@ -5,7 +5,10 @@ namespace App\Entity;
 use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
+use App\Api\DTO\Play;
+use App\Api\State\Processor\GamePlayProcessor;
 use App\Enum\GameStatusEnum;
 use App\Model\Player;
 use App\Repository\RoomRepository;
@@ -23,6 +26,12 @@ use Ramsey\Uuid\UuidInterface;
                 'status' => new QueryParameter(filter: new ExactFilter()),
             ],
         ),
+		new Post(
+			uriTemplate: '/game/{id}/play',
+			input: Play::class,
+			processor: GamePlayProcessor::class,
+			status: 204,
+		),
     ],
 )]
 #[ORM\Entity(repositoryClass: RoomRepository::class)]

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Api;
+namespace App\Api\Serialization;
 
 use App\Entity\Room;
 use App\Model\Card\Card;
