@@ -63,10 +63,8 @@ final class GameManager
      * @param array<Card>          $cards
      * @param array<string, mixed> $data
      */
-	public function play(Room $room, Player $player, array $cards, array $data = []): void
+	public function play(Room $room, GameState $state, Player $player, array $cards, array $data = []): void
 	{
-		$state = $this->gameStateRepository->get($room);
-
 		if ($state->currentPlayerId !== $player->id) {
 			throw new \LogicException("It's not this player's turn");
 		}
@@ -82,9 +80,10 @@ final class GameManager
 				'playerId' => $player->id,
 				'cards' => $cards,
 				'data' => $data,
+				'gameMode' => $room->getGameMode()->getValue(),
 			],
 		);
 
-		$this->gameEventApplier->apply($gameEvent, $this->gameStateRepository->get($room));
+		$newState = $this->gameEventApplier->apply($gameEvent, $state);
 	}
 }

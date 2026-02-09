@@ -38,6 +38,16 @@ final class GameEventApplier
 
 	private function applyCardPlayed(GameEvent $event, GameState $state): GameState
 	{
+		if (!$gameMode = ($event->data['gameMode'] ?? null)) {
+			throw new \InvalidArgumentException("Missing gameMode in CARD_PLAYED event data");
+		}
+
+		$gameMode = $this->gameModeProvider->getForValue($gameMode);
+
+		$cards = $event->data['cards'] ?? null;
+
+		// refactor GameModes here
+
 		return $state;
 	}
 

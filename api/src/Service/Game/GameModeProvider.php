@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service\Game;
 
 use App\Entity\Room;
+use App\Service\GameManager\GameMode\GameModeEnum;
 use App\Service\GameManager\GameMode\GameModeInterface;
 
 final class GameModeProvider
@@ -16,9 +17,14 @@ final class GameModeProvider
 
 	public function getForRoom(Room $room): GameModeInterface
 	{
-		foreach ($this->gameModes as $gameMode) {
-			if ($room->getGameMode()->getValue() === $gameMode->getGameMode()) {
-				return $gameMode;
+		return $this->getForValue($room->getGameMode()->getValue());
+	}
+
+	public function getForValue(GameModeEnum $gameMode): GameModeInterface
+	{
+		foreach ($this->gameModes as $mode) {
+			if ($mode->getGameMode() === $gameMode) {
+				return $mode;
 			}
 		}
 
