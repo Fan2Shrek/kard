@@ -17,7 +17,7 @@ final class GameModeProvider
 	public function getForRoom(Room $room): GameModeInterface
 	{
 		foreach ($this->gameModes as $gameMode) {
-			if ($room->getGameMode() === $gameMode->getGameMode()) {
+			if ($room->getGameMode()->getValue() === $gameMode->getGameMode()) {
 				return $gameMode;
 			}
 		}

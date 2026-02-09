@@ -6,12 +6,14 @@ use App\Entity\GameModeDescription;
 use App\Entity\Room;
 use App\Enum\GameStatusEnum;
 use App\Event\Room\RoomEvent;
+use App\Game\GameManager as GameGameManager;
 use App\Model\Player;
 use App\Repository\GameModeDescriptionRepository;
 use App\Repository\GameModeRepository;
 use App\Repository\RoomRepository;
 use App\Service\AssetsProvider;
 use App\Service\Card\HandRepositoryInterface;
+use App\Service\Game\State\GameStateRepositoryInterface;
 use App\Service\GameContextProvider;
 use App\Service\GameManager\GameManager;
 use App\Service\GameManager\GameMode\GameModeEnum;
@@ -189,6 +191,28 @@ final class RoomController extends AbstractController
         return $response;
     }
 
+    #[Route('/v2/start/{id}', name: 'game_start_v2')]
+    public function startV2(Room $room, GameGameManager $newGm, GameStateRepositoryInterface $gameStateRepository): Response
+    {
+        $response = $this->redirectToRoute('game', ['id' => $room->getId()]);
+        $state = $newGm->startRoom($room);
+		$gameStateRepository->save($state, $room);
+
+        $this->hub->publish(new Update(
+            'current_games',
+            "<turbo-stream action=\"remove\" target=\"game-{$room->getId()}\"></turbo-stream>"
+        ));
+
+        $this->hub->publish(new Update(
+            sprintf('game-%s', $room->getId()),
+            json_encode([
+                'url' => $response->getTargetUrl(),
+            ])
+        ));
+
+        return $response;
+    }
+
     #[Route('/game/{id}', name: 'game')]
     public function game(
         Room $room,
@@ -212,6 +236,36 @@ final class RoomController extends AbstractController
             'game' => $serializer->serialize($gameContextProvider->provide($room), 'json'),
             'player' => $serializer->serialize($this->getUser(), 'json'),
             'hand' => $handRepository->get($user, $room)->getCards(),
+            'playerId' => $user->getId(),
+            'room' => $room,
+        ]);
+    }
+
+    #[Route('/v2/game/{id}', name: 'game_v2')]
+    public function gamev2(
+        Room $room,
+        SerializerInterface $serializer,
+        AssetsProvider $assetsProvider,
+        GameContextProvider $gameContextProvider,
+        HandRepositoryInterface $handRepository,
+		GameStateRepositoryInterface $gameStateRepository,
+    ): Response {
+        $user = $this->getUser();
+		$state = $gameStateRepository->get($room);
+
+        if (!\in_array($user, $room->getParticipants()->toArray(), true)) {
+            return $this->render('home/game.html.twig', [
+                'assets' => $assetsProvider->getAllCardsAssets(),
+                'game' => $serializer->serialize($gameContextProvider->provide($room), 'json'),
+                'room' => $room,
+            ]);
+        }
+
+        return $this->render('home/game.html.twig', [
+            'assets' => $assetsProvider->getAllCardsAssets(),
+            'game' => $serializer->serialize($gameContextProvider->provide($room), 'json'),
+            'player' => $serializer->serialize($this->getUser(), 'json'),
+            'hand' => $state->getPlayerStateById($user->getId())->hand,
             'playerId' => $user->getId(),
             'room' => $room,
         ]);

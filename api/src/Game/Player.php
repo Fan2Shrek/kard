@@ -14,7 +14,7 @@ final readonly class Player
 	) {
 	}
 
-	public function fromUser(User $user): self
+	public static function fromUser(User $user): self
 	{
 		return new self($user->getId()->toString(), $user->getUsername());
 	}

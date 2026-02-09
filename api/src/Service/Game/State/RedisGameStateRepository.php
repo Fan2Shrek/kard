@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Service\Game\State;
 
 use App\Entity\Room;
+use App\Game\GameManager;
 use App\Game\State\GameState;
-use App\Service\Game\GameManager;
 use App\Service\Redis\RedisClient;
 use Symfony\Component\DependencyInjection\Attribute\WhenNot;
 
@@ -36,10 +36,10 @@ final class RedisGameStateRepository implements GameStateRepositoryInterface
                 return null;
             }
         }
-        $previousEventId = $gameState->lastEventid;
+        $previousEventId = $gameState->lastEventId;
         $this->buildGameStateFromEvents($gameState, $room);
 
-        if ($previousEventId !== $gameState->lastEventid) {
+        if ($previousEventId !== $gameState->lastEventId) {
             $this->decoratedRepository->save($gameState, $room);
         }
 
@@ -48,7 +48,7 @@ final class RedisGameStateRepository implements GameStateRepositoryInterface
 
     private function buildGameStateFromEvents(GameState $gameState, Room $room): void
     {
-        $events = $this->gameEventRepository->getEventsSince($gameState->lastEventid, $room->getId()->toString());
+        $events = $this->gameEventRepository->getEventsSince($gameState->lastEventId, $room->getId()->toString());
 
         foreach ($events as $event) {
             $this->gameManager->play($event, $gameState);

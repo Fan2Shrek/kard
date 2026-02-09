@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Entity\Game;
 
-use App\Enum\GameEventTypeEnum;
 use App\Game\State\GameEvent as StateGameEvent;
 use App\Repository\Game\GameEventRepository;
 use Doctrine\DBAL\Types\Types;
@@ -18,16 +17,20 @@ final class GameEvent
     #[ORM\GeneratedValue]
     private int $id;
 
-    #[ORM\Column(enumType: GameEventTypeEnum::class)]
-    private GameEventTypeEnum $type;
+    #[ORM\Column]
+    private string $type;
 
     #[ORM\Column(type: Types::JSON)]
     private array $data = [];
 
-    public function __construct(GameEventTypeEnum $type, array $data)
+    #[ORM\Column]
+    private string $roomId;
+
+    public function __construct(string $type, array $data, string $roomId)
     {
         $this->type = $type;
         $this->data = $data;
+		$this->roomId = $roomId;
     }
 
     public function getId(): int
@@ -35,7 +38,7 @@ final class GameEvent
         return $this->id;
     }
 
-    public function getType(): GameEventTypeEnum
+    public function getType(): string
     {
         return $this->type;
     }
@@ -44,6 +47,11 @@ final class GameEvent
     {
         return $this->data;
     }
+
+	public function getRoomId(): string
+	{
+		return $this->roomId;
+	}
 
     public static function createFromGameEvent(StateGameEvent $gameEvent): self
     {

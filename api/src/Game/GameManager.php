@@ -18,13 +18,12 @@ final class GameManager
 {
 	public function __construct(
 		private CardGenerator $cardGenerator,
-		private GameStateRepositoryInterface $gameStateRepository,
 		private GameModeProvider $gameModeProvider,
 		private GameEventApplier $gameEventApplier,
 	) {
 	}
 
-	public function startRoom(Room $room): void
+	public function startRoom(Room $room): GameState
 	{
         $room->setStatus(GameStatusEnum::PLAYING);
 
@@ -40,6 +39,7 @@ final class GameManager
 			$players,
 			0,
 			null,
+			[],
 			$deck->getCards(),
 		);
 
@@ -56,8 +56,7 @@ final class GameManager
 			}
 		}
 
-		$this->gameEventApplier->applyMultiple($events, $gameState);
-		$this->gameStateRepository->save($gameState, $room);
+		return $this->gameEventApplier->applyMultiple($events, $gameState);
 	}
 
     /**
