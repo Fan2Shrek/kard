@@ -25,9 +25,14 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-    App\Service\GameManager\GameManager:
+    App\Service\Game\GameModeProvider:
         arguments:
             $gameModes: !tagged_iterator app.game_mode
+
+    App\Service\Game\State\GameStateRepositoryInterface: '@App\Service\Game\State\DoctrineGameStateRepository'
+
+    App\Service\Game\State\RedisGameStateRepository:
+        decorates: 'App\Service\Game\State\GameStateRepositoryInterface'
 
     App\Service\Redis\RedisConnection:
       arguments:
