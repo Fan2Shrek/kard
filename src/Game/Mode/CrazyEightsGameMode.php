@@ -15,20 +15,14 @@ use App\Game\Event\TurnSkippedEvent;
 use App\Game\Model\Card\Hand;
 use App\Game\Model\GameContext;
 use App\Game\Model\GameState;
-use Symfony\Component\Mercure\HubInterface;
-use Symfony\Component\Mercure\Update;
-use Symfony\Component\Serializer\SerializerInterface;
 
 final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameModeInterface
 {
     use CardsHelperTrait;
 
     public function __construct(
-        HubInterface $hub,
         private HandRepositoryInterface $handRepository,
-        private SerializerInterface $serializer,
     ) {
-        parent::__construct($hub);
     }
 
     public function getGameMode(): GameModeEnum
@@ -143,11 +137,6 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
             $context->addEvent(new CardDrawnEvent($gameContext->getRoom(), $nextPlayer, $drawnCount, true));
 
             $gameContext->getNextPlayer()->cardsCount += $drawnCount;
-
-            $this->getHub()->publish(new Update(
-                sprintf('room-%s-%s', $gameContext->getRoom()->getId(), $nextPlayer->id),
-                $this->serializer->serialize($nextHand, 'json'),
-            ));
 
             // todo maybe player can add a 2
             $gameContext->nextPlayer(); // skip turn

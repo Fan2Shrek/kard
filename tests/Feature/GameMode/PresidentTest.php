@@ -14,15 +14,11 @@ use App\Game\Mode\GameModeEnum;
 use App\Game\Mode\PresidentGameMode;
 use App\Tests\AAA\Act\Act;
 use App\Tests\AAA\Arrange\Arrange;
-use App\Tests\Resource\HubSpy;
 
 covers(PresidentGameMode::class);
 
 beforeEach(function () {
-    HubSpy::reset();
-    Act::addContext('gamePlayer', new PresidentGameMode(
-        new HubSpy(),
-    ));
+    Act::addContext('gamePlayer', new PresidentGameMode());
     Act::addContext('gameMode', new GameMode(GameModeEnum::PRESIDENT));
 });
 

@@ -19,8 +19,6 @@ use App\Game\Model\Turn;
 use Psr\Container\ContainerInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Mercure\HubInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
 covers(GameManager::class);
 
@@ -94,11 +92,7 @@ test("play() joue un tour normal : sauvegarde la main et l'état, dispatch les e
         }
     };
 
-    $gameMode = new CrazyEightsGameMode(
-        $this->createMock(HubInterface::class),
-        $handRepository,
-        $this->createMock(SerializerInterface::class),
-    );
+    $gameMode = new CrazyEightsGameMode($handRepository);
 
     $gameManager = new GameManager([$gameMode], $container, $gameStateProvider, $handRepository);
 

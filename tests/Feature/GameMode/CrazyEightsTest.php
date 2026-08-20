@@ -17,17 +17,13 @@ use App\Game\Mode\GameModeEnum;
 use App\Tests\AAA\Act\Act;
 use App\Tests\AAA\Arrange\Arrange;
 use App\Tests\Resource\ActHandRepository;
-use App\Tests\Resource\HubSpy;
 
 covers(CrazyEightsGameMode::class);
 
 beforeEach(function () {
-    HubSpy::reset();
     Act::reset();
     Act::addContext('gamePlayer', new CrazyEightsGameMode(
-        new HubSpy(),
         new ActHandRepository(),
-        $this->createMock(Symfony\Component\Serializer\SerializerInterface::class)
     ));
     Act::addContext('gameMode', new GameMode(GameModeEnum::CRAZY_EIGHTS));
 });
@@ -472,9 +468,6 @@ describe('Huit américain: events', function () {
             Arrange::setCurrentCard(5, 's');
 
             Act::playCard(2, 's');
-
-            // le hub n'est plus utilisé que pour pousser la main du joueur forcé de piocher
-            expect(HubSpy::$published)->toHaveCount(1);
 
             $events = Act::getEvents();
             expect($events)->toHaveCount(2);

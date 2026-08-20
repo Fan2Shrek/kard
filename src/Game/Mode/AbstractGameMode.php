@@ -9,7 +9,6 @@ use App\Game\Model\Card\Card;
 use App\Game\Model\Card\Hand;
 use App\Game\Model\GameContext;
 use App\Game\Model\GameState;
-use Symfony\Component\Mercure\HubInterface;
 
 abstract class AbstractGameMode implements GameModeInterface
 {
@@ -20,22 +19,12 @@ abstract class AbstractGameMode implements GameModeInterface
      */
     protected array $cards;
 
-    public function __construct(
-        private HubInterface $hub,
-    ) {
-    }
-
     public function play(array $cards, GameContext $context, Hand $hand, array $data = []): void
     {
         $this->cards = $cards;
         $this->gameContext = $context->getState();
 
         $this->doPlay($cards, $context, $hand, $data);
-    }
-
-    public function getHub(): HubInterface
-    {
-        return $this->hub;
     }
 
     /**
