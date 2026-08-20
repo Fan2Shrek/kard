@@ -6,7 +6,7 @@ use App\Entity\GameMode;
 use App\Entity\GameModeDescription;
 use App\Repository\GameModeDescriptionRepository;
 use App\Repository\GameModeRepository;
-use App\Service\GameManager\GameMode\GameModeEnum;
+use App\Game\Mode\GameModeEnum;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;

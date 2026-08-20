@@ -24,7 +24,7 @@
 |
 */
 
-use App\Model\Player;
+use App\Game\Model\Player;
 use Pest\Expectation;
 use Symfony\Component\Mercure\Update;
 

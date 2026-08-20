@@ -3,7 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\GameMode;
-use App\Service\GameManager\GameMode\GameModeEnum;
+use App\Game\Mode\GameModeEnum;
 
 class GameModeFixtures extends AbstractFixtures
 {

@@ -6,15 +6,15 @@ use App\Entity\GameModeDescription;
 use App\Entity\Room;
 use App\Enum\GameStatusEnum;
 use App\Event\Room\RoomEvent;
-use App\Model\Player;
+use App\Game\Model\Player;
 use App\Repository\GameModeDescriptionRepository;
 use App\Repository\GameModeRepository;
 use App\Repository\RoomRepository;
 use App\Service\AssetsProvider;
-use App\Service\Card\HandRepositoryInterface;
-use App\Service\GameContextProvider;
-use App\Service\GameManager\GameManager;
-use App\Service\GameManager\GameMode\GameModeEnum;
+use App\Game\Card\HandRepositoryInterface;
+use App\Game\GameStateProvider;
+use App\Game\GameManager;
+use App\Game\Mode\GameModeEnum;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -194,7 +194,7 @@ final class RoomController extends AbstractController
         Room $room,
         SerializerInterface $serializer,
         AssetsProvider $assetsProvider,
-        GameContextProvider $gameContextProvider,
+        GameStateProvider $gameStateProvider,
         HandRepositoryInterface $handRepository,
     ): Response {
         $user = $this->getUser();
@@ -202,14 +202,14 @@ final class RoomController extends AbstractController
         if (!\in_array($user, $room->getParticipants()->toArray(), true)) {
             return $this->render('home/game.html.twig', [
                 'assets' => $assetsProvider->getAllCardsAssets(),
-                'game' => $serializer->serialize($gameContextProvider->provide($room), 'json'),
+                'game' => $serializer->serialize($gameStateProvider->provide($room), 'json'),
                 'room' => $room,
             ]);
         }
 
         return $this->render('home/game.html.twig', [
             'assets' => $assetsProvider->getAllCardsAssets(),
-            'game' => $serializer->serialize($gameContextProvider->provide($room), 'json'),
+            'game' => $serializer->serialize($gameStateProvider->provide($room), 'json'),
             'player' => $serializer->serialize($this->getUser(), 'json'),
             'hand' => $handRepository->get($user, $room)->getCards(),
             'playerId' => $user->getId(),

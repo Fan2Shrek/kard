@@ -12,7 +12,7 @@ services:
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
     _instanceof:
-      App\Service\GameManager\GameMode\GameModeInterface:
+      App\Game\Mode\GameModeInterface:
             tags: ['app.game_mode']
 
     # makes classes in src/ available to be used as services
@@ -20,12 +20,12 @@ services:
     App\:
         resource: '../src/'
         exclude:
-            - '../src/Debug/'
             - '../src/DependencyInjection/'
             - '../src/Entity/'
+            - '../src/Game/Mode/TraceableGameMode.php'
             - '../src/Kernel.php'
 
-    App\Service\GameManager\GameManager:
+    App\Game\GameManager:
         arguments:
             $gameModes: !tagged_iterator app.game_mode
 

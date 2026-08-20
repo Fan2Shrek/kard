@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Service\GameManager\GameMode;
+namespace App\Game\Mode;
 
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
-use App\Model\Card\Hand;
-use App\Model\GameContext;
-use App\Service\Card\HandRepositoryInterface;
+use App\Game\Card\HandRepositoryInterface;
+use App\Game\Model\Card\Hand;
+use App\Game\Model\GameState;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -35,7 +35,7 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
         return 7;
     }
 
-    public function setup(GameContext $ctx, array $hands): void
+    public function setup(GameState $ctx, array $hands): void
     {
         $ctx->setCurrentCards($ctx->draw(1));
     }
@@ -48,7 +48,7 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
         return $ids;
     }
 
-    public function isGameFinished(GameContext $gameContext): bool
+    public function isGameFinished(GameState $gameContext): bool
     {
         foreach ($gameContext->getPlayers() as $player) {
             if (0 === $player->cardsCount) {
@@ -61,7 +61,7 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
         return false;
     }
 
-    protected function doPlay(array $cards, GameContext $gameContext, Hand $hand, array $data): void
+    protected function doPlay(array $cards, GameState $gameContext, Hand $hand, array $data): void
     {
         if (empty($cards)) {
             $hand->addMultipleCards($gameContext->draw(1));

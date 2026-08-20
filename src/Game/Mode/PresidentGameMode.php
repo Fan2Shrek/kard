@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Service\GameManager\GameMode;
+namespace App\Game\Mode;
 
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
-use App\Model\Card\Card;
-use App\Model\Card\Hand;
-use App\Model\GameContext;
+use App\Game\Model\Card\Card;
+use App\Game\Model\Card\Hand;
+use App\Game\Model\GameState;
 
 /**
  * @see https://bicyclecards.com/how-to-play/presidents
@@ -44,7 +44,7 @@ final class PresidentGameMode extends AbstractGameMode
         return $order;
     }
 
-    public function isGameFinished(GameContext $gameContext): bool
+    public function isGameFinished(GameState $gameContext): bool
     {
         foreach ($gameContext->getPlayers() as $player) {
             if (0 === $player->cardsCount) {
@@ -57,7 +57,7 @@ final class PresidentGameMode extends AbstractGameMode
         return false;
     }
 
-    protected function doPlay(array $cards, GameContext $gameContext, Hand $hand, array $data): void
+    protected function doPlay(array $cards, GameState $gameContext, Hand $hand, array $data): void
     {
         $this->cards = $cards;
         $this->gameContext = $gameContext;

@@ -3,7 +3,7 @@
 namespace App\Entity;
 
 use App\Enum\GameStatusEnum;
-use App\Model\Player;
+use App\Game\Model\Player;
 use App\Repository\RoomRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;

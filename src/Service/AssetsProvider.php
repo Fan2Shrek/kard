@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Model\Card\Card;
-use App\Service\Card\CardGenerator;
+use App\Game\Model\Card\Card;
+use App\Game\Card\CardGenerator;
 use Symfony\Component\Asset\Packages;
 
 final class AssetsProvider

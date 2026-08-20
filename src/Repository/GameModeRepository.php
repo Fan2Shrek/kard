@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\GameMode;
-use App\Service\GameManager\GameMode\GameModeEnum;
+use App\Game\Mode\GameModeEnum;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

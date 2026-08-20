@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Card;
+namespace App\Game\Card;
 
 use App\Entity\Room;
 use App\Entity\User;
-use App\Model\Card\Hand;
+use App\Game\Model\Card\Hand;
 use App\Service\Redis\RedisConnection;
 use Symfony\Component\Serializer\SerializerInterface;
 

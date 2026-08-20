@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model\Card;
+namespace App\Game\Model\Card;
 
 final class Hand implements \Countable
 {

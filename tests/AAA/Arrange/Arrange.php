@@ -7,11 +7,11 @@ namespace App\Tests\AAA\Arrange;
 use App\Entity\Room;
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
-use App\Model\Card\Card;
-use App\Model\Card\Hand;
-use App\Model\GameContext;
-use App\Model\Player;
-use App\Model\Turn;
+use App\Game\Model\Card\Card;
+use App\Game\Model\Card\Hand;
+use App\Game\Model\GameState;
+use App\Game\Model\Player;
+use App\Game\Model\Turn;
 use App\Tests\AAA\Act\Act;
 use Ramsey\Uuid\Uuid;
 
@@ -94,7 +94,7 @@ abstract /* static */ class Arrange
         Act::addContext('gameContextPlayers', $players);
     }
 
-    private static function createGameContext($turns): GameContext
+    private static function createGameContext($turns): GameState
     {
         if (null === $players = Act::get('gameContextPlayers')) {
             $players = [
@@ -110,7 +110,7 @@ abstract /* static */ class Arrange
             }
         }
 
-        return new GameContext(
+        return new GameState(
             'room-id',
             new Room(
                 Act::get('gameMode'),

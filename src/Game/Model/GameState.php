@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Model;
+namespace App\Game\Model;
 
 use App\Entity\Room;
-use App\Model\Card\Card;
-use App\Model\Card\Deck;
+use App\Game\Model\Card\Card;
+use App\Game\Model\Card\Deck;
 
-final class GameContext
+final class GameState
 {
     private PlayersList $players;
 

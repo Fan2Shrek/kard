@@ -6,8 +6,8 @@ namespace App\Tests\Resource;
 
 use App\Entity\Room;
 use App\Entity\User;
-use App\Model\Card\Hand;
-use App\Service\Card\HandRepositoryInterface;
+use App\Game\Model\Card\Hand;
+use App\Game\Card\HandRepositoryInterface;
 use App\Tests\AAA\Act\Act;
 
 final class ActHandRepository implements HandRepositoryInterface

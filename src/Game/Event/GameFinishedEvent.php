@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Event;
+namespace App\Game\Event;
 
 use App\Entity\Room;
-use App\Model\GameContext;
+use App\Game\Model\GameState;
 
 final class GameFinishedEvent
 {
     public function __construct(
         public Room $room,
-        public GameContext $context,
+        public GameState $context,
     ) {
     }
 }

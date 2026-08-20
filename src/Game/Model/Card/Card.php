@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model\Card;
+namespace App\Game\Model\Card;
 
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;

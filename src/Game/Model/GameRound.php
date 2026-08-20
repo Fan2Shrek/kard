@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model;
+namespace App\Game\Model;
 
 final class GameRound
 {

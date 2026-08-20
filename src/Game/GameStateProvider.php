@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Service;
+namespace App\Game;
 
 use App\Entity\Room;
-use App\Model\GameContext;
-use App\Model\Player;
+use App\Game\Model\GameState;
+use App\Game\Model\Player;
 use App\Service\Redis\RedisConnection;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
-final class GameContextProvider
+final class GameStateProvider
 {
     public function __construct(
         private readonly RedisConnection $redis,
@@ -17,18 +17,18 @@ final class GameContextProvider
     ) {
     }
 
-    public function provide(Room $room): GameContext
+    public function provide(Room $room): GameState
     {
         if ('' === $ctx = $this->redis->get($this->getKey($room))) {
             $ctx = $this->createContext($room);
         }
 
-        return is_string($ctx) ? $this->serializer->deserialize($ctx, GameContext::class, 'json', [
+        return is_string($ctx) ? $this->serializer->deserialize($ctx, GameState::class, 'json', [
             AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true,
         ]) : $ctx;
     }
 
-    public function save(GameContext $ctx): void
+    public function save(GameState $ctx): void
     {
         $this->redis->set($this->getKey($ctx->getRoom()), $this->serializer->serialize($ctx, 'json'));
     }
@@ -38,11 +38,11 @@ final class GameContextProvider
         $this->redis->del($this->getKey($room));
     }
 
-    private function createContext(Room $room): GameContext
+    private function createContext(Room $room): GameState
     {
         $players = array_map(fn ($u): Player => Player::fromUser($u), $room->getParticipants()->toArray());
 
-        return new GameContext(
+        return new GameState(
             $room->getId(),
             $room,
             $players,

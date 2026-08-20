@@ -1,21 +1,21 @@
 <?php
 
-namespace App\Api;
+namespace App\Game\Serializer;
 
 use App\Entity\Room;
-use App\Model\Card\Card;
-use App\Model\GameContext;
-use App\Model\Player;
-use App\Model\Turn;
+use App\Game\Model\Card\Card;
+use App\Game\Model\GameState;
+use App\Game\Model\Player;
+use App\Game\Model\Turn;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-final class GameContextSerializer implements DenormalizerInterface, DenormalizerAwareInterface
+final class GameStateSerializer implements DenormalizerInterface, DenormalizerAwareInterface
 {
     use DenormalizerAwareTrait;
 
-    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): GameContext
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): GameState
     {
         $players = [];
         foreach ($data['players'] as $player) {
@@ -26,7 +26,7 @@ final class GameContextSerializer implements DenormalizerInterface, Denormalizer
             );
         }
 
-        return new GameContext(
+        return new GameState(
             $data['id'],
             $this->denormalizer->denormalize($data['room'], Room::class, $format, $context),
             $players,
@@ -43,13 +43,13 @@ final class GameContextSerializer implements DenormalizerInterface, Denormalizer
 
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
-        return GameContext::class === $type;
+        return GameState::class === $type;
     }
 
     public function getSupportedTypes(?string $format): array
     {
         return [
-            GameContext::class => true,
+            GameState::class => true,
         ];
     }
 }

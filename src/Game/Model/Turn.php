@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Model;
+namespace App\Game\Model;
 
-use App\Model\Card\Card;
+use App\Game\Model\Card\Card;
 
 final class Turn
 {

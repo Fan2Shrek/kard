@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Service\Card;
+namespace App\Game\Card;
 
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
-use App\Model\Card\Card;
-use App\Model\Card\Deck;
-use App\Model\Card\Hand;
+use App\Game\Model\Card\Card;
+use App\Game\Model\Card\Deck;
+use App\Game\Model\Card\Hand;
 
 final class CardGenerator
 {

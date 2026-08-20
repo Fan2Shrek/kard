@@ -3,7 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\GameModeRepository;
-use App\Service\GameManager\GameMode\GameModeEnum;
+use App\Game\Mode\GameModeEnum;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: GameModeRepository::class)]

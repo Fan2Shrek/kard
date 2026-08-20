@@ -1,24 +1,23 @@
 <?php
 
-namespace App\Service\GameManager;
+namespace App\Game;
 
 use App\Entity\Result;
 use App\Entity\Room;
 use App\Enum\GameStatusEnum;
-use App\Event\GameFinishedEvent;
-use App\Model\Card\Card;
-use App\Model\Card\Hand;
-use App\Model\GameContext;
-use App\Model\Player;
+use App\Game\Card\CachedHandRepositoryInterface;
+use App\Game\Card\CardGenerator;
+use App\Game\Card\HandRepositoryInterface;
+use App\Game\Event\GameFinishedEvent;
+use App\Game\Mode\GameModeEnum;
+use App\Game\Mode\GameModeInterface;
+use App\Game\Mode\SetupGameModeInterface;
+use App\Game\Model\Card\Card;
+use App\Game\Model\Card\Hand;
+use App\Game\Model\GameState;
+use App\Game\Model\Player;
 use App\Repository\ResultRepository;
 use App\Repository\UserRepository;
-use App\Service\Card\CachedHandRepositoryInterface;
-use App\Service\Card\CardGenerator;
-use App\Service\Card\HandRepositoryInterface;
-use App\Service\GameContextProvider;
-use App\Service\GameManager\GameMode\GameModeEnum;
-use App\Service\GameManager\GameMode\GameModeInterface;
-use App\Service\GameManager\GameMode\SetupGameModeInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
@@ -35,7 +34,7 @@ final class GameManager implements ServiceSubscriberInterface
         private iterable $gameModes,
         private ContainerInterface $container,
         private HubInterface $hub,
-        private GameContextProvider $gameContextProvider,
+        private GameStateProvider $gameStateProvider,
         private HandRepositoryInterface $handRepository,
         private SerializerInterface $serializer,
     ) {
@@ -51,11 +50,11 @@ final class GameManager implements ServiceSubscriberInterface
         ];
     }
 
-    public function setupRoom(Room $room): GameContext
+    public function setupRoom(Room $room): GameState
     {
         [$hands, $drawPile] = $this->drawHands($room);
 
-        $gameContext = $this->gameContextProvider->provide($room);
+        $gameContext = $this->gameStateProvider->provide($room);
         $gameContext->setDrawPile($drawPile);
 
         $players = array_reduce($gameContext->getPlayers(), function (array $carry, Player $player) {
@@ -69,12 +68,12 @@ final class GameManager implements ServiceSubscriberInterface
             $players[$player->getId()->toString()]->cardsCount = count($hands[$k]);
         }
 
-        $this->gameContextProvider->save($gameContext);
+        $this->gameStateProvider->save($gameContext);
 
         return $gameContext;
     }
 
-    public function start(GameContext $ctx): void
+    public function start(GameState $ctx): void
     {
         $players = $ctx->getPlayers();
 
@@ -114,7 +113,7 @@ final class GameManager implements ServiceSubscriberInterface
             ),
         );
 
-        $this->gameContextProvider->save($ctx);
+        $this->gameStateProvider->save($ctx);
     }
 
     /**
@@ -123,7 +122,7 @@ final class GameManager implements ServiceSubscriberInterface
      */
     public function play(Room $room, Player $player, array $cards, array $data = []): void
     {
-        $ctx = $this->gameContextProvider->provide($room);
+        $ctx = $this->gameStateProvider->provide($room);
         $player = current(array_filter(
             $ctx->getPlayers(),
             fn (Player $p): bool => $p->id === $player->id,
@@ -160,7 +159,7 @@ final class GameManager implements ServiceSubscriberInterface
 
         $player->cardsCount = count($hand);
 
-        $this->gameContextProvider->save($ctx);
+        $this->gameStateProvider->save($ctx);
 
         $this->hub->publish(new Update(
             sprintf('room-%s', $room->getId()),
@@ -185,7 +184,7 @@ final class GameManager implements ServiceSubscriberInterface
             if ($this->handRepository instanceof CachedHandRepositoryInterface) {
                 $this->handRepository->deleteAllHandForRoom($room);
             }
-            $this->gameContextProvider->clear($room);
+            $this->gameStateProvider->clear($room);
 
             $this->container->get('event_dispatcher')->dispatch(new GameFinishedEvent($room, $ctx));
             $this->container->get('result_repository')->save($result);

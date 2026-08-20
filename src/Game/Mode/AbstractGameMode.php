@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\Service\GameManager\GameMode;
+namespace App\Game\Mode;
 
-use App\Domain\Exception\RuleException;
-use App\Model\Card\Card;
-use App\Model\Card\Hand;
-use App\Model\GameContext;
+use App\Game\Exception\RuleException;
+use App\Game\Model\Card\Card;
+use App\Game\Model\Card\Hand;
+use App\Game\Model\GameState;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 
 abstract class AbstractGameMode implements GameModeInterface
 {
-    protected GameContext $gameContext;
+    protected GameState $gameContext;
 
     /**
      * @var array<Card>
@@ -25,7 +25,7 @@ abstract class AbstractGameMode implements GameModeInterface
     ) {
     }
 
-    public function play(array $cards, GameContext $gameContext, Hand $hand, array $data = []): void
+    public function play(array $cards, GameState $gameContext, Hand $hand, array $data = []): void
     {
         $this->cards = $cards;
         $this->gameContext = $gameContext;
@@ -44,7 +44,7 @@ abstract class AbstractGameMode implements GameModeInterface
      * @param array<Card>          $cards
      * @param array<string, mixed> $data
      */
-    abstract protected function doPlay(array $cards, GameContext $gameContext, Hand $hand, array $data): void;
+    abstract protected function doPlay(array $cards, GameState $gameContext, Hand $hand, array $data): void;
 
     protected function dispatchMercureEvent(string $eventName, string $text): void
     {

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Domain\Exception;
+namespace App\Game\Exception;
 
-use App\Service\GameManager\GameMode\GameModeEnum;
+use App\Domain\Exception\TranslatableException;
+use App\Game\Mode\GameModeEnum;
 
 class RuleException extends \Exception implements TranslatableException
 {

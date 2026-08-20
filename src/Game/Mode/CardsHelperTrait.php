@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Service\GameManager\GameMode;
+namespace App\Game\Mode;
 
 use App\Enum\Card\Rank;
-use App\Model\Card\Card;
+use App\Game\Model\Card\Card;
 
 trait CardsHelperTrait
 {

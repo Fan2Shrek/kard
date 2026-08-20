@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model;
+namespace App\Game\Model;
 
 use App\Entity\User;
 

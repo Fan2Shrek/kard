@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Service\GameManager\GameMode;
+namespace App\Game\Mode;
 
-use App\Model\Card\Card;
-use App\Model\Card\Hand;
-use App\Model\GameContext;
+use App\Game\Model\Card\Card;
+use App\Game\Model\Card\Hand;
+use App\Game\Model\GameState;
 
 interface GameModeInterface
 {
@@ -12,7 +12,7 @@ interface GameModeInterface
      * @param array<Card>          $cards
      * @param array<string, mixed> $data
      */
-    public function play(array $cards, GameContext $gameContext, Hand $hand, array $data = []): void;
+    public function play(array $cards, GameState $gameContext, Hand $hand, array $data = []): void;
 
     public function getGameMode(): GameModeEnum;
 
@@ -28,5 +28,5 @@ interface GameModeInterface
      */
     public function getPlayerOrder(array $players): array;
 
-    public function isGameFinished(GameContext $gameContext): bool;
+    public function isGameFinished(GameState $gameContext): bool;
 }

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Service\GameManager\GameMode;
+namespace App\Game\Mode;
 
-use App\Model\Card\Hand;
-use App\Model\GameContext;
+use App\Game\Model\Card\Hand;
+use App\Game\Model\GameState;
 
 interface SetupGameModeInterface extends GameModeInterface
 {
@@ -14,5 +14,5 @@ interface SetupGameModeInterface extends GameModeInterface
      *
      * @param array<string, Hand> $hands
      */
-    public function setup(GameContext $ctx, array $hands): void;
+    public function setup(GameState $ctx, array $hands): void;
 }

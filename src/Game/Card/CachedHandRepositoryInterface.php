@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Card;
+namespace App\Game\Card;
 
 use App\Entity\Room;
 

@@ -4,9 +4,9 @@ namespace App\Tests\AAA\Act;
 
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
-use App\Model\Card\Card;
-use App\Model\Card\Hand;
-use App\Model\GameContext;
+use App\Game\Model\Card\Card;
+use App\Game\Model\Card\Hand;
+use App\Game\Model\GameState;
 
 abstract /* static */ class Act
 {
@@ -69,7 +69,7 @@ abstract /* static */ class Act
         return self::$context[$key] ?? null;
     }
 
-    private static function play(array $cards, GameContext $gameContext, array $handCards, array $data): void
+    private static function play(array $cards, GameState $gameContext, array $handCards, array $data): void
     {
         $currentPlayer = static::get('gameContextPlayers')[current(array_keys(static::get('gameContextPlayers') ?? []))] ?? null;
         $hands = static::get('hands') ?? [];
