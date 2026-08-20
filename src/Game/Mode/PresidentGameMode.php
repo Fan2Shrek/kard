@@ -4,6 +4,10 @@ namespace App\Game\Mode;
 
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
+use App\Game\Event\CardOrNothingCalledEvent;
+use App\Game\Event\CardPlayedEvent;
+use App\Game\Event\RoundEndedEvent;
+use App\Game\Event\TurnSkippedEvent;
 use App\Game\Model\Card\Card;
 use App\Game\Model\Card\Hand;
 use App\Game\Model\GameContext;
@@ -19,6 +23,8 @@ final class PresidentGameMode extends AbstractGameMode
     use CardsHelperTrait;
 
     private bool $isTurnFinished;
+
+    private GameContext $context;
 
     public function getGameMode(): GameModeEnum
     {
@@ -64,6 +70,7 @@ final class PresidentGameMode extends AbstractGameMode
 
         $this->cards = $cards;
         $this->gameContext = $gameContext;
+        $this->context = $context;
 
         if (\count($cards) > 3) {
             throw $this->createRuleException('card.count.invalid');
@@ -86,8 +93,10 @@ final class PresidentGameMode extends AbstractGameMode
             }
 
             // skip
+            $passingPlayer = $gameContext->getCurrentPlayer();
             $gameContext->setCurrentCards([]);
             $gameContext->nextPlayer();
+            $context->addEvent(new TurnSkippedEvent($gameContext->getRoom(), $passingPlayer));
 
             if ($gameContext->getCurrentPlayer()->id === $gameContext->getData('lastPlayer')) {
                 $this->handleRoundEnd();
@@ -95,6 +104,8 @@ final class PresidentGameMode extends AbstractGameMode
 
             return;
         }
+
+        $actingPlayer = $gameContext->getCurrentPlayer();
 
         match (\count($currentCards)) { // @phpstan-ignore-line
             0 => $this->handleStart($cards),
@@ -104,6 +115,9 @@ final class PresidentGameMode extends AbstractGameMode
         };
 
         $hand->removeCards($cards);
+
+        $context->addEvent(new CardPlayedEvent($gameContext->getRoom(), $actingPlayer, $cards));
+
         if ($this->isTurnFinished ?? false) {
             return;
         }
@@ -140,12 +154,14 @@ final class PresidentGameMode extends AbstractGameMode
         $beforeLastTurn = ($nonSkippedTurns[1] ?? null)?->getCards() ?? null;
 
         if ($this->isSameRank($card, $currentCards[0])) {
-            $message =
-                null !== $beforeLastTurn && $lastTurn[0]->rank === $beforeLastTurn[0]->rank ?
-                'Appel aux quatre'
-                : \sprintf('%s ou rien', $card->rank->value);
-            // maybe use translation here too
-            $this->dispatchMercureEvent('message', $message);
+            $isCallForFour = null !== $beforeLastTurn && $lastTurn[0]->rank === $beforeLastTurn[0]->rank;
+
+            $this->context->addEvent(new CardOrNothingCalledEvent(
+                $this->gameContext->getRoom(),
+                $this->gameContext->getCurrentPlayer(),
+                $card->rank,
+                $isCallForFour,
+            ));
         }
 
         // Rank or nothing :p
@@ -283,7 +299,7 @@ final class PresidentGameMode extends AbstractGameMode
     {
         $this->gameContext->setCurrentCards($this->cards);
         $this->gameContext->newRound();
-        $this->dispatchMercureEvent('message', 'Fin du tour');
+        $this->context->addEvent(new RoundEndedEvent($this->gameContext->getRoom()));
         $this->isTurnFinished = true;
     }
 }

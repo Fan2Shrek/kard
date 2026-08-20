@@ -6,6 +6,7 @@ namespace App\Game\EventListener;
 
 use App\Game\Event\AbstractGameEvent;
 use App\Game\Event\CardDrawnEvent;
+use App\Game\Event\CardOrNothingCalledEvent;
 use App\Game\Event\CardPlayedEvent;
 use App\Game\Event\PlayOrderReversedEvent;
 use App\Game\Event\RoundEndedEvent;
@@ -33,6 +34,7 @@ final class MercurePublishingSubscriber implements EventSubscriberInterface
             PlayOrderReversedEvent::class => 'onGameEvent',
             TurnSkippedEvent::class => 'onGameEvent',
             RoundEndedEvent::class => 'onGameEvent',
+            CardOrNothingCalledEvent::class => 'onGameEvent',
         ];
     }
 

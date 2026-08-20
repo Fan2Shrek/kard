@@ -4,6 +4,9 @@ use App\Game\Exception\RuleException;
 use App\Entity\GameMode;
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
+use App\Game\Event\CardOrNothingCalledEvent;
+use App\Game\Event\CardPlayedEvent;
+use App\Game\Event\RoundEndedEvent;
 use App\Game\Model\Card\Card;
 use App\Game\Model\Card\Hand;
 use App\Game\Model\Player;
@@ -674,33 +677,32 @@ describe('Président: fin de tour', function () {
     });
 });
 
-describe('Président: mercure', function () {
+describe('Président: events', function () {
     describe('Carte ou rien', function () {
-        test("Lors d'une carte ou rien un évenement est envoyé", function () {
+        test("Lorsqu'une carte ou rien est déclarée, un évenement CardOrNothingCalled est envoyé", function () {
             Arrange::setCurrentCard(7);
 
             Act::playCard(7, 'h');
 
-            expect(HubSpy::$published)->toHaveCount(1);
+            $events = Act::getEvents();
+
+            expect($events)->toHaveCount(2);
+            expect($events[0])->toBeInstanceOf(CardOrNothingCalledEvent::class);
+            expect($events[1])->toBeInstanceOf(CardPlayedEvent::class);
         });
 
-        test("Lors d'une carte ou rien l'évenement envoyé a l'action message", function () {
+        test("L'évenement CardOrNothingCalled contient le rang concerné et n'est pas un appel aux quatre", function () {
             Arrange::setCurrentCard(7);
 
             Act::playCard(7, 'h');
 
-            expectMercureMessage(current(HubSpy::$published))->toBeAction('message');
+            $event = Act::getEvents()[0];
+
+            expect($event->rank)->toBe(Rank::SEVEN);
+            expect($event->isCallForFour)->toBeFalse();
         });
 
-        test("Lors d'une carte ou rien l'évenement envoyé possède un message", function () {
-            Arrange::setCurrentCard(7);
-
-            Act::playCard(7, 'h');
-
-            expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', '7 ou rien');
-        });
-
-        test("Lors d'une carte ou rien l'évenement envoyé possède un message même au milieu d'un round", function () {
+        test("L'évenement CardOrNothingCalled est envoyé même au milieu d'un round", function () {
             Arrange::setRound([
                 [6],
                 [8],
@@ -709,10 +711,10 @@ describe('Président: mercure', function () {
 
             Act::playCard(9, 'h');
 
-            expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', '9 ou rien');
+            expect(Act::getEvents()[0]->rank)->toBe(Rank::NINE);
         });
 
-        test("Si un deux est joué par dessus une carte ou rien, la fin de tour n'est pas envoyé", function () {
+        test("Si un deux est joué par dessus une carte ou rien invalide, aucun évenement n'est envoyé", function () {
             Arrange::setRound([
                 [3],
                 [5],
@@ -725,10 +727,10 @@ describe('Président: mercure', function () {
             } catch (RuleException $e) {
             }
 
-            expect(HubSpy::$published)->toHaveCount(0);
+            expect(Act::getEvents())->toHaveCount(0);
         });
 
-        test("Lors de l'appel aux quatre, un évenement est envoyé", function () {
+        test("Lors de l'appel aux quatre, un évenement CardOrNothingCalled est envoyé", function () {
             Arrange::setRound([
                 [9],
                 [9],
@@ -736,10 +738,11 @@ describe('Président: mercure', function () {
 
             Act::playCard(9, 'h');
 
-            expect(HubSpy::$published)->toHaveCount(1);
+            expect(Act::getEvents())->toHaveCount(2);
+            expect(Act::getEvents()[0])->toBeInstanceOf(CardOrNothingCalledEvent::class);
         });
 
-        test("Lors de l'appel aux quatre, l'évènement possède un message", function () {
+        test("L'évenement CardOrNothingCalled indique l'appel aux quatre", function () {
             Arrange::setRound([
                 [9],
                 [9],
@@ -747,26 +750,21 @@ describe('Président: mercure', function () {
 
             Act::playCard(9, 'h');
 
-            expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'Appel aux quatre');
+            expect(Act::getEvents()[0]->isCallForFour)->toBeTrue();
         });
     });
 
     describe("Fin d'un tour", function () {
-        test("A la fin d'un tour, un événement est envoyé", function () {
+        test("A la fin d'un tour, un événement RoundEnded est envoyé", function () {
             Arrange::setCurrentCard(7);
 
             Act::playCard(2, 'h');
 
-            expect(HubSpy::$published)->toHaveCount(1);
-        });
+            $events = Act::getEvents();
 
-        test("A la fin d'un tour, un événement est envoyé avec un message", function () {
-            Arrange::setCurrentCard(7);
-
-            Act::playCard(2, 'h');
-
-            expectMercureMessage(current(HubSpy::$published))->toBeAction('message');
-            expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'Fin du tour');
+            expect($events)->toHaveCount(2);
+            expect($events[0])->toBeInstanceOf(RoundEndedEvent::class);
+            expect($events[1])->toBeInstanceOf(CardPlayedEvent::class);
         });
     });
 });

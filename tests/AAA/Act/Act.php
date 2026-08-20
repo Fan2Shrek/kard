@@ -83,6 +83,7 @@ abstract /* static */ class Act
         self::$context['currentHand'] = $hand;
 
         $context = new GameContext($gameState);
+        self::$context['events'] = [];
         static::get('gamePlayer')->play($cards, $context, $hand, $data);
         self::$context['events'] = $context->flushEvents();
     }

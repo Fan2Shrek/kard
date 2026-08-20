@@ -10,7 +10,6 @@ use App\Game\Model\Card\Hand;
 use App\Game\Model\GameContext;
 use App\Game\Model\GameState;
 use Symfony\Component\Mercure\HubInterface;
-use Symfony\Component\Mercure\Update;
 
 abstract class AbstractGameMode implements GameModeInterface
 {
@@ -46,19 +45,6 @@ abstract class AbstractGameMode implements GameModeInterface
      * @param array<string, mixed> $data
      */
     abstract protected function doPlay(array $cards, GameContext $context, Hand $hand, array $data): void;
-
-    protected function dispatchMercureEvent(string $eventName, string $text): void
-    {
-        $this->hub->publish(new Update(
-            \sprintf('room-%s', $this->gameContext->getId()),
-            \json_encode([
-                'action' => $eventName,
-                'data' => [
-                    'text' => $text,
-                ],
-            ])
-        ));
-    }
 
     /**
      * @param array<mixed> $params
