@@ -9,7 +9,7 @@ use App\Service\Redis\RedisConnection;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
-final class GameStateProvider
+class GameStateProvider
 {
     public function __construct(
         private readonly RedisConnection $redis,

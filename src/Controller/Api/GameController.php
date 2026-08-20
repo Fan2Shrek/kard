@@ -6,21 +6,49 @@ use App\Entity\Room;
 use App\Entity\User;
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
+use App\Game\Card\HandRepositoryInterface;
+use App\Game\GameManager;
+use App\Game\GameStateProvider;
 use App\Game\Model\Card\Card;
 use App\Game\Model\Player;
-use App\Game\GameManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route('/api/game')]
 final class GameController extends AbstractController
 {
     public function __construct(
         private readonly GameManager $gameManager,
+        private readonly GameStateProvider $gameStateProvider,
+        private readonly HandRepositoryInterface $handRepository,
+        private readonly SerializerInterface $serializer,
     ) {
+    }
+
+    /**
+     * Returns the public game state, plus the connected player's hand when they are a participant.
+     *
+     * Used by the front to resync after receiving a game event over Mercure.
+     */
+    #[Route('/{id}', name: 'state', methods: ['GET'])]
+    public function state(Room $room): Response
+    {
+        $user = $this->getUser();
+        $state = $this->gameStateProvider->provide($room);
+
+        $hand = null;
+        if (\in_array($user, $room->getParticipants()->toArray(), true)) {
+            $hand = $this->handRepository->get($user, $room)?->getCards();
+        }
+
+        return new JsonResponse($this->serializer->serialize([
+            'state' => $state,
+            'hand' => $hand,
+        ], 'json'), Response::HTTP_OK, [], true);
     }
 
     /**

@@ -20,9 +20,6 @@ use App\Game\Model\Player;
 use App\Repository\ResultRepository;
 use App\Repository\UserRepository;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\Mercure\HubInterface;
-use Symfony\Component\Mercure\Update;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
@@ -34,10 +31,8 @@ final class GameManager implements ServiceSubscriberInterface
     public function __construct(
         private iterable $gameModes,
         private ContainerInterface $container,
-        private HubInterface $hub,
         private GameStateProvider $gameStateProvider,
         private HandRepositoryInterface $handRepository,
-        private SerializerInterface $serializer,
     ) {
     }
 
@@ -166,19 +161,6 @@ final class GameManager implements ServiceSubscriberInterface
         foreach ($context->flushEvents() as $event) {
             $this->container->get('event_dispatcher')->dispatch($event);
         }
-
-        $this->hub->publish(new Update(
-            sprintf('room-%s', $room->getId()),
-            $this->serializer->serialize([
-                'action' => 'play',
-                'data' => $ctx,
-            ], 'json'),
-        ));
-
-        $this->hub->publish(new Update(
-            sprintf('room-%s-%s', $room->getId(), $player->id),
-            $this->serializer->serialize($hand, 'json'),
-        ));
 
         if ($gameMode->isGameFinished($ctx)) {
             $room->setStatus(GameStatusEnum::FINISHED);
