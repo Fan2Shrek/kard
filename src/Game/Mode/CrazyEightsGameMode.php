@@ -7,7 +7,13 @@ namespace App\Game\Mode;
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
 use App\Game\Card\HandRepositoryInterface;
+use App\Game\Event\CardDrawnEvent;
+use App\Game\Event\CardPlayedEvent;
+use App\Game\Event\PlayOrderReversedEvent;
+use App\Game\Event\SuitChangedEvent;
+use App\Game\Event\TurnSkippedEvent;
 use App\Game\Model\Card\Hand;
+use App\Game\Model\GameContext;
 use App\Game\Model\GameState;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
@@ -61,18 +67,21 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
         return false;
     }
 
-    protected function doPlay(array $cards, GameState $gameContext, Hand $hand, array $data): void
+    protected function doPlay(array $cards, GameContext $context, Hand $hand, array $data): void
     {
+        $gameContext = $context->getState();
+
         if (empty($cards)) {
+            $player = $gameContext->getCurrentPlayer();
+
             $hand->addMultipleCards($gameContext->draw(1));
-            $this->dispatchMercureEvent(
-                'message',
-                \sprintf('%s pioche une carte', $gameContext->getCurrentPlayer()->username),
-            );
+            $context->addEvent(new CardDrawnEvent($gameContext->getRoom(), $player, 1));
             $gameContext->nextPlayer();
 
             return;
         }
+
+        $actingPlayer = $gameContext->getCurrentPlayer();
 
         $currentCards = $gameContext->getCurrentCards();
         // always the last card played
@@ -91,10 +100,7 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
 
             $newSuit = Suit::from(strtolower($data['name'][0]));
 
-            $this->dispatchMercureEvent(
-                'message',
-                \sprintf('Changement de couleur en %s', $newSuit->getSymbol()),
-            );
+            $context->addEvent(new SuitChangedEvent($gameContext->getRoom(), $actingPlayer, $newSuit));
 
             $hand->removeCards($cards);
             $gameContext->addData('suit', $newSuit);
@@ -120,10 +126,7 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
 
         if (Rank::ACE === $mainCard->rank) {
             $gameContext->setPlayerOrder(array_reverse($gameContext->getPlayers()), true);
-            $this->dispatchMercureEvent(
-                'message',
-                'Changement de sens !',
-            );
+            $context->addEvent(new PlayOrderReversedEvent($gameContext->getRoom()));
 
             if (2 === count($gameContext->getPlayers())) {
                 $gameContext->nextPlayer();
@@ -133,15 +136,13 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
         if (Rank::TWO === $mainCard->rank) {
             $nextPlayer = $gameContext->getNextPlayer();
             $nextHand = $this->handRepository->get($nextPlayer->id, $gameContext->getRoom());
-            $nextHand->addMultipleCards($gameContext->draw(2 * count($cards)));
+            $drawnCount = 2 * count($cards);
+            $nextHand->addMultipleCards($gameContext->draw($drawnCount));
             $this->handRepository->save($nextPlayer->id, $gameContext->getRoom(), $nextHand); // @pest-mutate-ignore
 
-            $this->dispatchMercureEvent(
-                'message',
-                \sprintf('%s pioche %d cartes', $gameContext->getNextPlayer()->username, 2 * count($cards)),
-            );
+            $context->addEvent(new CardDrawnEvent($gameContext->getRoom(), $nextPlayer, $drawnCount, true));
 
-            $gameContext->getNextPlayer()->cardsCount += 2 * count($cards);
+            $gameContext->getNextPlayer()->cardsCount += $drawnCount;
 
             $this->getHub()->publish(new Update(
                 sprintf('room-%s-%s', $gameContext->getRoom()->getId(), $nextPlayer->id),
@@ -154,15 +155,14 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
 
         if (Rank::JACK === $mainCard->rank) {
             $gameContext->nextPlayer();
-            $this->dispatchMercureEvent(
-                'message',
-                \sprintf('%s saute son tour', $gameContext->getCurrentPlayer()->username),
-            );
+            $context->addEvent(new TurnSkippedEvent($gameContext->getRoom(), $gameContext->getCurrentPlayer()));
         }
 
         $hand->removeCards($cards);
         $gameContext->setCurrentCards($cards);
-        $gameContext->addData('lastPlayer', $gameContext->getCurrentPlayer()->id); // @pest-mutate-ignore flemme
+        $gameContext->addData('lastPlayer', $actingPlayer->id); // @pest-mutate-ignore flemme
         $gameContext->nextPlayer();
+
+        $context->addEvent(new CardPlayedEvent($gameContext->getRoom(), $actingPlayer, $cards));
     }
 }

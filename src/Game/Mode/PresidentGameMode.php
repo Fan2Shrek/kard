@@ -6,6 +6,7 @@ use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
 use App\Game\Model\Card\Card;
 use App\Game\Model\Card\Hand;
+use App\Game\Model\GameContext;
 use App\Game\Model\GameState;
 
 /**
@@ -57,8 +58,10 @@ final class PresidentGameMode extends AbstractGameMode
         return false;
     }
 
-    protected function doPlay(array $cards, GameState $gameContext, Hand $hand, array $data): void
+    protected function doPlay(array $cards, GameContext $context, Hand $hand, array $data): void
     {
+        $gameContext = $context->getState();
+
         $this->cards = $cards;
         $this->gameContext = $gameContext;
 

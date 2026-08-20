@@ -14,6 +14,7 @@ use App\Game\Mode\GameModeInterface;
 use App\Game\Mode\SetupGameModeInterface;
 use App\Game\Model\Card\Card;
 use App\Game\Model\Card\Hand;
+use App\Game\Model\GameContext;
 use App\Game\Model\GameState;
 use App\Game\Model\Player;
 use App\Repository\ResultRepository;
@@ -153,13 +154,18 @@ final class GameManager implements ServiceSubscriberInterface
 
         $gameMode = $this->getGameMode($room->getGameMode()->getValue());
 
-        $gameMode->play($cards, $ctx, $hand, $data);
+        $context = new GameContext($ctx);
+        $gameMode->play($cards, $context, $hand, $data);
 
         $this->handRepository->save($player->id, $room, $hand);
 
         $player->cardsCount = count($hand);
 
         $this->gameStateProvider->save($ctx);
+
+        foreach ($context->flushEvents() as $event) {
+            $this->container->get('event_dispatcher')->dispatch($event);
+        }
 
         $this->hub->publish(new Update(
             sprintf('room-%s', $room->getId()),

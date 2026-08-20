@@ -4,6 +4,7 @@ namespace App\Game\Mode;
 
 use App\Game\Model\Card\Card;
 use App\Game\Model\Card\Hand;
+use App\Game\Model\GameContext;
 use App\Game\Model\GameState;
 
 interface GameModeInterface
@@ -12,7 +13,7 @@ interface GameModeInterface
      * @param array<Card>          $cards
      * @param array<string, mixed> $data
      */
-    public function play(array $cards, GameState $gameContext, Hand $hand, array $data = []): void;
+    public function play(array $cards, GameContext $context, Hand $hand, array $data = []): void;
 
     public function getGameMode(): GameModeEnum;
 

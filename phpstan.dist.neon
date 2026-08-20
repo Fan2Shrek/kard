@@ -9,5 +9,4 @@ parameters:
         - bin/
         - src/
     excludePaths:
-        - src/Api/
         - src/DataFixtures/

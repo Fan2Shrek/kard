@@ -4,6 +4,11 @@ use App\Game\Exception\RuleException;
 use App\Entity\GameMode;
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
+use App\Game\Event\CardDrawnEvent;
+use App\Game\Event\CardPlayedEvent;
+use App\Game\Event\PlayOrderReversedEvent;
+use App\Game\Event\SuitChangedEvent;
+use App\Game\Event\TurnSkippedEvent;
 use App\Game\Model\Card\Card;
 use App\Game\Model\Card\Hand;
 use App\Game\Model\Player;
@@ -398,17 +403,21 @@ describe('Huit américain: cartes spéciales', function () {
     });
 });
 
-describe('Huit américain: mercure', function () {
+describe('Huit américain: events', function () {
     describe('Cartes spéciales', function () {
-        test("Lorsqu'un valet est posé, un évenement est envoyé", function () {
+        test("Lorsqu'un valet est posé, un évenement TurnSkipped puis CardPlayed sont envoyés", function () {
             Arrange::setCurrentCard(7, 'h');
 
             Act::playCard('j', 'h');
 
-            expect(HubSpy::$published)->toHaveCount(1);
+            $events = Act::getEvents();
+
+            expect($events)->toHaveCount(2);
+            expect($events[0])->toBeInstanceOf(TurnSkippedEvent::class);
+            expect($events[1])->toBeInstanceOf(CardPlayedEvent::class);
         });
 
-        test("Lorsqu'un valet est posé, un évenement contient un message", function () {
+        test("L'évenement TurnSkipped contient le joueur qui saute son tour", function () {
             Arrange::setPlayers([
                 new Player('1', 'Tyler, the Creator'),
                 new Player('2', 'After The Storm'),
@@ -418,45 +427,39 @@ describe('Huit américain: mercure', function () {
 
             Act::playCard('j', 'h');
 
-            expectMercureMessage(current(HubSpy::$published))->toBeAction('message');
-            expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'After The Storm saute son tour');
+            expect(Act::getEvents()[0]->player->username)->toBe('After The Storm');
         });
 
-        test("Lorsqu'un as est posé, un évenement est envoyé", function () {
+        test("Lorsqu'un as est posé, un évenement PlayOrderReversed puis CardPlayed sont envoyés", function () {
             Arrange::setCurrentCard(7, 'h');
 
             Act::playCard(1, 'h');
 
-            expect(HubSpy::$published)->toHaveCount(1);
+            $events = Act::getEvents();
+
+            expect($events)->toHaveCount(2);
+            expect($events[0])->toBeInstanceOf(PlayOrderReversedEvent::class);
+            expect($events[1])->toBeInstanceOf(CardPlayedEvent::class);
         });
 
-        test("Lorsqu'un as est posé, un évenement contient un message", function () {
-            Arrange::setCurrentCard(7, 'h');
-
-            Act::playCard(1, 'h');
-
-            expectMercureMessage(current(HubSpy::$published))->toBeAction('message');
-            expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'Changement de sens !');
-        });
-
-        test("Lorsqu'un huit est posé, un évenement est envoyé", function () {
+        test("Lorsqu'un huit est posé, un évenement SuitChanged est envoyé", function () {
             Arrange::setCurrentCard(7, 'h');
 
             Act::playCard(8, 's', ['name' => 'spade']);
 
-            expect(HubSpy::$published)->toHaveCount(1);
+            expect(Act::getEvents())->toHaveCount(1);
+            expect(Act::getEvents()[0])->toBeInstanceOf(SuitChangedEvent::class);
         });
 
-        test("Lorsqu'un huit est posé, un évenement contient un message", function () {
+        test("L'évenement SuitChanged contient la nouvelle couleur", function () {
             Arrange::setCurrentCard(7, 'h');
 
             Act::playCard(8, 's', ['name' => 'heart']);
 
-            expectMercureMessage(current(HubSpy::$published))->toBeAction('message');
-            expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'Changement de couleur en ♥️');
+            expect(Act::getEvents()[0]->suit)->toBe(Suit::HEARTS);
         });
 
-        test("Lorsqu'un deux est posé, un évenement est envoyé", function () {
+        test("Lorsqu'un deux est posé, un évenement CardDrawn forcé puis CardPlayed sont envoyés", function () {
             Arrange::setDrawPillSize(3);
             Arrange::setPlayers([
                 new Player('1', 'Player 1'),
@@ -470,10 +473,17 @@ describe('Huit américain: mercure', function () {
 
             Act::playCard(2, 's');
 
-            expect(HubSpy::$published)->toHaveCount(2);
+            // le hub n'est plus utilisé que pour pousser la main du joueur forcé de piocher
+            expect(HubSpy::$published)->toHaveCount(1);
+
+            $events = Act::getEvents();
+            expect($events)->toHaveCount(2);
+            expect($events[0])->toBeInstanceOf(CardDrawnEvent::class);
+            expect($events[0]->forced)->toBeTrue();
+            expect($events[1])->toBeInstanceOf(CardPlayedEvent::class);
         });
 
-        test("Lorsqu'un deux est posé, un évenement contient un message", function () {
+        test("L'évenement CardDrawn contient le joueur forcé de piocher et le nombre de cartes", function () {
             Arrange::setDrawPillSize(5);
             Arrange::setPlayers([
                 new Player('1', 'Player 1'),
@@ -490,12 +500,14 @@ describe('Huit américain: mercure', function () {
                 [2, 'd'],
             ]);
 
-            expectMercureMessage(current(HubSpy::$published))->toBeAction('message');
-            expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'Player 2 pioche 4 cartes');
+            $event = Act::getEvents()[0];
+
+            expect($event->player->username)->toBe('Player 2');
+            expect($event->count)->toBe(4);
         });
     });
 
-    test("Lors qu'un joueur pioche un message est envoyé", function () {
+    test("Lorsqu'un joueur pioche, un évenement CardDrawn est envoyé", function () {
         Arrange::setDrawPillSize(3);
         Arrange::setPlayers([
             new Player('1', 'Player 1'),
@@ -509,8 +521,13 @@ describe('Huit américain: mercure', function () {
 
         Act::playCard(null);
 
-        expectMercureMessage(current(HubSpy::$published))->toBeAction('message');
-        expectMercureMessage(current(HubSpy::$published))->toBeHaveData('text', 'Player 1 pioche une carte');
+        $events = Act::getEvents();
+
+        expect($events)->toHaveCount(1);
+        expect($events[0])->toBeInstanceOf(CardDrawnEvent::class);
+        expect($events[0]->player->username)->toBe('Player 1');
+        expect($events[0]->count)->toBe(1);
+        expect($events[0]->forced)->toBeFalse();
     });
 });
 

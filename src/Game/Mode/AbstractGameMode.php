@@ -7,6 +7,7 @@ namespace App\Game\Mode;
 use App\Game\Exception\RuleException;
 use App\Game\Model\Card\Card;
 use App\Game\Model\Card\Hand;
+use App\Game\Model\GameContext;
 use App\Game\Model\GameState;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
@@ -25,12 +26,12 @@ abstract class AbstractGameMode implements GameModeInterface
     ) {
     }
 
-    public function play(array $cards, GameState $gameContext, Hand $hand, array $data = []): void
+    public function play(array $cards, GameContext $context, Hand $hand, array $data = []): void
     {
         $this->cards = $cards;
-        $this->gameContext = $gameContext;
+        $this->gameContext = $context->getState();
 
-        $this->doPlay($cards, $gameContext, $hand, $data);
+        $this->doPlay($cards, $context, $hand, $data);
     }
 
     public function getHub(): HubInterface
@@ -44,7 +45,7 @@ abstract class AbstractGameMode implements GameModeInterface
      * @param array<Card>          $cards
      * @param array<string, mixed> $data
      */
-    abstract protected function doPlay(array $cards, GameState $gameContext, Hand $hand, array $data): void;
+    abstract protected function doPlay(array $cards, GameContext $context, Hand $hand, array $data): void;
 
     protected function dispatchMercureEvent(string $eventName, string $text): void
     {

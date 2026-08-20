@@ -15,6 +15,9 @@ final class GameStateSerializer implements DenormalizerInterface, DenormalizerAw
 {
     use DenormalizerAwareTrait;
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): GameState
     {
         $players = [];
@@ -41,6 +44,9 @@ final class GameStateSerializer implements DenormalizerInterface, DenormalizerAw
         );
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return GameState::class === $type;
