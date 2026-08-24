@@ -85,6 +85,8 @@ trait CardsHelperTrait
 				return $turn;
 			}
 		}
+
+		throw new \RuntimeException('No non-skipped turn found in round.');
 	}
 
 	/**

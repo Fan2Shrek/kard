@@ -7,7 +7,8 @@ namespace App\Game\Model\State;
 final class Turn
 {
 	/**
-	 * @param string[] $cardIds
+	 * @param string[]              $cardIds
+	 * @param array<string, mixed>  $data
 	 */
 	public function __construct(
 		public string $playerId,

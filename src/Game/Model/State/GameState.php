@@ -171,6 +171,9 @@ final readonly class GameState
 		return $this->playerOrder[$nextIndex];
 	}
 
+	/**
+	 * @param string[] $playerOrder
+	 */
 	public function withPlayerOrder(array $playerOrder): self
 	{
 		return new self(

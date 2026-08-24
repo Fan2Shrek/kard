@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Enum\GameStatusEnum;
-use App\Game\Model\Player;
 use App\Repository\RoomRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -76,17 +75,6 @@ class Room
     public function getParticipants(): Collection
     {
         return $this->participants;
-    }
-
-    /**
-     * @return Player[]
-     */
-    public function getPlayers(): array
-    {
-        return array_map(
-            fn (User $user): Player => Player::fromUser($user),
-            $this->participants->toArray(),
-        );
     }
 
     public function addParticipant(User $player): static

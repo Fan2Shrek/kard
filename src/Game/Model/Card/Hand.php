@@ -9,6 +9,9 @@ final readonly class Hand extends AbstractCardStack
 		return \in_array($cardId, $this->cards, true);
 	}
 
+	/**
+	 * @param string[] $cardIds
+	 */
 	public function hasCards(array $cardIds): bool
 	{
 		return empty(array_diff($cardIds, $this->cards));

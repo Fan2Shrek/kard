@@ -27,6 +27,9 @@ class GameContext
 		$this->pendingDrawPile = $gameState->drawPile;
 	}
 
+	/**
+	 * @param array<string, mixed> $payload
+	 */
 	public function pushEvent(GameEventTypeEnum $type, array $payload = []): void
 	{
 		$this->events[] = new GameEvent($type, $payload);

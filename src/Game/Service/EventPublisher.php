@@ -33,6 +33,8 @@ final class EventPublisher
 
 	/**
 	 * @param GameEvent[] $events
+	 *
+	 * @return array{events: GameEvent[]}
 	 */
 	private function getPayload(array $events): array
 	{

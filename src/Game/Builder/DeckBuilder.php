@@ -12,6 +12,9 @@ use Ramsey\Uuid\Uuid;
 
 final class DeckBuilder
 {
+	/**
+	 * @var Card[]
+	 */
 	private array $cards = [];
 
 	public function build(): Deck

@@ -56,6 +56,10 @@ abstract class AbstractGameMode implements GameModeInterface
         return $e;
     }
 
+	/**
+	 * @param string[]              $cards
+	 * @param array<string, mixed>  $data
+	 */
 	protected function validatePlay(array $cards, GameContext $context, string $playerId, array $data = []): void
 	{
 		$hand = $context->gameState->getPlayerStateById($playerId)->hand;
@@ -65,6 +69,9 @@ abstract class AbstractGameMode implements GameModeInterface
 		}
 	}
 
+	/**
+	 * @param array<string, mixed> $data
+	 */
 	protected function postPlay(GameContext $context, string $playerId, array $data = []): void
 	{
 		foreach ($this->playedCardIds as $cardId) {

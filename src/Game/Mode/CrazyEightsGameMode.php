@@ -82,7 +82,7 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
 
 		$round = $context->gameState->getCurrentRound();
 
-		$lastTurnCards = $round->getLastTurn()?->cardIds ?? [];
+		$lastTurnCards = $round->getLastTurn()->cardIds ?? [];
 		$lastCard = \end($lastTurnCards);
 		$lastCard = $context->gameState->getCardById($lastCard);
 
