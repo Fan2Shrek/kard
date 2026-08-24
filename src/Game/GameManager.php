@@ -58,6 +58,9 @@ final class GameManager implements ServiceSubscriberInterface
 		$deck = $this->createDeck();
 		$cards = $deck->cards;
         [$hands, $drawPile] = $this->drawHands($deck, $room->getParticipants()->count(), $gameMode);
+		// DrawPile is keyed by card id with id values too (like Hand/DiscardPile),
+		// not the Card objects themselves - array_map preserves the id keys here
+		$drawPileIds = array_map(fn (Card $card): string => $card->id, $drawPile);
 
 		$players = [];
 
@@ -78,7 +81,7 @@ final class GameManager implements ServiceSubscriberInterface
 			'',
 			[],
 			new DiscardPile([]),
-			new DrawPile($drawPile),
+			new DrawPile($drawPileIds),
 			array_combine(array_map(fn (Card $card) => $card->id, $cards), $cards)
 		);
 
@@ -90,7 +93,7 @@ final class GameManager implements ServiceSubscriberInterface
 			current($order),
 			[],
 			new DiscardPile([]),
-			new DrawPile($drawPile),
+			new DrawPile($drawPileIds),
 			array_combine(array_map(fn (Card $card) => $card->id, $cards), $cards)
 		);
 

@@ -28,6 +28,6 @@ abstract readonly class AbstractCardStack
 	public function removeCard(string $card): static
 	{
 		// @phpstan-ignore new.static (subclasses are final and don't override the constructor)
-		return new static(array_filter($this->cards, fn (string $c): bool => $c !== $card));
+		return new static(array_values(array_filter($this->cards, fn (string $c): bool => $c !== $card)));
 	}
 }

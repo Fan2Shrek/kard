@@ -24,6 +24,9 @@ abstract class AbstractGameMode implements GameModeInterface
     {
         $this->playedCardIds = $cards;
         $this->gameState = $context->gameState;
+        // game modes are shared, long-lived services - reset per-play state here
+        // rather than relying on every round-ending branch to restore it itself
+        $this->shouldPushEndTurn = true;
 
 		$this->validatePlay($cards, $context, $playerId, $data);
 
