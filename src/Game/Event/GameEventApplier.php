@@ -22,7 +22,7 @@ final class GameEventApplier implements GameEventApplierInterface
             $event instanceof SuitChangedEvent => new ApplyResult($state->withData('suit', $event->suit)),
             $event instanceof PlayOrderReversedEvent => new ApplyResult($state->withPlayerOrder(array_reverse($state->getPlayers()), true)),
             // Pure notifications: turn advance / current cards / lastPlayer /
-            // fastPlay bookkeeping around them is applied directly by the
+            // everyoneCanPlay bookkeeping around them is applied directly by the
             // game mode (not every state change needs a dedicated event -
             // these carry no information a front-end or persisted log needs).
             $event instanceof CardPlayedEvent,

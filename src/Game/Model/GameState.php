@@ -129,14 +129,14 @@ final readonly class GameState
         return $this->cloneWith(data: $data);
     }
 
-    public function isFastPlay(): bool
+    public function everyoneCanPlay(): bool
     {
-        return (bool) ($this->data['fastPlay'] ?? false);
+        return (bool) ($this->data['everyoneCanPlay'] ?? false);
     }
 
-    public function withFastPlay(bool $fastPlay): self
+    public function withEveryoneCanPlay(bool $everyoneCanPlay): self
     {
-        return $this->withData('fastPlay', $fastPlay);
+        return $this->withData('everyoneCanPlay', $everyoneCanPlay);
     }
 
     public function getLastPlayerId(): ?string

@@ -124,12 +124,12 @@ final class GameManager implements ServiceSubscriberInterface
 
         $this->assertCanPlay($ctx, $player);
 
-        if ($ctx->isFastPlay()) {
+        if ($ctx->everyoneCanPlay()) {
             if ($ctx->getCurrentPlayer()->id !== $player->id && [] === $cards) {
                 return;
             }
 
-            $ctx = $this->applyFastPlayOverride($ctx, $player);
+            $ctx = $this->applyEveryoneCanPlayOverride($ctx, $player);
         }
 
         $hand = $this->loadAndValidateHand($room, $player, $cards);
@@ -166,12 +166,12 @@ final class GameManager implements ServiceSubscriberInterface
 
     private function assertCanPlay(GameState $ctx, Player $player): void
     {
-        if (!$ctx->isFastPlay() && $ctx->getCurrentPlayer()->id !== $player->id) {
+        if (!$ctx->everyoneCanPlay() && $ctx->getCurrentPlayer()->id !== $player->id) {
             throw new \InvalidArgumentException('Not your turn');
         }
     }
 
-    private function applyFastPlayOverride(GameState $ctx, Player $player): GameState
+    private function applyEveryoneCanPlayOverride(GameState $ctx, Player $player): GameState
     {
         return $ctx->withCurrentPlayer(
             current(array_filter(

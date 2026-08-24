@@ -72,7 +72,7 @@ final class PresidentGameMode extends AbstractGameMode
             throw $this->createRuleException('card.count.invalid');
         }
 
-        $this->gameContext = $this->context->mutate(fn (GameState $s): GameState => $s->withFastPlay(false)); // reset
+        $this->gameContext = $this->context->mutate(fn (GameState $s): GameState => $s->withEveryoneCanPlay(false)); // reset
         $nonSkippedTurns = $this->gameContext->getRound()->getNonSkippedTurns();
         $currentCards = ($nonSkippedTurns[0] ?? null)?->getCards() ?? [];
 
@@ -167,7 +167,7 @@ final class PresidentGameMode extends AbstractGameMode
             if (3 === count($count)) {
                 $this->handleRoundEnd();
             } else {
-                $this->gameContext = $this->context->mutate(fn (GameState $s): GameState => $s->withFastPlay(true));
+                $this->gameContext = $this->context->mutate(fn (GameState $s): GameState => $s->withEveryoneCanPlay(true));
             }
         }
 
@@ -192,7 +192,7 @@ final class PresidentGameMode extends AbstractGameMode
         }
 
         if (2 === count($cards)) {
-            $this->gameContext = $this->context->mutate(fn (GameState $s): GameState => $s->withFastPlay(true));
+            $this->gameContext = $this->context->mutate(fn (GameState $s): GameState => $s->withEveryoneCanPlay(true));
 
             return;
         }
@@ -229,7 +229,7 @@ final class PresidentGameMode extends AbstractGameMode
             throw $this->createRuleException('card.values.higher');
         }
 
-        $this->gameContext = $this->context->mutate(fn (GameState $s): GameState => $s->withFastPlay(true));
+        $this->gameContext = $this->context->mutate(fn (GameState $s): GameState => $s->withEveryoneCanPlay(true));
     }
 
     /**
