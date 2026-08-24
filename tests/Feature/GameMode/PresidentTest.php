@@ -55,7 +55,7 @@ describe('Président: règles basiques', function () {
 
         Act::playCard(8, 's');
 
-        expect(Act::get('gameContext')->getData('fastPlay'))->toBeFalse();
+        expect(Act::get('gameContext')->isFastPlay())->toBeFalse();
     });
 
     test('Il est possible de jouer 2 cartes', function () {
@@ -290,7 +290,7 @@ describe('Président: cartes doubles', function () {
 
         Act::playcards([[7], [7]]);
 
-        expect(Act::get('gameContext')->getData('fastPlay'))->toBeTrue();
+        expect(Act::get('gameContext')->isFastPlay())->toBeTrue();
     });
 
     test('On peut jouer un double sur un double de même valeur', function () {
@@ -404,7 +404,7 @@ describe('Président: début de partie', function () {
             [7, 'h'],
         ]);
 
-        expect(Act::get('gameContext')->getData('fastPlay'))->toBeTrue();
+        expect(Act::get('gameContext')->isFastPlay())->toBeTrue();
     });
 
     test('On peut commencer une partie avec un triple de cartes à la même valeur', function () {
@@ -512,7 +512,7 @@ describe('Président: carte ou rien', function () {
 
         Act::playCard(7, 'h');
 
-        expect(Act::get('gameContext')->getData('fastPlay'))->toBeTrue();
+        expect(Act::get('gameContext')->isFastPlay())->toBeTrue();
     });
 
     test("Apres l'appel aux quatre, le jeu reprends dans l'ordre", function () {
@@ -527,7 +527,7 @@ describe('Président: carte ou rien', function () {
         Act::playCard(7, 'c');
         Act::playCard(4, 'h');
 
-        expect(Act::get('gameContext')->getData('fastPlay'))->toBeFalse();
+        expect(Act::get('gameContext')->isFastPlay())->toBeFalse();
     });
 
     test('Après un appel aux quatres, le joueurs qui a fini reprends', function () {

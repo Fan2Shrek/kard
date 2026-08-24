@@ -129,6 +129,26 @@ final readonly class GameState
         return $this->cloneWith(data: $data);
     }
 
+    public function isFastPlay(): bool
+    {
+        return (bool) ($this->data['fastPlay'] ?? false);
+    }
+
+    public function withFastPlay(bool $fastPlay): self
+    {
+        return $this->withData('fastPlay', $fastPlay);
+    }
+
+    public function getLastPlayerId(): ?string
+    {
+        return $this->data['lastPlayer'] ?? null;
+    }
+
+    public function withLastPlayer(string $playerId): self
+    {
+        return $this->withData('lastPlayer', $playerId);
+    }
+
     public function getRoom(): Room
     {
         return $this->room;

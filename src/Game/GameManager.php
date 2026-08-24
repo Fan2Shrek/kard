@@ -124,7 +124,7 @@ final class GameManager implements ServiceSubscriberInterface
 
         $this->assertCanPlay($ctx, $player);
 
-        if ($ctx->getData('fastPlay')) {
+        if ($ctx->isFastPlay()) {
             if ($ctx->getCurrentPlayer()->id !== $player->id && [] === $cards) {
                 return;
             }
@@ -166,7 +166,7 @@ final class GameManager implements ServiceSubscriberInterface
 
     private function assertCanPlay(GameState $ctx, Player $player): void
     {
-        if (!$ctx->getData('fastPlay') && $ctx->getCurrentPlayer()->id !== $player->id) {
+        if (!$ctx->isFastPlay() && $ctx->getCurrentPlayer()->id !== $player->id) {
             throw new \InvalidArgumentException('Not your turn');
         }
     }

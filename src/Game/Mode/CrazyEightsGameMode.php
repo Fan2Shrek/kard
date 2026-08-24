@@ -100,7 +100,7 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
 
             return $context->mutate(fn (GameState $s): GameState => $s
                 ->withCurrentCards($cards)
-                ->withData('lastPlayer', $actingPlayer->id) // @pest-mutate-ignore flemme
+                ->withLastPlayer($actingPlayer->id) // @pest-mutate-ignore flemme
                 ->withNextPlayer());
         }
 
@@ -149,7 +149,7 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
 
         $gameContext = $context->mutate(fn (GameState $s): GameState => $s
             ->withCurrentCards($cards)
-            ->withData('lastPlayer', $actingPlayer->id) // @pest-mutate-ignore flemme
+            ->withLastPlayer($actingPlayer->id) // @pest-mutate-ignore flemme
             ->withNextPlayer());
 
         $context->dispatch(new CardPlayedEvent($gameContext->getRoom(), $actingPlayer, $cards));
