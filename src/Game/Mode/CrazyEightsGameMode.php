@@ -6,7 +6,6 @@ namespace App\Game\Mode;
 
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
-use App\Game\Card\HandRepositoryInterface;
 use App\Game\Event\CardDrawnEvent;
 use App\Game\Event\CardPlayedEvent;
 use App\Game\Event\PlayOrderReversedEvent;
@@ -16,14 +15,9 @@ use App\Game\Model\Card\Hand;
 use App\Game\Model\GameContext;
 use App\Game\Model\GameState;
 
-final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameModeInterface
+final class CrazyEightsGameMode /*extends AbstractGameMode implements SetupGameModeInterface */
 {
     use CardsHelperTrait;
-
-    public function __construct(
-        private HandRepositoryInterface $handRepository,
-    ) {
-    }
 
     public function getGameMode(): GameModeEnum
     {
@@ -35,7 +29,7 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
         return 7;
     }
 
-    public function setup(GameState &$ctx, array $hands): void
+    public function setup(GameContext $ctx): void
     {
         [$ctx, $cards] = $ctx->withDrawnCards(1);
         $ctx = $ctx->withCurrentCards($cards);

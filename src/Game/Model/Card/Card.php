@@ -9,8 +9,9 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 final readonly class Card
 {
     public function __construct(
-        public readonly Rank $rank,
-        public readonly ?Suit $suit,
+		public string $id,
+        public Rank $rank,
+        public ?Suit $suit,
     ) {
     }
 

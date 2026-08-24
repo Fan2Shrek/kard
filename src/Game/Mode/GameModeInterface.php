@@ -5,7 +5,7 @@ namespace App\Game\Mode;
 use App\Game\Model\Card\Card;
 use App\Game\Model\Card\Hand;
 use App\Game\Model\GameContext;
-use App\Game\Model\GameState;
+use App\Game\Model\State\GameState;
 
 interface GameModeInterface
 {
@@ -23,11 +23,11 @@ interface GameModeInterface
     public function getCardsCount(int $playerCount): ?int;
 
     /**
-     * @param array<string, Hand> $players
-     *
      * @return array<string>
      */
-    public function getPlayerOrder(array $players): array;
+    public function getPlayerOrder(GameState $state): array;
 
-    public function isGameFinished(GameState &$gameContext): bool;
+    public function isGameFinished(GameState $state): bool;
+
+	public function refreshScore(GameContext $ctx): void;
 }

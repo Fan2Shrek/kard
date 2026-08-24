@@ -5,33 +5,33 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Game\Model\Card\Card;
-use App\Game\Card\CardGenerator;
 use Symfony\Component\Asset\Packages;
 
 final class AssetsProvider
 {
     public function __construct(
         private readonly Packages $packages,
-        private readonly CardGenerator $cardGenerator,
     ) {
     }
 
     /**
+	 * @param array<Card> $cards
+	 *
      * @return array<string, string>
      */
-    public function getAllCardsAssets(): array
+    public function getAssets(array $cards): array
     {
-        $cards = array_reduce(
-            $this->cardGenerator->generate()->getCards(),
+        $assets = array_reduce(
+            $cards,
             function (array $carry, Card $card) {
                 $carry[(string) $card] = $this->packages->getUrl('resources/'.$card->getImg());
 
                 return $carry;
             },
-            [],
+			[],
         );
-        $cards['back'] = $this->packages->getUrl('resources/back.svg');
+        $assets['back'] = $this->packages->getUrl('resources/back.svg');
 
-        return $cards;
+        return $assets;
     }
 }

@@ -6,15 +6,15 @@ use App\Entity\GameModeDescription;
 use App\Entity\Room;
 use App\Enum\GameStatusEnum;
 use App\Event\Room\RoomEvent;
-use App\Game\Model\Player;
 use App\Repository\GameModeDescriptionRepository;
 use App\Repository\GameModeRepository;
 use App\Repository\RoomRepository;
 use App\Service\AssetsProvider;
-use App\Game\Card\HandRepositoryInterface;
-use App\Game\GameStateProvider;
 use App\Game\GameManager;
 use App\Game\Mode\GameModeEnum;
+use App\Game\Model\Card\Hand;
+use App\Game\Model\State\PlayerState;
+use App\Game\StateProvider\GameStateProviderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -99,13 +99,23 @@ final class RoomController extends AbstractController
             $this->hub->publish(new Update(
                 \sprintf('game-%s-waiting', $room->getId()),
                 $this->renderView('components/turbo/player-join.html.twig', [
-                    'player' => Player::fromUser($user),
+                    'player' => new PlayerState(
+						$user->getId()->toString(),
+						$user->getUsername(),
+						0,
+						new Hand([]),
+					),
                 ])
             ));
         }
 
         $players = array_map(
-            fn ($player): Player => Player::fromUser($player),
+            fn ($player): PlayerState => new PlayerState(
+				$player->getId()->toString(),
+				$player->getUsername(),
+				0,
+				new Hand([]),
+			),
             $room->getParticipants()->toArray(),
         );
 
@@ -169,9 +179,7 @@ final class RoomController extends AbstractController
         $response = $this->redirectToRoute('game', ['id' => $room->getId()]);
         $room->setStatus(GameStatusEnum::PLAYING);
 
-        $gameContext = $this->gameManager->setupRoom($room);
-
-        $this->gameManager->start($gameContext);
+        $gameContext = $this->gameManager->start($room);
         $this->roomRepository->save($room);
 
         $this->hub->publish(new Update(
@@ -194,24 +202,26 @@ final class RoomController extends AbstractController
         Room $room,
         SerializerInterface $serializer,
         AssetsProvider $assetsProvider,
-        GameStateProvider $gameStateProvider,
-        HandRepositoryInterface $handRepository,
+        GameStateProviderInterface $gameStateProvider,
     ): Response {
         $user = $this->getUser();
 
+		$state = $gameStateProvider->get($room->getId()->toString());
+		$assets = $assetsProvider->getAssets($state->cards);
+
+
         if (!\in_array($user, $room->getParticipants()->toArray(), true)) {
             return $this->render('home/game.html.twig', [
-                'assets' => $assetsProvider->getAllCardsAssets(),
-                'game' => $serializer->serialize($gameStateProvider->provide($room), 'json'),
+                'assets' => $assets,
+                'game' => $serializer->serialize($state, 'json'),
                 'room' => $room,
             ]);
         }
 
         return $this->render('home/game.html.twig', [
-            'assets' => $assetsProvider->getAllCardsAssets(),
-            'game' => $serializer->serialize($gameStateProvider->provide($room), 'json'),
+            'assets' => $assets,
+            'game' => $serializer->serialize($state, 'json'),
             'player' => $serializer->serialize($this->getUser(), 'json'),
-            'hand' => $handRepository->get($user, $room)->getCards(),
             'playerId' => $user->getId(),
             'room' => $room,
         ]);

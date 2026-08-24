@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Game\Model\State;
+
+final class Turn
+{
+	/**
+	 * @param string[] $cardIds
+	 */
+	public function __construct(
+		public string $playerId,
+		public array $cardIds,
+	) {}
+
+	public function hasBeenSkipped(): bool
+	{
+		return [] === $this->cardIds;
+	}
+}

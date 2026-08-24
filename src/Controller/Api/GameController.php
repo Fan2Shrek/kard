@@ -4,13 +4,8 @@ namespace App\Controller\Api;
 
 use App\Entity\Room;
 use App\Entity\User;
-use App\Enum\Card\Rank;
-use App\Enum\Card\Suit;
-use App\Game\Card\HandRepositoryInterface;
 use App\Game\GameManager;
-use App\Game\GameStateProvider;
-use App\Game\Model\Card\Card;
-use App\Game\Model\Player;
+use App\Game\StateProvider\GameStateProviderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,8 +18,7 @@ final class GameController extends AbstractController
 {
     public function __construct(
         private readonly GameManager $gameManager,
-        private readonly GameStateProvider $gameStateProvider,
-        private readonly HandRepositoryInterface $handRepository,
+        private readonly GameStateProviderInterface $gameStateProvider,
         private readonly SerializerInterface $serializer,
     ) {
     }
@@ -37,18 +31,10 @@ final class GameController extends AbstractController
     #[Route('/{id}', name: 'state', methods: ['GET'])]
     public function state(Room $room): Response
     {
-        $user = $this->getUser();
-        $state = $this->gameStateProvider->provide($room);
-
-        $hand = null;
-        if (\in_array($user, $room->getParticipants()->toArray(), true)) {
-            $hand = $this->handRepository->get($user, $room)?->getCards();
-        }
-
-        return new JsonResponse($this->serializer->serialize([
-            'state' => $state,
-            'hand' => $hand,
-        ], 'json'), Response::HTTP_OK, [], true);
+		// @todo presenter
+		return $this->json(
+			$this->gameStateProvider->get($room->getId()->toString())
+		);
     }
 
     /**
@@ -61,20 +47,10 @@ final class GameController extends AbstractController
     {
         $request->attributes->set('_format', 'json');
         $user = $this->getUser();
-        $card = $request->toArray()['cards'];
+        $cards = $request->toArray()['cards'];
         $data = $request->toArray()['data'];
 
-        $cards = array_map(fn ($card): Card => new Card(Rank::from($card['rank']), Suit::from($card['suit'])), $card);
-        $player = current(array_filter(
-            $room->getPlayers(),
-            fn (Player $p): bool => $p->id === $user->getId()->toString(),
-        ));
-
-        if (false === $player) {
-            return new JsonResponse(['error' => 'Player not found'], Response::HTTP_NOT_FOUND);
-        }
-
-        $this->gameManager->play($room, $player, $cards, $data);
+        $this->gameManager->play($room, $user, $cards, $data);
 
         return new JsonResponse();
     }

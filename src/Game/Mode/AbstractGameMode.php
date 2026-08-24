@@ -8,11 +8,11 @@ use App\Game\Exception\RuleException;
 use App\Game\Model\Card\Card;
 use App\Game\Model\Card\Hand;
 use App\Game\Model\GameContext;
-use App\Game\Model\GameState;
+use App\Game\Model\State\GameState;
 
 abstract class AbstractGameMode implements GameModeInterface
 {
-    protected GameState $gameContext;
+    protected GameState $gameState;
 
     /**
      * @var array<Card>
@@ -22,11 +22,9 @@ abstract class AbstractGameMode implements GameModeInterface
     public function play(array $cards, GameContext $context, Hand $hand, array $data = []): void
     {
         $this->cards = $cards;
-        $this->gameContext = $context->getState();
+        $this->gameState = $context->gameState;
 
-        $this->gameContext = $this->doPlay($cards, $context, $hand, $data);
-
-        $context->replaceState($this->gameContext);
+        $this->doPlay($cards, $context, $hand, $data);
     }
 
     /**

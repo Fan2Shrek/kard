@@ -11,7 +11,7 @@ use App\Game\Event\TurnSkippedEvent;
 use App\Game\Model\Card\Card;
 use App\Game\Model\Card\Hand;
 use App\Game\Model\GameContext;
-use App\Game\Model\GameState;
+use App\Game\Model\State\GameState;
 
 /**
  * @see https://bicyclecards.com/how-to-play/presidents
@@ -34,27 +34,27 @@ final class PresidentGameMode extends AbstractGameMode
         return null;
     }
 
-    public function getPlayerOrder(array $players): array
+    public function getPlayerOrder(GameState $state): array
     {
         $order = [];
 
-        foreach ($players as $id => $hand) {
-            if ($hand->has(new Card(Rank::QUEEN, Suit::HEARTS))) {
-                array_unshift($order, $id);
+		$queenOfHeartsId = array_find_key($state->cards, fn (Card $card): bool => Rank::QUEEN === $card->rank && Suit::HEARTS === $card->suit);
+
+        foreach ($state->players as $playerState) {
+            if ($playerState->hand->has($queenOfHeartsId)) {
+                array_unshift($order, $playerState->id);
             } else {
-                $order[] = $id;
+                $order[] = $playerState->id;
             }
         }
 
         return $order;
     }
 
-    public function isGameFinished(GameState &$gameContext): bool
+    public function isGameFinished(GameState $state): bool
     {
-        foreach ($gameContext->getPlayers() as $player) {
-            if (0 === $player->cardsCount) {
-                $gameContext = $gameContext->withWinner($player);
-
+        foreach ($state->players as $player) {
+            if (0 === $player->score) {
                 return true;
             }
         }
@@ -62,10 +62,18 @@ final class PresidentGameMode extends AbstractGameMode
         return false;
     }
 
+	public function refreshScore(GameContext $ctx): void
+	{
+		foreach ($ctx->gameState->players as $player) {
+			if ($player->score !== $player->hand->count()) {
+				$ctx->pushScoreUpdate($player->id, $player->hand->count());
+			}
+		}
+	}
+
     protected function doPlay(array $cards, GameContext $context, Hand $hand, array $data): GameState
     {
         $this->cards = $cards;
-        $this->gameContext = $context->getState();
         $this->context = $context;
 
         if (\count($cards) > 3) {

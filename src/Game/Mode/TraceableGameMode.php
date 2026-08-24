@@ -4,7 +4,7 @@ namespace App\Game\Mode;
 
 use App\Game\Model\Card\Hand;
 use App\Game\Model\GameContext;
-use App\Game\Model\GameState;
+use App\Game\Model\State\GameState;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
@@ -20,10 +20,10 @@ final class TraceableGameMode implements GameModeInterface, SetupGameModeInterfa
     ) {
     }
 
-    public function setup(GameState &$gameContext, array $hands): void
+    public function setup(GameContext $ctx): void
     {
         if ($this->gameMode instanceof SetupGameModeInterface) {
-            $this->gameMode->setup($gameContext, $hands);
+            $this->gameMode->setup($ctx);
         }
     }
 
@@ -54,13 +54,13 @@ final class TraceableGameMode implements GameModeInterface, SetupGameModeInterfa
         }
     }
 
-    public function getPlayerOrder(array $players): array
+    public function getPlayerOrder(GameState $state): array
     {
-        return $this->gameMode->getPlayerOrder($players);
+        return $this->gameMode->getPlayerOrder($state);
     }
 
-    public function isGameFinished(GameState &$gameContext): bool
+    public function isGameFinished(GameState $state): bool
     {
-        return $this->gameMode->isGameFinished($gameContext);
+        return $this->gameMode->isGameFinished($state);
     }
 }

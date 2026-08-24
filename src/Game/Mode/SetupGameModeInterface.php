@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace App\Game\Mode;
 
-use App\Game\Model\Card\Hand;
-use App\Game\Model\GameState;
+use App\Game\Model\GameContext;
 
 interface SetupGameModeInterface extends GameModeInterface
 {
     /**
-     * Setup the game mode with the given hands.
-     *
-     * @param array<string, Hand> $hands
+     * Setup the game mode with the given state.
      */
-    public function setup(GameState &$ctx, array $hands): void;
+    public function setup(GameContext $ctx): void;
 }
