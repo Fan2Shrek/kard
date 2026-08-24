@@ -62,7 +62,7 @@ abstract /* static */ class Act
 
     private static function createCard(string $value, string $color): Card
     {
-        return new Card(Suit::from($color), Rank::from($value));
+        return new Card(Rank::from($value), Suit::from($color));
     }
 
     public static function get(string $key): mixed

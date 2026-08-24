@@ -97,16 +97,16 @@ describe('Président: règles basiques', function () {
     test('La dame de coeur commence', function () {
         $hands = [
             0 => new Hand([
-                new Card(Suit::SPADES, Rank::EIGHT),
-                new Card(Suit::HEARTS, Rank::EIGHT),
+                new Card(Rank::EIGHT, Suit::SPADES),
+                new Card(Rank::EIGHT, Suit::HEARTS),
             ]),
             1 => new Hand([
-                new Card(Suit::SPADES, Rank::EIGHT),
-                new Card(Suit::HEARTS, Rank::QUEEN),
+                new Card(Rank::EIGHT, Suit::SPADES),
+                new Card(Rank::QUEEN, Suit::HEARTS),
             ]),
             2 => new Hand([
-                new Card(Suit::SPADES, Rank::EIGHT),
-                new Card(Suit::HEARTS, Rank::KING),
+                new Card(Rank::EIGHT, Suit::SPADES),
+                new Card(Rank::KING, Suit::HEARTS),
             ]),
         ];
 

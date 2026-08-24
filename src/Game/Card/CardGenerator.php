@@ -10,15 +10,20 @@ use App\Game\Model\Card\Hand;
 
 final class CardGenerator
 {
-    public function generate(): Deck
+    public function generate(bool $withJokers = false): Deck
     {
         $cards = [];
 
         foreach (Suit::cases() as $suit) {
             foreach (Rank::cases() as $rank) {
-                $cards[] = new Card($suit, $rank);
+                $cards[] = new Card($rank, $suit);
             }
         }
+
+		if ($withJokers) {
+			$cards[] = new Card(Rank::JOKER, null);
+			$cards[] = new Card(Rank::JOKER, null);
+		}
 
         return new Deck($cards);
     }

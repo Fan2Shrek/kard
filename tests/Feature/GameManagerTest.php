@@ -33,7 +33,7 @@ test("play() joue un tour normal : sauvegarde la main et l'état, dispatch les e
         $room,
         [$player1, $player2],
         $player1,
-        [new Turn([new Card(Suit::HEARTS, Rank::SEVEN)])],
+        [new Turn([new Card(Rank::SEVEN, Suit::HEARTS)])],
     );
 
     $handRepository = new class implements HandRepositoryInterface {
@@ -59,8 +59,8 @@ test("play() joue un tour normal : sauvegarde la main et l'état, dispatch les e
         }
     };
     $handRepository->hands['1'] = new Hand([
-        new Card(Suit::SPADES, Rank::SEVEN),
-        new Card(Suit::SPADES, Rank::EIGHT),
+        new Card(Rank::SEVEN, Suit::SPADES),
+        new Card(Rank::EIGHT, Suit::SPADES),
     ]);
 
     $gameStateProvider = $this->createMock(GameStateProvider::class);
@@ -96,7 +96,7 @@ test("play() joue un tour normal : sauvegarde la main et l'état, dispatch les e
 
     $gameManager = new GameManager([$gameMode], $container, $gameStateProvider, $handRepository);
 
-    $gameManager->play($room, $player1, [new Card(Suit::SPADES, Rank::SEVEN)]);
+    $gameManager->play($room, $player1, [new Card(Rank::SEVEN, Suit::SPADES)]);
 
     expect($handRepository->saved['1']->getCards())->toHaveCount(1);
     expect($player1->cardsCount)->toBe(1);

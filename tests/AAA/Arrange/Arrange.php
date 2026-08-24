@@ -28,18 +28,18 @@ abstract /* static */ class Arrange
             $rank = (string) $rank;
         }
 
-        $card = new Card(Suit::from($suit), Rank::from($rank));
+        $card = new Card(Rank::from($rank), Suit::from($suit));
         Act::addContext('gameContext', self::createGameContext([new Turn([$card])]));
     }
 
     public static function setCurrentCards(array $cards): void
     {
-        Act::addContext('gameContext', self::createGameContext([new Turn(array_map(fn (int $card) => new Card(Suit::SPADES, Rank::from((string) $card)), $cards))]));
+        Act::addContext('gameContext', self::createGameContext([new Turn(array_map(fn (int $card) => new Card(Rank::from((string) $card), Suit::SPADES), $cards))]));
     }
 
     public static function setCurrentHand(array $cards): void
     {
-        Act::addContext('handCards', array_map(fn (array $card) => new Card(Suit::from($card[1]), Rank::from((string) $card[0])), $cards));
+        Act::addContext('handCards', array_map(fn (array $card) => new Card(Rank::from((string) $card[0]), Suit::from($card[1])), $cards));
     }
 
     public static function setHands(array $hands): void
@@ -48,7 +48,7 @@ abstract /* static */ class Arrange
             array_keys($hands),
             static function (array $carry, int $index) use ($hands): array {
                 $carry[$index] = new Hand(array_map(
-                    fn (array $card) => new Card(Suit::from($card[1]), Rank::from((string) $card[0])),
+                    fn (array $card) => new Card(Rank::from((string) $card[0]), Suit::from($card[1])),
                     $hands[$index]
                 ));
 
@@ -63,7 +63,7 @@ abstract /* static */ class Arrange
         $cards = [];
 
         for ($i = 0; $i < $count; ++$i) {
-            $cards[] = new Card(Suit::SPADES, Rank::from((string) ($i + 1)));
+            $cards[] = new Card(Rank::from((string) ($i + 1)), Suit::SPADES);
         }
 
         Act::addContext('drawPill', $cards);
@@ -81,8 +81,8 @@ abstract /* static */ class Arrange
             array_map(
                 fn (array $turns) => new Turn(array_map(
                     fn (int $value) => new Card(
-                        Suit::SPADES,
-                        Rank::from((string) $value)),
+                        Rank::from((string) $value),
+                        Suit::SPADES),
                     $turns)),
                 $cards
             ),

@@ -39,7 +39,7 @@ final class PresidentGameMode extends AbstractGameMode
         $order = [];
 
         foreach ($players as $id => $hand) {
-            if ($hand->has(new Card(Suit::HEARTS, Rank::QUEEN))) {
+            if ($hand->has(new Card(Rank::QUEEN, Suit::HEARTS))) {
                 array_unshift($order, $id);
             } else {
                 $order[] = $id;

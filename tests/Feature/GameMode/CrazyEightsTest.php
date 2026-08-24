@@ -58,7 +58,7 @@ describe('Huit américain: règles basiques', function () {
         Act::playCard(9, 's');
 
         expect(Act::get('gameContext')->getCurrentCards())->toHaveCount(1);
-        expect(Act::get('gameContext')->getCurrentCards())->toEqual([new Card(Suit::SPADES, Rank::NINE)]);
+        expect(Act::get('gameContext')->getCurrentCards())->toEqual([new Card(Rank::NINE, Suit::SPADES)]);
     });
 
     test('Il est possible de jouer une carte sur la même valeur', function () {
@@ -122,28 +122,28 @@ describe('Huit américain: règles basiques', function () {
     test("L'ordre des joueurs est aléatoire", function () {
         $hands = [
             1 => new Hand([
-                new Card(Suit::SPADES, Rank::EIGHT),
-                new Card(Suit::HEARTS, Rank::EIGHT),
+                new Card(Rank::EIGHT, Suit::SPADES),
+                new Card(Rank::EIGHT, Suit::HEARTS),
             ]),
             2 => new Hand([
-                new Card(Suit::SPADES, Rank::EIGHT),
-                new Card(Suit::HEARTS, Rank::QUEEN),
+                new Card(Rank::EIGHT, Suit::SPADES),
+                new Card(Rank::QUEEN, Suit::HEARTS),
             ]),
             3 => new Hand([
-                new Card(Suit::SPADES, Rank::EIGHT),
-                new Card(Suit::HEARTS, Rank::KING),
+                new Card(Rank::EIGHT, Suit::SPADES),
+                new Card(Rank::KING, Suit::HEARTS),
             ]),
             4 => new Hand([
-                new Card(Suit::SPADES, Rank::EIGHT),
-                new Card(Suit::HEARTS, Rank::KING),
+                new Card(Rank::EIGHT, Suit::SPADES),
+                new Card(Rank::KING, Suit::HEARTS),
             ]),
             5 => new Hand([
-                new Card(Suit::SPADES, Rank::EIGHT),
-                new Card(Suit::HEARTS, Rank::KING),
+                new Card(Rank::EIGHT, Suit::SPADES),
+                new Card(Rank::KING, Suit::HEARTS),
             ]),
             6 => new Hand([
-                new Card(Suit::SPADES, Rank::EIGHT),
-                new Card(Suit::HEARTS, Rank::KING),
+                new Card(Rank::EIGHT, Suit::SPADES),
+                new Card(Rank::KING, Suit::HEARTS),
             ]),
         ];
 
