@@ -7,7 +7,8 @@ export const AssetsContext = createContext({
 
 export const AssetsContextProvider = ({ children, assets }) => {
     const getCardAsset = useCallback((card) => {
-        return assets[card.rank + card.suit];
+	console.log(assets)
+        return assets[card.rank + card.suit ?? ''];
     }, [assets]);
 
     const getBackAsset = useCallback(() => {

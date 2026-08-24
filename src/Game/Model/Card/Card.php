@@ -17,7 +17,7 @@ final readonly class Card
     #[Ignore]
     public function getImg(): string
     {
-        return sprintf('%s%s.svg', $this->rank->value, $this->suit->value ?? '');
+        return sprintf('%s%s.svg', $this->rank->value, $this->suit?->value ?? '');
     }
 
     public function isSameAs(Card $card): bool

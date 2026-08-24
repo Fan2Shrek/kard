@@ -15,7 +15,7 @@ final class CardGenerator
         $cards = [];
 
         foreach (Suit::cases() as $suit) {
-            foreach (Rank::cases() as $rank) {
+            foreach (Rank::valueCases() as $rank) {
                 $cards[] = new Card($rank, $suit);
             }
         }
