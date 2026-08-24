@@ -73,14 +73,8 @@ final class PresidentGameMode extends AbstractGameMode
         }
 
         $this->gameContext = $this->context->mutate(fn (GameState $s): GameState => $s->withData('fastPlay', false)); // reset
-        $previousTurns = array_reverse($this->gameContext->getRound()->getTurns());
-        $nonSkippedTurns = array_values(array_filter($previousTurns, fn ($turn): bool => !empty($turn->getCards())));
-
-        if (0 === \count($nonSkippedTurns)) {
-            $currentCards = [];
-        } else {
-            $currentCards = $nonSkippedTurns[0]->getCards();
-        }
+        $nonSkippedTurns = $this->gameContext->getRound()->getNonSkippedTurns();
+        $currentCards = ($nonSkippedTurns[0] ?? null)?->getCards() ?? [];
 
         if ([] === $cards) {
             if ([] === $this->gameContext->getRound()->getTurns()) {
@@ -140,13 +134,11 @@ final class PresidentGameMode extends AbstractGameMode
             throw $this->createRuleException('card.value.higher');
         }
 
-        $previousTurns = array_reverse($this->gameContext->getRound()->getTurns());
-        $nonSkippedTurns = array_values(array_filter($previousTurns, fn ($turn): bool => !empty($turn->getCards())));
-
-        if ([] === $previousTurns[0]->getCards()) {
+        if ([] === $this->gameContext->getCurrentCards()) {
             return;
         }
 
+        $nonSkippedTurns = $this->gameContext->getRound()->getNonSkippedTurns();
         $lastTurn = $currentCards;
         $beforeLastTurn = ($nonSkippedTurns[1] ?? null)?->getCards() ?? null;
 

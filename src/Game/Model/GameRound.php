@@ -31,4 +31,17 @@ final readonly class GameRound
     {
         return $this->turns;
     }
+
+    /**
+     * Turns where cards were actually played (i.e. not a pass), most recent first.
+     *
+     * @return Turn[]
+     */
+    public function getNonSkippedTurns(): array
+    {
+        return array_values(array_filter(
+            array_reverse($this->turns),
+            fn (Turn $turn): bool => [] !== $turn->getCards(),
+        ));
+    }
 }
