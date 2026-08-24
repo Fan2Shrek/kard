@@ -159,6 +159,13 @@ final class RoomController extends AbstractController
                     "<turbo-stream action=\"remove\" target=\"game-{$id}\"></turbo-stream>"
                 ));
 
+                if ([] === $this->roomRepository->findAllCurrent()) {
+                    $this->hub->publish(new Update(
+                        'current_games',
+                        $this->renderView('components/turbo/no-games.html.twig')
+                    ));
+                }
+
                 return $this->redirectToRoute('home');
             }
 
@@ -187,6 +194,13 @@ final class RoomController extends AbstractController
             'current_games',
             "<turbo-stream action=\"remove\" target=\"game-{$room->getId()}\"></turbo-stream>"
         ));
+
+        if ([] === $this->roomRepository->findAllCurrent()) {
+            $this->hub->publish(new Update(
+                'current_games',
+                $this->renderView('components/turbo/no-games.html.twig')
+            ));
+        }
 
         $this->hub->publish(new Update(
             sprintf('game-%s', $room->getId()),

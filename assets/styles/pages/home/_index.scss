@@ -70,6 +70,10 @@
         text-align: left;
       }
 
+      & th.empty {
+        text-align: center;
+      }
+
       & thead tr {
         border-color: rgb(255 255 255 / 0.1);
         border-bottom: 1px solid rgb(255 255 255 / 0.1);
