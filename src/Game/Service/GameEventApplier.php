@@ -21,6 +21,7 @@ final class GameEventApplier
 			GameEventTypeEnum::CARD_DISCARDED => $this->handleCardDiscarded($gameState, $event),
 			GameEventTypeEnum::SCORE_UPDATED => $this->handleScoreUpdated($gameState, $event),
 			GameEventTypeEnum::ROUND_ENDED => $this->handleRoundEnded($gameState),
+			GameEventTypeEnum::CARD_OR_NOTHING_CALLED => $gameState,
 		};
 
 		return $newState;

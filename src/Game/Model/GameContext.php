@@ -76,4 +76,11 @@ class GameContext
 			'playerId' => $playerId,
 		]);
 	}
+
+	public function pushCardOrNothingCalled(string $rank): void
+	{
+		$this->pushEvent(GameEventTypeEnum::CARD_OR_NOTHING_CALLED, [
+			'rank' => $rank,
+		]);
+	}
 }

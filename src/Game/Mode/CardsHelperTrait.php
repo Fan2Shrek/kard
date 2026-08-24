@@ -85,4 +85,14 @@ trait CardsHelperTrait
 			}
 		}
 	}
+
+	/**
+	 * @return Turn[] the last $count non-skipped turns, in chronological order - skips are ignored, not treated as breaking the sequence
+	 */
+	protected function getLastNonSkippedTurns(Round $round, int $count): array
+	{
+		$nonSkipped = array_values(array_filter($round->turns, fn (Turn $turn): bool => !$turn->hasBeenSkipped()));
+
+		return array_slice($nonSkipped, -$count);
+	}
 }

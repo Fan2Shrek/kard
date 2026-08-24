@@ -7,6 +7,7 @@ use App\Enum\Card\Suit;
 use App\Game\Model\Card\Card;
 use App\Game\Model\GameContext;
 use App\Game\Model\State\GameState;
+use App\Game\Model\State\Round;
 
 /**
  * @see https://bicyclecards.com/how-to-play/presidents
@@ -132,15 +133,69 @@ final class PresidentGameMode extends AbstractGameMode implements SetupGameModeI
 
 		$base = $this->gameState->getCardById($lastTurn->cardIds[0]);
 
-		if ($this->isHigherByRankOrder($played, $base) || $base->rank === $played->rank) {
-			$context->pushTurn($this->playedCardIds);
-		} else {
+		$cardOrNothingRank = $this->getCardOrNothingRank($currentRound);
+
+		if (null !== $cardOrNothingRank) {
+			if ($played->rank !== $cardOrNothingRank) {
+				throw $this->createRuleException('card.or_nothing', [
+					'%played_card%' => $played->rank->value,
+					'%actual_card%' => $cardOrNothingRank->value,
+				]);
+			}
+		} elseif (!$this->isHigherByRankOrder($played, $base) && $base->rank !== $played->rank) {
 			throw $this->createRuleException('card.value.higher');
+		}
+
+		$context->pushTurn($this->playedCardIds);
+
+		// this play just matched the previous turn's rank for the first time - the lock is born here
+		if (null === $cardOrNothingRank && $base->rank === $played->rank) {
+			$context->pushCardOrNothingCalled($played->rank->value);
+		}
+
+		// four of a kind ends the round
+		if (2 === count($this->playedCardIds) && $base->rank === $played->rank) {
+			$this->handleRoundEnd($context);
+		}
+		// four singles of the same rank played in a row (skips ignored) ends the round too
+		if (1 === count($this->playedCardIds)) {
+			$lastThreeTurns = $this->getLastNonSkippedTurns($currentRound, 3);
+			$allSingleSameRank = 3 === count($lastThreeTurns);
+
+			foreach ($lastThreeTurns as $turn) {
+				if (1 !== count($turn->cardIds) || $this->gameState->getCardById($turn->cardIds[0])->rank !== $played->rank) {
+					$allSingleSameRank = false;
+					break;
+				}
+			}
+
+			if ($allSingleSameRank) {
+				$this->handleRoundEnd($context);
+			}
 		}
 
 		if (Rank::TWO === $played->rank) {
 			$this->handleRoundEnd($context);
 		}
+	}
+
+	/**
+	 * When the last two non-skipped turns of the round played the same rank ("carte ou rien"),
+	 * only that exact rank may be played next. Skips in between don't break this - they're
+	 * simply ignored when looking for the last two real plays.
+	 */
+	private function getCardOrNothingRank(Round $round): ?Rank
+	{
+		$turns = $this->getLastNonSkippedTurns($round, 2);
+
+		if (2 !== count($turns)) {
+			return null;
+		}
+
+		$first = $this->gameState->getCardById($turns[0]->cardIds[0])->rank;
+		$second = $this->gameState->getCardById($turns[1]->cardIds[0])->rank;
+
+		return $first === $second ? $first : null;
 	}
 
     /**

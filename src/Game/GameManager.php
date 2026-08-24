@@ -20,6 +20,7 @@ use App\Game\Model\Event\GameEvent;
 use App\Game\Model\GameContext;
 use App\Game\Model\State\GameState;
 use App\Game\Model\State\PlayerState;
+use App\Game\Service\EventPublisher;
 use App\Game\Service\GameEventApplier;
 use App\Game\StateProvider\GameStateProviderInterface;
 use App\Repository\ResultRepository;
@@ -38,6 +39,7 @@ final class GameManager implements ServiceSubscriberInterface
         private ContainerInterface $container,
         private GameStateProviderInterface $gameStateProvider,
         private GameEventApplier $gea,
+		private EventPublisher $publisher,
     ) {
     }
 
@@ -150,6 +152,8 @@ final class GameManager implements ServiceSubscriberInterface
         $this->finishGameIfNeeded($room, $player, $state, $gameMode);
 
 		$this->gameStateProvider->save($room->getId()->toString(), $state);
+
+		$this->publisher->publish($room, $events);
     }
 
     private function getGameMode(GameModeEnum $gameModeEnum): GameModeInterface

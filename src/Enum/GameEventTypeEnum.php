@@ -12,4 +12,5 @@ enum GameEventTypeEnum: string
 	case ROUND_ENDED = 'round_ended';
 	case TURN_PLAYED = 'turn_played';
 	case TURN_ENDED = 'turn_ended';
+	case CARD_OR_NOTHING_CALLED = 'card_or_nothing_called';
 }
