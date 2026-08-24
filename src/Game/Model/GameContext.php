@@ -44,11 +44,6 @@ final class GameContext
         return $this->state;
     }
 
-    public function addEvent(GameEvent $event): void
-    {
-        $this->events[] = $event;
-    }
-
     /**
      * Records the event and immediately applies its GameState mutation.
      */
