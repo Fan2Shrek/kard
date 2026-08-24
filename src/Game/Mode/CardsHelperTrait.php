@@ -7,7 +7,7 @@ use App\Game\Model\Card\Card;
 
 trait CardsHelperTrait
 {
-    private function isLegacyHigher(Card $card, Card $currentCard): bool
+    private function isHigherByRankOrder(Card $card, Card $currentCard): bool
     {
         $ranks = $this->getRanks();
         if (!in_array($card->rank, $ranks, true) || !in_array($currentCard->rank, $ranks, true)) {

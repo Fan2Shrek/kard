@@ -15,8 +15,6 @@ use App\Game\Model\GameState;
 
 /**
  * @see https://bicyclecards.com/how-to-play/presidents
- *
- * @todo gameData in gameContext ??
  */
 final class PresidentGameMode extends AbstractGameMode
 {
@@ -139,7 +137,7 @@ final class PresidentGameMode extends AbstractGameMode
 
         $card = $cards[0];
 
-        if (!$this->isLegacyHigher($card, $currentCards[0]) && !$this->isSameRank($card, $currentCards[0])) {
+        if (!$this->isHigherByRankOrder($card, $currentCards[0]) && !$this->isSameRank($card, $currentCards[0])) {
             throw $this->createRuleException('card.value.higher');
         }
 
@@ -236,7 +234,7 @@ final class PresidentGameMode extends AbstractGameMode
             return;
         }
 
-        if (!$this->isLegacyHigher($card, $currentCard)) {
+        if (!$this->isHigherByRankOrder($card, $currentCard)) {
             throw $this->createRuleException('card.values.higher');
         }
 
@@ -268,7 +266,7 @@ final class PresidentGameMode extends AbstractGameMode
             return;
         }
 
-        if (!$this->isLegacyHigher($card, $currentCard)) {
+        if (!$this->isHigherByRankOrder($card, $currentCard)) {
             throw $this->createRuleException('card.values.higher');
         }
     }
