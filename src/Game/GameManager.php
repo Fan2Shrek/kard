@@ -119,66 +119,28 @@ final class GameManager implements ServiceSubscriberInterface
     public function play(Room $room, Player $player, array $cards, array $data = []): void
     {
         $ctx = $this->gameStateProvider->provide($room);
-        $player = current(array_filter(
-            $ctx->getPlayers(),
-            fn (Player $p): bool => $p->id === $player->id,
-        ));
+        $player = $this->resolveActingPlayer($ctx, $player);
 
-        if (!$ctx->getData('fastPlay') && $ctx->getCurrentPlayer()->id !== $player->id) {
-            throw new \InvalidArgumentException('Not your turn');
-        }
+        $this->assertCanPlay($ctx, $player);
 
         if ($ctx->getData('fastPlay')) {
             if ($ctx->getCurrentPlayer()->id !== $player->id && [] === $cards) {
                 return;
             }
 
-            $ctx->setCurrentPlayer(
-                current(array_filter(
-                    $ctx->getPlayers(),
-                    fn (Player $p): bool => $p->id === $player->id,
-                )),
-            );
+            $this->applyFastPlayOverride($ctx, $player);
         }
 
-        $hand = $this->handRepository->get($player->id, $room);
-
-        if (!empty($cards) && !$hand->hasCards($cards)) {
-            throw new \InvalidArgumentException('Card not found in player hand');
-        }
+        $hand = $this->loadAndValidateHand($room, $player, $cards);
 
         $gameMode = $this->getGameMode($room->getGameMode()->getValue());
 
         $context = new GameContext($ctx);
         $gameMode->play($cards, $context, $hand, $data);
 
-        $this->handRepository->save($player->id, $room, $hand);
-
-        $player->cardsCount = count($hand);
-
-        $this->gameStateProvider->save($ctx);
-
-        foreach ($context->flushEvents() as $event) {
-            $this->container->get('event_dispatcher')->dispatch($event);
-        }
-
-        if ($gameMode->isGameFinished($ctx)) {
-            $room->setStatus(GameStatusEnum::FINISHED);
-
-            $result = new Result(
-                $this->container->get('user_repository')->find($player->id),
-                $room,
-            );
-            if ($this->handRepository instanceof CachedHandRepositoryInterface) {
-                $this->handRepository->deleteAllHandForRoom($room);
-            }
-            $this->gameStateProvider->clear($room);
-
-            $this->container->get('event_dispatcher')->dispatch(new GameFinishedEvent($room, $ctx));
-            $this->container->get('result_repository')->save($result);
-
-            return;
-        }
+        $this->persistPlayerState($room, $player, $hand, $ctx);
+        $this->dispatchEvents($context);
+        $this->finishGameIfNeeded($room, $player, $ctx, $gameMode);
     }
 
     public function getGameMode(GameModeEnum $gameModeEnum): GameModeInterface
@@ -190,6 +152,82 @@ final class GameManager implements ServiceSubscriberInterface
         }
 
         throw new \InvalidArgumentException('Game mode not found');
+    }
+
+    private function resolveActingPlayer(GameState $ctx, Player $player): Player
+    {
+        return current(array_filter(
+            $ctx->getPlayers(),
+            fn (Player $p): bool => $p->id === $player->id,
+        ));
+    }
+
+    private function assertCanPlay(GameState $ctx, Player $player): void
+    {
+        if (!$ctx->getData('fastPlay') && $ctx->getCurrentPlayer()->id !== $player->id) {
+            throw new \InvalidArgumentException('Not your turn');
+        }
+    }
+
+    private function applyFastPlayOverride(GameState $ctx, Player $player): void
+    {
+        $ctx->setCurrentPlayer(
+            current(array_filter(
+                $ctx->getPlayers(),
+                fn (Player $p): bool => $p->id === $player->id,
+            )),
+        );
+    }
+
+    /**
+     * @param array<Card> $cards
+     */
+    private function loadAndValidateHand(Room $room, Player $player, array $cards): Hand
+    {
+        $hand = $this->handRepository->get($player->id, $room);
+
+        if (!empty($cards) && !$hand->hasCards($cards)) {
+            throw new \InvalidArgumentException('Card not found in player hand');
+        }
+
+        return $hand;
+    }
+
+    private function persistPlayerState(Room $room, Player $player, Hand $hand, GameState $ctx): void
+    {
+        $this->handRepository->save($player->id, $room, $hand);
+
+        $player->cardsCount = count($hand);
+
+        $this->gameStateProvider->save($ctx);
+    }
+
+    private function dispatchEvents(GameContext $context): void
+    {
+        foreach ($context->flushEvents() as $event) {
+            $this->container->get('event_dispatcher')->dispatch($event);
+        }
+    }
+
+    private function finishGameIfNeeded(Room $room, Player $player, GameState $ctx, GameModeInterface $gameMode): void
+    {
+        if (!$gameMode->isGameFinished($ctx)) {
+            return;
+        }
+
+        $room->setStatus(GameStatusEnum::FINISHED);
+
+        $result = new Result(
+            $this->container->get('user_repository')->find($player->id),
+            $room,
+        );
+        if ($this->handRepository instanceof CachedHandRepositoryInterface) {
+            $this->handRepository->deleteAllHandForRoom($room);
+        }
+        $this->gameStateProvider->clear($room);
+
+        $this->container->get('event_dispatcher')->dispatch(new GameFinishedEvent($room, $ctx));
+        $this->container->get('result_repository')->save($result);
     }
 
     /**
