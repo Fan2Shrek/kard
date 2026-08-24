@@ -2,7 +2,9 @@
 
 namespace App\Entity;
 
+use App\Doctrine\RoomConfigurationType;
 use App\Enum\GameStatusEnum;
+use App\Game\Model\GameConfiguration;
 use App\Repository\RoomRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -36,6 +38,9 @@ class Room
 
     #[ORM\Column(enumType: GameStatusEnum::class)]
     private GameStatusEnum $status;
+
+    #[ORM\Column(type: RoomConfigurationType::NAME)]
+    private GameConfiguration $configuration;
 
     public function __construct(GameMode $gameMode, UuidInterface|string|null $id = null, ?GameStatusEnum $status = null)
     {
@@ -107,6 +112,18 @@ class Room
     public function setStatus(GameStatusEnum $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getConfiguration(): GameConfiguration
+    {
+        return $this->configuration;
+    }
+
+    public function setConfiguration(GameConfiguration $configuration): static
+    {
+        $this->configuration = $configuration;
 
         return $this;
     }

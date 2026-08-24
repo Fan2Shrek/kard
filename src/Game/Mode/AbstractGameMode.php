@@ -8,6 +8,8 @@ use App\Game\Exception\RuleException;
 use App\Game\Model\Card\Card;
 use App\Game\Model\GameContext;
 use App\Game\Model\State\GameState;
+use Override;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 abstract class AbstractGameMode implements GameModeInterface
 {
@@ -36,6 +38,10 @@ abstract class AbstractGameMode implements GameModeInterface
 
 		$this->postPlay($context, $playerId, $data);
     }
+
+	public function configureOptions(OptionsResolver $resolver): void
+	{
+	}
 
     /**
      * This method implements the game rules.

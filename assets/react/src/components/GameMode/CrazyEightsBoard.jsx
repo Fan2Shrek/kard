@@ -54,6 +54,19 @@ export default ({ ctx, player }) => {
                 ))}
             </div>
         ),
+        joker: (
+            <div>
+                {Object.entries(suitsIcons).map(([ name, icon ]) => (
+                    <a
+                        key={name}
+                        className="button button--medium"
+                        onClick={() => handlePlay({ suit: name })}
+                    >
+                    {icon}
+                    </a>
+                ))}
+            </div>
+        ),
     }), []);
 
     return <>

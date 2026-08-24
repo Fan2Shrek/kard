@@ -7,6 +7,7 @@ use App\Entity\Room;
 use App\Entity\User;
 use App\Enum\GameStatusEnum;
 use App\Game\Builder\DeckBuilder;
+use App\Game\Builder\GameConfigurationBuilder;
 use App\Game\Event\GameFinishedEvent;
 use App\Game\Mode\GameModeEnum;
 use App\Game\Mode\GameModeInterface;
@@ -17,6 +18,7 @@ use App\Game\Model\Card\DiscardPile;
 use App\Game\Model\Card\DrawPile;
 use App\Game\Model\Card\Hand;
 use App\Game\Model\Event\GameEvent;
+use App\Game\Model\GameConfiguration;
 use App\Game\Model\GameContext;
 use App\Game\Model\State\GameState;
 use App\Game\Model\State\PlayerState;
@@ -52,10 +54,25 @@ final class GameManager implements ServiceSubscriberInterface
         ];
     }
 
+	public function getDefaultConfiguration(GameModeEnum $gameMode): GameConfiguration
+	{
+		return $this->buildConfiguration($gameMode, []);
+	}
+
+	/**
+	 * @param array<string, mixed> $rawOptions
+	 */
+	public function buildConfiguration(GameModeEnum $gameModeEnum, array $rawOptions): GameConfiguration
+	{
+		$gameMode = $this->getGameMode($gameModeEnum);
+
+		return new GameConfigurationBuilder()->build($gameMode, $rawOptions);
+	}
+
     public function start(Room $room): GameState
     {
         $gameMode = $this->getGameMode($room->getGameMode()->getValue());
-		$deck = $this->createDeck();
+		$deck = $this->createDeck($room->getConfiguration());
 		$cards = $deck->cards;
         [$hands, $drawPile] = $this->drawHands($deck, $room->getParticipants()->count(), $gameMode);
 		// DrawPile is keyed by card id with id values too (like Hand/DiscardPile),
@@ -216,11 +233,19 @@ final class GameManager implements ServiceSubscriberInterface
         $this->container->get('result_repository')->save($result);
     }
 
-	private function createDeck(): Deck
+	private function createDeck(GameConfiguration $config): Deck
 	{
-		$deck = new DeckBuilder()->build();
+		$deck = new DeckBuilder();
 
-		return $deck->shuffle();
+		if ($config->hasJokers()) {
+			$deck->withJokers();
+		}
+
+		if ($config->deckCount() > 1) {
+			$deck->withDeckCount($config->deckCount());
+		}
+
+		return $deck->build()->shuffle();
 	}
 
     /**

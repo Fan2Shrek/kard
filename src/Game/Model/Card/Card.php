@@ -28,6 +28,6 @@ final readonly class Card
 
     public function __toString(): string
     {
-        return sprintf('%s%s', $this->rank->value, $this->suit->value);
+        return sprintf('%s%s', $this->rank->value, $this->suit->value ?? '');
     }
 }

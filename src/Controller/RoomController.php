@@ -43,15 +43,17 @@ final class RoomController extends AbstractController
         Request $request,
         GameModeRepository $gameModeRepository,
         GameModeDescriptionRepository $gameModeDescriptionRepository,
+		GameManager $gameManager,
     ): Response {
         if (Request::METHOD_POST === $request->getMethod()) {
-            $gameMode = $request->getPayload()->get('gameMode');
-            $gameMode = $gameModeRepository->findByGameMode(GameModeEnum::from($gameMode));
+            $gameModeEnum = GameModeEnum::from($request->getPayload()->get('gameMode'));
+            $gameMode = $gameModeRepository->findByGameMode($gameModeEnum);
 
             $user = $this->getUser();
             $room = new Room($gameMode);
             $room->setOwner($user);
             $room->addParticipant($user);
+			$room->setConfiguration($gameManager->getDefaultConfiguration($gameModeEnum));
 
             $this->roomRepository->save($room);
             $this->eventDispatcher->dispatch(new RoomEvent($room), 'room.created');
@@ -123,7 +125,39 @@ final class RoomController extends AbstractController
         return $this->render('home/waiting.html.twig', [
             'room' => $room,
             'players' => $players,
+			'configuration' => $room->getConfiguration(),
         ]);
+    }
+
+    #[Route('/configuration/{id}', name: 'game_configuration', methods: ['POST'])]
+    public function updateConfiguration(Room $room, Request $request): Response
+    {
+        if ($room->getOwner() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if (GameStatusEnum::PLAYING === $room->getStatus()) {
+            return $this->redirectToRoute('game', ['id' => $room->getId()]);
+        }
+
+        $payload = $request->getPayload();
+        $rawOptions = [
+            'withJokers' => $payload->getBoolean('withJokers'),
+            'deckCount' => $payload->getInt('deckCount', 1),
+        ];
+
+        $room->setConfiguration($this->gameManager->buildConfiguration($room->getGameMode()->getValue(), $rawOptions));
+        $this->roomRepository->save($room);
+
+        $this->hub->publish(new Update(
+            \sprintf('game-%s-waiting', $room->getId()),
+            $this->renderView('components/turbo/room-configuration.html.twig', [
+                'room' => $room,
+                'configuration' => $room->getConfiguration(),
+            ])
+        ));
+
+        return $this->redirectToRoute('waiting', ['id' => $room->getId()]);
     }
 
     #[Route('/leave/{id}', name: 'game_leave')]

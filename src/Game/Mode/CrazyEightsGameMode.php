@@ -89,7 +89,7 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
 		$activeSuit = $this->getActiveSuit($round, $lastCard);
 		$mainCard = $cards[0];
 
-		if (Rank::EIGHT === $mainCard->rank) {
+		if (Rank::EIGHT === $mainCard->rank || Rank::JOKER === $mainCard->rank) {
 			if (!isset($data['suit'])) {
 				throw $this->createRuleException('suit.not_set');
 			}
@@ -104,10 +104,17 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
 				'suit' => $suit->value,
 			]);
 
-			// an eight is wild (playable regardless of rank/suit) but still needs to
-			// be recorded as a turn - it's the only way the chosen suit sticks for
-			// the next player's match via getActiveSuit()
 			$context->pushTurn($this->playedCardIds, null, ['suit' => $suit->value]);
+
+			if (Rank::JOKER === $mainCard->rank) {
+				$nextPlayerId = $context->gameState->getNextPlayerId();
+
+				for ($i = 0; $i < 4 * count($this->playedCardIds); ++$i) {
+					$context->drawCard($nextPlayerId);
+				}
+
+				$context->skipNextPlayerTurn();
+			}
 
 			return;
 		}

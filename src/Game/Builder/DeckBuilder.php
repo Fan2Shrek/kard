@@ -17,12 +17,14 @@ final class DeckBuilder
 	 */
 	private array $cards = [];
 
+	private int $deckCount = 1;
+
+	private bool $withJokers = false;
+
 	public function build(): Deck
 	{
-		foreach (Rank::valueCases() as $rank) {
-			foreach (Suit::cases() as $suit) {
-				$this->cards[] = new Card(Uuid::uuid4()->toString(), $rank, $suit);
-			}
+		for ($i = 0; $i < $this->deckCount; $i++) {
+			$this->cards = array_merge($this->cards, $this->getOneDeckCards());
 		}
 
 		return new Deck($this->cards);
@@ -30,9 +32,33 @@ final class DeckBuilder
 
 	public function withJokers(): self
 	{
-		$this->cards[] = new Card(Uuid::uuid4()->toString(), Rank::JOKER, null);
-		$this->cards[] = new Card(Uuid::uuid4()->toString(), Rank::JOKER, null);
+		$this->withJokers = true;
 
 		return $this;
+	}
+
+	public function withDeckCount(int $count): self
+	{
+		$this->deckCount = $count;
+
+		return $this;
+	}
+
+	private function getOneDeckCards(): array
+	{
+		$cards = [];
+
+		foreach (Rank::valueCases() as $rank) {
+			foreach (Suit::cases() as $suit) {
+				$cards[] = new Card(Uuid::uuid4()->toString(), $rank, $suit);
+			}
+		}
+
+		if ($this->withJokers) {
+			$cards[] = new Card(Uuid::uuid4()->toString(), Rank::JOKER, null);
+			$cards[] = new Card(Uuid::uuid4()->toString(), Rank::JOKER, null);
+		}
+
+		return $cards;
 	}
 }

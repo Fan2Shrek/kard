@@ -2,9 +2,9 @@
 
 namespace App\Game\Mode;
 
-use App\Game\Model\Card\Card;
 use App\Game\Model\GameContext;
 use App\Game\Model\State\GameState;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 interface GameModeInterface
 {
@@ -29,4 +29,6 @@ interface GameModeInterface
     public function isGameFinished(GameState $state): bool;
 
 	public function refreshScore(GameContext $ctx): void;
+
+	public function configureOptions(OptionsResolver $resolver): void;
 }

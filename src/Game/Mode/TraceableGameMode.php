@@ -4,6 +4,7 @@ namespace App\Game\Mode;
 
 use App\Game\Model\GameContext;
 use App\Game\Model\State\GameState;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
@@ -70,5 +71,10 @@ final class TraceableGameMode implements GameModeInterface, SetupGameModeInterfa
 		$this->gameMode->refreshScore($ctx);
 
 		$event->stop();
+	}
+
+	public function configureOptions(OptionsResolver $resolver): void
+	{
+		$this->gameMode->configureOptions($resolver);
 	}
 }
