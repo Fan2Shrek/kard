@@ -8,28 +8,21 @@ export const GameContext = createContext({
     isPlayerTurn: () => { },
 })
 
-export const GameContextProvider = ({ children, gameContext, player }) => {
-    const getCardAsset = useCallback((card) => {
-        return gameContext.assets[card.rank + card.suit];
-    }, [gameContext]);
-
-    const getBackAsset = useCallback(() => {
-        return gameContext.assets['back'];
-    }, [gameContext]);
-
+export const GameContextProvider = ({ children, gameContext, player, roomId }) => {
     const isPlayerTurn = useCallback(() => {
-        return gameContext.currentPlayer === player.id;
+        return gameContext.currentPlayerId === player.id;
     }, [gameContext, player]);
 
-    const currentPlayer = useMemo(() => gameContext.currentPlayer, [gameContext]);
+    const currentPlayer = useMemo(
+        () => gameContext.currentPlayerId,
+        [gameContext],
+    );
 
     return <GameContext.Provider value={{
-        roomId: gameContext.id,
+        roomId,
         gameContext,
         currentPlayer,
         player,
-        getCardAsset,
-        getBackAsset,
         isPlayerTurn,
     }}>
         {children}

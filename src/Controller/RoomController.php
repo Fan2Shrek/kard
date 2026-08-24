@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Domain\DTO\GameStateDTO;
 use App\Entity\GameModeDescription;
 use App\Entity\Room;
 use App\Enum\GameStatusEnum;
@@ -208,22 +209,26 @@ final class RoomController extends AbstractController
 
 		$state = $gameStateProvider->get($room->getId()->toString());
 		$assets = $assetsProvider->getAssets($state->cards);
+		$isParticipant = \in_array($user, $room->getParticipants()->toArray(), true);
+		$viewerId = $isParticipant ? $user->getId()->toString() : null;
+		$dto = GameStateDTO::fromState($state, $viewerId);
 
-
-        if (!\in_array($user, $room->getParticipants()->toArray(), true)) {
+        if (!$isParticipant) {
             return $this->render('home/game.html.twig', [
                 'assets' => $assets,
-                'game' => $serializer->serialize($state, 'json'),
+                'game' => $serializer->serialize($dto, 'json'),
                 'room' => $room,
+                'gameMode' => $room->getGameMode()->getValue()->value,
             ]);
         }
 
         return $this->render('home/game.html.twig', [
             'assets' => $assets,
-            'game' => $serializer->serialize($state, 'json'),
+            'game' => $serializer->serialize($dto, 'json'),
             'player' => $serializer->serialize($this->getUser(), 'json'),
             'playerId' => $user->getId(),
             'room' => $room,
+            'gameMode' => $room->getGameMode()->getValue()->value,
         ]);
     }
 }

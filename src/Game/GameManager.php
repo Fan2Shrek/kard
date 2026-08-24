@@ -66,7 +66,7 @@ final class GameManager implements ServiceSubscriberInterface
 				$player->getId()->toString(),
 				$player->getUsername(),
 				count($hand),
-				new Hand($hand),
+				new Hand(array_map(fn (Card $card): string => $card->id, $hand)),
 			);
 		}
 
@@ -91,6 +91,7 @@ final class GameManager implements ServiceSubscriberInterface
 			new DrawPile($drawPile),
 			array_combine(array_map(fn (Card $card) => $card->id, $cards), $cards)
 		);
+
 
         if ($gameMode instanceof SetupGameModeInterface) {
 			$ctx = $this->createGameContext($state);
@@ -125,16 +126,10 @@ final class GameManager implements ServiceSubscriberInterface
             $state = $this->applyEveryoneCanPlayOverride($state, $player);
         }
 
-		$hand = $player->hand;
-
-		if (!$hand->hasCards($cards)) {
-			throw new \InvalidArgumentException('Player does not have the cards');
-		}
-
         $gameMode = $this->getGameMode($room->getGameMode()->getValue());
 
         $context = new GameContext($state);
-        $gameMode->play($cards, $context, $hand, $data);
+        $gameMode->play($cards, $context, $player->id, $data);
         $events = $context->flushEvents();
 
 		foreach ($events as $event) {
@@ -143,15 +138,18 @@ final class GameManager implements ServiceSubscriberInterface
 
 		$context = new GameContext($state);
 		$gameMode->refreshScore($context);
+		$scoreEvents = $context->flushEvents();
 
-		$events = array_merge($events, $context->flushEvents());
-
-		foreach ($events as $event) {
+		foreach ($scoreEvents as $event) {
 			$state = $this->gea->apply($event, $state);
 		}
 
+		$events = array_merge($events, $scoreEvents);
+
         $this->dispatchEvents($events);
         $this->finishGameIfNeeded($room, $player, $state, $gameMode);
+
+		$this->gameStateProvider->save($room->getId()->toString(), $state);
     }
 
     private function getGameMode(GameModeEnum $gameModeEnum): GameModeInterface

@@ -8,7 +8,7 @@ use App\Enum\GameEventTypeEnum;
 use App\Game\Model\Event\GameEvent;
 use App\Game\Model\State\GameState;
 
-final class GameContext
+class GameContext
 {
 	/**
 	 * @var GameEvent[]
@@ -40,7 +40,40 @@ final class GameContext
 	{
 		$this->pushEvent(GameEventTypeEnum::SCORE_UPDATED, [
 			'playerId' => $playerId,
-			'scores' => $newScore,
+			'score' => $newScore,
+		]);
+	}
+
+	public function startNewRound(): void
+	{
+		$this->pushEvent(GameEventTypeEnum::ROUND_STARTED);
+	}
+
+	public function endCurrentRound(): void
+	{
+		$this->pushEvent(GameEventTypeEnum::ROUND_ENDED);
+	}
+
+	/**
+	* @param array<string> $cards
+	*/
+	public function pushTurn(array $cards): void
+	{
+		$this->pushEvent(GameEventTypeEnum::TURN_PLAYED, [
+			'cards' => $cards,
+		]);
+	}
+
+	public function pushEndTurn(): void
+	{
+		$this->pushEvent(GameEventTypeEnum::TURN_ENDED);
+	}
+
+	public function pushCardDiscarded(string $cardId, string $playerId): void
+	{
+		$this->pushEvent(GameEventTypeEnum::CARD_DISCARDED, [
+			'cardId' => $cardId,
+			'playerId' => $playerId,
 		]);
 	}
 }

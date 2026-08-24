@@ -3,17 +3,16 @@
 namespace App\Game\Mode;
 
 use App\Game\Model\Card\Card;
-use App\Game\Model\Card\Hand;
 use App\Game\Model\GameContext;
 use App\Game\Model\State\GameState;
 
 interface GameModeInterface
 {
     /**
-     * @param array<Card>          $cards
+     * @param array<string>        $cards card ids - resolved to Card by AbstractGameMode::play() before doPlay()
      * @param array<string, mixed> $data
      */
-    public function play(array $cards, GameContext $context, Hand $hand, array $data = []): void;
+    public function play(array $cards, GameContext $context, string $playerId, array $data = []): void;
 
     public function getGameMode(): GameModeEnum;
 

@@ -19,13 +19,15 @@ abstract readonly class AbstractCardStack
 		return count($this->cards);
 	}
 
-	public function addCard(Card $card): self
+	public function addCard(string $card): static
 	{
+		// @phpstan-ignore new.static (subclasses are final and don't override the constructor)
 		return new static([...$this->cards, $card]);
 	}
 
-	public function removeCard(Card $card): self
+	public function removeCard(string $card): static
 	{
-		return new static(array_values(array_filter($this->cards, fn (Card $c): bool => !$c->isSameAs($card))));
+		// @phpstan-ignore new.static (subclasses are final and don't override the constructor)
+		return new static(array_values(array_filter($this->cards, fn (string $c): bool => $c !== $card)));
 	}
 }

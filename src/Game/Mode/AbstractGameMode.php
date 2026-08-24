@@ -6,7 +6,6 @@ namespace App\Game\Mode;
 
 use App\Game\Exception\RuleException;
 use App\Game\Model\Card\Card;
-use App\Game\Model\Card\Hand;
 use App\Game\Model\GameContext;
 use App\Game\Model\State\GameState;
 
@@ -14,17 +13,25 @@ abstract class AbstractGameMode implements GameModeInterface
 {
     protected GameState $gameState;
 
-    /**
-     * @var array<Card>
-     */
-    protected array $cards;
+	protected bool $shouldPushEndTurn = true;
 
-    public function play(array $cards, GameContext $context, Hand $hand, array $data = []): void
+    /**
+     * @var string[]
+     */
+    protected array $playedCardIds;
+
+    public function play(array $cards, GameContext $context, string $playerId, array $data = []): void
     {
-        $this->cards = $cards;
+        $this->playedCardIds = $cards;
         $this->gameState = $context->gameState;
 
-        $this->doPlay($cards, $context, $hand, $data);
+		$this->validatePlay($cards, $context, $playerId, $data);
+
+		$cards = array_map(fn (string $c) => $context->gameState->getCardById($c), $cards);
+
+        $this->doPlay($cards, $context, $data);
+
+		$this->postPlay($context, $playerId, $data);
     }
 
     /**
@@ -33,7 +40,7 @@ abstract class AbstractGameMode implements GameModeInterface
      * @param array<Card>          $cards
      * @param array<string, mixed> $data
      */
-    abstract protected function doPlay(array $cards, GameContext $context, Hand $hand, array $data): GameState;
+    abstract protected function doPlay(array $cards, GameContext $context, array $data): void;
 
     /**
      * @param array<mixed> $params
@@ -45,4 +52,24 @@ abstract class AbstractGameMode implements GameModeInterface
 
         return $e;
     }
+
+	protected function validatePlay(array $cards, GameContext $context, string $playerId, array $data = []): void
+	{
+		$hand = $context->gameState->getPlayerStateById($playerId)->hand;
+
+		if (!$hand->hasCards($cards)) {
+			throw $this->createRuleException('Card not in your hand');
+		}
+	}
+
+	protected function postPlay(GameContext $context, string $playerId, array $data = []): void
+	{
+		foreach ($this->playedCardIds as $cardId) {
+			$context->pushCardDiscarded($cardId, $playerId);
+		}
+
+		if ($this->shouldPushEndTurn) {
+			$context->pushEndTurn();
+		}
+	}
 }

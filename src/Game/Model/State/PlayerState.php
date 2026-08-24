@@ -13,8 +13,7 @@ final readonly class PlayerState
 		public string $playerName,
 		public int $score,
 		public Hand $hand,
-	) {
-	}
+	) {}
 
 	public function withScore(int $score): self
 	{
@@ -24,5 +23,15 @@ final readonly class PlayerState
 	public function withHand(Hand $hand): self
 	{
 		return new self($this->id, $this->playerName, $this->score, $hand);
+	}
+
+	public function discardCard(string $cardId): self
+	{
+		return new self(
+			$this->id,
+			$this->playerName,
+			$this->score,
+			$this->hand->removeCard($cardId)
+		);
 	}
 }

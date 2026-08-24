@@ -2,6 +2,7 @@
 
 namespace App\Controller\Api;
 
+use App\Domain\DTO\GameStateDTO;
 use App\Entity\Room;
 use App\Entity\User;
 use App\Game\GameManager;
@@ -11,7 +12,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route('/api/game')]
 final class GameController extends AbstractController
@@ -19,7 +19,6 @@ final class GameController extends AbstractController
     public function __construct(
         private readonly GameManager $gameManager,
         private readonly GameStateProviderInterface $gameStateProvider,
-        private readonly SerializerInterface $serializer,
     ) {
     }
 
@@ -31,10 +30,11 @@ final class GameController extends AbstractController
     #[Route('/{id}', name: 'state', methods: ['GET'])]
     public function state(Room $room): Response
     {
-		// @todo presenter
-		return $this->json(
-			$this->gameStateProvider->get($room->getId()->toString())
-		);
+        $state = $this->gameStateProvider->get($room->getId()->toString());
+        $user = parent::getUser();
+        $viewerId = $user instanceof User ? $user->getId()->toString() : null;
+
+        return $this->json(GameStateDTO::fromState($state, $viewerId));
     }
 
     /**
