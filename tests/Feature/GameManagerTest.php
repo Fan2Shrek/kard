@@ -5,78 +5,73 @@ use App\Entity\Room;
 use App\Entity\User;
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
-use App\Game\Card\HandRepositoryInterface;
-use App\Game\Event\CardPlayedEvent;
-use App\Game\Event\GameEventApplier;
+use App\Enum\GameEventTypeEnum;
 use App\Game\GameManager;
-use App\Game\GameStateProvider;
-use App\Game\Mode\CrazyEightsGameMode;
 use App\Game\Mode\GameModeEnum;
+use App\Game\Mode\PresidentGameMode;
 use App\Game\Model\Card\Card;
+use App\Game\Model\Card\DiscardPile;
+use App\Game\Model\Card\DrawPile;
 use App\Game\Model\Card\Hand;
-use App\Game\Model\GameState;
-use App\Game\Model\Player;
-use App\Game\Model\Turn;
+use App\Game\Model\Event\GameEvent;
+use App\Game\Model\State\GameState;
+use App\Game\Model\State\PlayerState;
+use App\Game\Model\State\Round;
+use App\Game\Service\EventPublisher;
+use App\Game\Service\GameEventApplier;
+use App\Game\StateProvider\GameStateProviderInterface;
 use Psr\Container\ContainerInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Mercure\HubInterface;
+use Symfony\Component\Serializer\SerializerInterface;
 
 covers(GameManager::class);
 
 test("play() joue un tour normal : sauvegarde la main et l'état, dispatch les events, sans passer par Mercure directement", function () {
-    $room = new Room(new GameMode(GameModeEnum::CRAZY_EIGHTS), Uuid::uuid4());
+    $room = new Room(new GameMode(GameModeEnum::PRESIDENT), Uuid::uuid4());
 
-    $player1 = new Player('1', 'Player 1', 2);
-    $player2 = new Player('2', 'Player 2', 1);
+    $userId = Uuid::uuid4();
+    $user = new User('player1', 'player1@test.com');
+    (new ReflectionProperty($user, 'id'))->setValue($user, $userId);
+
+    $card7 = new Card('7s', Rank::SEVEN, Suit::SPADES);
+    $card8 = new Card('8s', Rank::EIGHT, Suit::SPADES);
+    $card9 = new Card('9s', Rank::NINE, Suit::SPADES);
+
+    // scores pre-set to the *post-play* hand size, so refreshScore() doesn't add
+    // an incidental SCORE_UPDATED noise event on top of the ones we assert on.
+    // player2 must keep a non-empty hand: a score of 0 means "this player has
+    // won" per PresidentGameMode::isGameFinished(), which we don't want here.
+    $player1 = new PlayerState($userId->toString(), 'Player 1', 1, new Hand(['7s', '8s']));
+    $player2 = new PlayerState('2', 'Player 2', 1, new Hand(['9s']));
 
     $state = new GameState(
-        'room-id',
-        $room,
         [$player1, $player2],
-        $player1,
-        [new Turn([new Card(Rank::SEVEN, Suit::HEARTS)])],
+        [$userId->toString(), '2'],
+        $userId->toString(),
+        [0 => new Round(0, [])],
+        new DiscardPile([]),
+        new DrawPile([]),
+        ['7s' => $card7, '8s' => $card8, '9s' => $card9],
     );
-
-    $handRepository = new class implements HandRepositoryInterface {
-        /** @var array<string, Hand> */
-        public array $hands = [];
-
-        /** @var array<string, Hand> */
-        public array $saved = [];
-
-        public function get(string|User $player, Room $room): ?Hand
-        {
-            return $this->hands[$player] ?? null;
-        }
-
-        public function getRaw(User $player, Room $room): ?string
-        {
-            return null;
-        }
-
-        public function save(string|User $player, Room $room, Hand $hand): void
-        {
-            $this->saved[$player] = $hand;
-        }
-    };
-    $handRepository->hands['1'] = new Hand([
-        new Card(Rank::SEVEN, Suit::SPADES),
-        new Card(Rank::EIGHT, Suit::SPADES),
-    ]);
 
     $savedState = null;
 
-    $gameStateProvider = $this->createMock(GameStateProvider::class);
-    $gameStateProvider->method('provide')->willReturn($state);
-    $gameStateProvider->expects($this->once())->method('save')->with($this->callback(function (GameState $newState) use (&$savedState): bool {
-        $savedState = $newState;
+    $gameStateProvider = $this->createMock(GameStateProviderInterface::class);
+    $gameStateProvider->method('get')->willReturn($state);
+    $gameStateProvider->expects($this->once())->method('save')->with(
+        $this->anything(),
+        $this->callback(function (GameState $newState) use (&$savedState): bool {
+            $savedState = $newState;
 
-        return true;
-    }));
+            return true;
+        })
+    );
 
     $dispatchedEvents = [];
     $eventDispatcher = new EventDispatcher();
-    $eventDispatcher->addListener(CardPlayedEvent::class, function (CardPlayedEvent $event) use (&$dispatchedEvents): void {
+    $eventDispatcher->addListener(GameEvent::class, function (GameEvent $event) use (&$dispatchedEvents): void {
         $dispatchedEvents[] = $event;
     });
 
@@ -99,17 +94,25 @@ test("play() joue un tour normal : sauvegarde la main et l'état, dispatch les e
         }
     };
 
-    $gameMode = new CrazyEightsGameMode($handRepository);
+    $hub = $this->createMock(HubInterface::class);
+    $serializer = $this->createMock(SerializerInterface::class);
+    $serializer->method('serialize')->willReturn('{}');
+    $publisher = new EventPublisher($hub, $serializer);
 
-    $gameManager = new GameManager([$gameMode], $container, $gameStateProvider, $handRepository, new GameEventApplier());
+    $gameMode = new PresidentGameMode();
+    $gameManager = new GameManager([$gameMode], $container, $gameStateProvider, new GameEventApplier(), $publisher);
 
-    $gameManager->play($room, $player1, [new Card(Rank::SEVEN, Suit::SPADES)]);
+    $gameManager->play($room, $user, ['7s']);
 
-    expect($handRepository->saved['1']->getCards())->toHaveCount(1);
-    expect($savedState->getPlayers()[0]->cardsCount)->toBe(1);
-    expect($savedState->getCurrentPlayer()->id)->toBe('2');
+    expect($savedState->getPlayerStateById($userId->toString())->hand->cards)->toBe(['8s']);
+    expect($savedState->currentPlayerId)->toBe('2');
 
-    expect($dispatchedEvents)->toHaveCount(1);
-    expect($dispatchedEvents[0])->toBeInstanceOf(CardPlayedEvent::class);
-    expect($dispatchedEvents[0]->player->id)->toBe('1');
+    $byType = fn (GameEventTypeEnum $type) => array_values(array_filter(
+        $dispatchedEvents,
+        fn (GameEvent $e): bool => $type === $e->type
+    ));
+
+    expect($byType(GameEventTypeEnum::TURN_PLAYED))->toHaveCount(1);
+    expect($byType(GameEventTypeEnum::CARD_DISCARDED))->toHaveCount(1);
+    expect($byType(GameEventTypeEnum::TURN_ENDED))->toHaveCount(1);
 });

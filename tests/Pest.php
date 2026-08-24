@@ -24,7 +24,9 @@
 |
 */
 
-use App\Game\Model\Player;
+use App\Enum\GameEventTypeEnum;
+use App\Game\Model\Event\GameEvent;
+use App\Game\Model\State\PlayerState;
 use Pest\Expectation;
 use Symfony\Component\Mercure\Update;
 
@@ -48,19 +50,21 @@ expect()->extend('toBeHaveData', function (string $key, string $expected) {
 });
 
 expect()->extend('toHaveTurns', function (int $count) {
-    expect($this->value->getRound()->getTurns())->toHaveCount($count);
+    expect($this->value->getCurrentRound()?->turns ?? [])->toHaveCount($count);
 });
 
 expect()->extend('toHaveNewRound', function () {
     expect($this->value)->toHaveTurns(0);
 });
 
-expect()->extend('toHaveWinner', function (Player|string $player) {
-    if ($player instanceof Player) {
-        $player = $player->username;
-    }
+expect()->extend('toHaveWinner', function (string $playerName) {
+    $winners = array_values(array_filter(
+        $this->value->players,
+        fn (PlayerState $p): bool => 0 === $p->score
+    ));
 
-    expect($this->value->getWinner()->username)->toBe($player);
+    expect($winners)->toHaveCount(1);
+    expect($winners[0]->playerName)->toBe($playerName);
 });
 
 /*
@@ -79,4 +83,18 @@ function expectMercureMessage(Update $update): Expectation
     $data = $update->getData();
 
     return expect(json_decode($data, true));
+}
+
+/**
+ * @param GameEvent[] $events
+ */
+function firstEventOfType(array $events, GameEventTypeEnum $type): ?GameEvent
+{
+    foreach ($events as $event) {
+        if ($event->type === $type) {
+            return $event;
+        }
+    }
+
+    return null;
 }

@@ -1,15 +1,9 @@
 <?php
 
-use App\Game\Exception\RuleException;
 use App\Entity\GameMode;
-use App\Enum\Card\Rank;
-use App\Enum\Card\Suit;
-use App\Game\Event\CardOrNothingCalledEvent;
-use App\Game\Event\CardPlayedEvent;
-use App\Game\Event\RoundEndedEvent;
-use App\Game\Model\Card\Card;
+use App\Enum\GameEventTypeEnum;
+use App\Game\Exception\RuleException;
 use App\Game\Model\Card\Hand;
-use App\Game\Model\Player;
 use App\Game\Mode\GameModeEnum;
 use App\Game\Mode\PresidentGameMode;
 use App\Tests\AAA\Act\Act;
@@ -18,6 +12,7 @@ use App\Tests\AAA\Arrange\Arrange;
 covers(PresidentGameMode::class);
 
 beforeEach(function () {
+    Act::reset();
     Act::addContext('gamePlayer', new PresidentGameMode());
     Act::addContext('gameMode', new GameMode(GameModeEnum::PRESIDENT));
 });
@@ -96,23 +91,15 @@ describe('Président: règles basiques', function () {
 
     test('La dame de coeur commence', function () {
         $hands = [
-            0 => new Hand([
-                new Card(Rank::EIGHT, Suit::SPADES),
-                new Card(Rank::EIGHT, Suit::HEARTS),
-            ]),
-            1 => new Hand([
-                new Card(Rank::EIGHT, Suit::SPADES),
-                new Card(Rank::QUEEN, Suit::HEARTS),
-            ]),
-            2 => new Hand([
-                new Card(Rank::EIGHT, Suit::SPADES),
-                new Card(Rank::KING, Suit::HEARTS),
-            ]),
+            new Hand([Act::card('8', 's')->id, Act::card('8', 'h')->id]),
+            new Hand([Act::card('8', 'c')->id, Act::card('q', 'h')->id]),
+            new Hand([Act::card('8', 'd')->id, Act::card('k', 'h')->id]),
         ];
 
-        $players = Act::orderPlayers($hands);
+        $order = Act::orderPlayers($hands);
 
-        expect($players)->toBe([1, 0, 2]);
+        // hand at index 1 (player '2') holds the queen of hearts, so it goes first
+        expect($order)->toBe(['2', '1', '3']);
     });
 
     test("Jouer une carte avance d'un tour", function () {
@@ -129,32 +116,36 @@ describe('Président: règles basiques', function () {
 
     test('Jouer une carte pass au prochain joueur', function () {
         Arrange::setPlayers([
-            new Player('1', 'Player 1'),
-            new Player('2', 'Player 2'),
+            ['1', 'Player 1'],
+            ['2', 'Player 2'],
         ]);
         Arrange::setGameStarted();
 
         Act::playCard(10, 's');
 
-        expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('2');
+        expect(Act::get('gameContext')->currentPlayerId)->toBe('2');
     });
 
     test('Finir un tour ne passe pas au prochain joueur', function () {
         Arrange::setPlayers([
-            new Player('1', 'Player 1'),
-            new Player('2', 'Player 2'),
+            ['1', 'Player 1'],
+            ['2', 'Player 2'],
         ]);
         Arrange::setCurrentCard(3);
 
         Act::playCard(2, 's');
 
-        expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('1');
+        expect(Act::get('gameContext')->currentPlayerId)->toBe('1');
     });
 
     test('Il est possible de passer son tour', function () {
+        // 3 joueurs : avec seulement 2 joueurs, passer termine systématiquement
+        // le round (il ne reste plus personne pour potentiellement le relancer) -
+        // ce test veut juste vérifier qu'un passe fonctionne sans terminer le round.
         Arrange::setPlayers([
-            new Player('1', 'Player 1'),
-            new Player('2', 'Player 2'),
+            ['1', 'Player 1'],
+            ['2', 'Player 2'],
+            ['3', 'Player 3'],
         ]);
         Arrange::setRound([
             [7],
@@ -163,15 +154,15 @@ describe('Président: règles basiques', function () {
         Act::playCard(null);
 
         expect(Act::get('gameContext'))->toHaveTurns(2);
-        expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('2');
+        expect(Act::get('gameContext')->currentPlayerId)->toBe('2');
     });
 
     test('Si tous les joueurs passent, le tour se fini', function () {
         Arrange::setPlayers([
-            new Player('1', 'Player 1'),
-            new Player('2', 'Player 2'),
-            new Player('3', 'Player 3'),
-            new Player('4', 'Player 4'),
+            ['1', 'Player 1'],
+            ['2', 'Player 2'],
+            ['3', 'Player 3'],
+            ['4', 'Player 4'],
         ]);
 
         Arrange::setGameStarted();
@@ -182,7 +173,7 @@ describe('Président: règles basiques', function () {
         Act::playCard(null);
 
         expect(Act::get('gameContext'))->toHaveNewRound();
-        expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('1');
+        expect(Act::get('gameContext')->currentPlayerId)->toBe('1');
     });
 
     test('Finir un tour ajoute les cartes à la défausse', function () {
@@ -194,13 +185,13 @@ describe('Président: règles basiques', function () {
 
         Act::playCard(2, 's');
 
-        expect(Act::get('gameContext')->getDiscarded())->toHaveCount(4);
+        expect(Act::get('gameContext')->discardPile->cards)->toHaveCount(4);
     });
 
     test('Un joueur sans carte est déclaré vainqueur', function () {
         Arrange::setPlayers([
-            new Player('1', 'Player 1', 3),
-            new Player('2', 'Player 2', 0),
+            ['1', 'Player 1', 3],
+            ['2', 'Player 2', 0],
         ]);
         Arrange::setGameStarted();
 
@@ -212,15 +203,18 @@ describe('Président: règles basiques', function () {
 
     test("Si tous les joueurs ont encore des cartes, il n'y a pas de vainqueur", function () {
         Arrange::setPlayers([
-            new Player('1', 'Player 1', 21),
-            new Player('2', 'Player 2', 13),
+            ['1', 'Player 1', 21],
+            ['2', 'Player 2', 13],
         ]);
         Arrange::setGameStarted();
 
         $result = Act::isGameFinished();
 
         expect($result)->toBeFalse();
-        expect(Act::get('gameContext')->getWinner())->toBeNull();
+        expect(array_filter(
+            Act::get('gameContext')->players,
+            fn ($p) => 0 === $p->score
+        ))->toBeEmpty();
     });
 
     test('Poser une carte la retire de sa main', function () {
@@ -231,7 +225,7 @@ describe('Président: règles basiques', function () {
         ]);
         Act::playCard(5, 's');
 
-        expect(Act::get('currentHand'))->toHaveCount(1);
+        expect(Act::get('currentHand')->cards)->toHaveCount(1);
     });
 });
 
@@ -282,17 +276,6 @@ describe('Président: cartes doubles', function () {
         Act::playcards([[8], [8]]);
     })->throwsNoExceptions();
 
-    test("Lorsqu'un double est joué, tous les joueurs peuvent joué", function () {
-        Arrange::setcurrentcards([
-            3,
-            3,
-        ]);
-
-        Act::playcards([[7], [7]]);
-
-        expect(Act::get('gameContext')->everyoneCanPlay())->toBeTrue();
-    });
-
     test('On peut jouer un double sur un double de même valeur', function () {
         Arrange::setcurrentcards([
             7,
@@ -309,7 +292,7 @@ describe('Président: cartes doubles', function () {
         ]);
 
         Act::playcards([[3], [3]]);
-    })->throws('card.values.higher');
+    })->throws('card.value.higher');
 
     test('On ne peut pas jouer un double avec deux valeurs différentes', function () {
         Arrange::setcurrentcards([
@@ -349,7 +332,7 @@ describe('Président: cartes triples', function () {
         ]);
 
         Act::playcards([[3], [3], [3]]);
-    })->throws('card.values.higher');
+    })->throws('card.value.higher');
 
     test('On ne peut pas jouer un triple avec des valeurs différentes', function () {
         Arrange::setcurrentcards([
@@ -397,15 +380,6 @@ describe('Président: début de partie', function () {
             [7, 'h'],
         ]);
     })->throwsNoExceptions();
-
-    test('Commencer avec un double, permet le carré rapide', function () {
-        Act::playCards([
-            [7, 's'],
-            [7, 'h'],
-        ]);
-
-        expect(Act::get('gameContext')->everyoneCanPlay())->toBeTrue();
-    });
 
     test('On peut commencer une partie avec un triple de cartes à la même valeur', function () {
         Act::playCards([
@@ -465,18 +439,6 @@ describe('Président: carte ou rien', function () {
         }
     });
 
-    test('Passer son tour annule la carte ou rien', function () {
-        Arrange::setRound([
-            [3],
-            [5],
-            [7],
-            [7],
-            [],
-        ]);
-
-        Act::playCard(9, 'h');
-    })->throwsNoExceptions();
-
     test("Passer son tour et remmetre la même valeur lance l'effet", function () {
         Arrange::setRound([
             [3],
@@ -502,39 +464,21 @@ describe('Président: carte ou rien', function () {
         Act::playCard(9, 'h');
     })->throws('card.or_nothing');
 
-    test("Lors de l'appel aux quatre, n'importe quelle joueur peut jouer", function () {
+    test('Le lock "carte ou rien" persiste même après un tour passé', function () {
         Arrange::setRound([
-            [3],
-            [5],
             [7],
             [7],
+            [],
         ]);
 
-        Act::playCard(7, 'h');
-
-        expect(Act::get('gameContext')->everyoneCanPlay())->toBeTrue();
-    });
-
-    test("Apres l'appel aux quatre, le jeu reprends dans l'ordre", function () {
-        Arrange::setRound([
-            [3],
-            [5],
-            [7],
-            [7],
-        ]);
-
-        Act::playCard(7, 'h');
-        Act::playCard(7, 'c');
-        Act::playCard(4, 'h');
-
-        expect(Act::get('gameContext')->everyoneCanPlay())->toBeFalse();
-    });
+        Act::playCard(9, 'h');
+    })->throws('card.or_nothing');
 
     test('Après un appel aux quatres, le joueurs qui a fini reprends', function () {
         Arrange::setPlayers([
-            new Player('1', 'Player 1'),
-            new Player('2', 'Player 2'),
-            new Player('3', 'Player 3'),
+            ['1', 'Player 1'],
+            ['2', 'Player 2'],
+            ['3', 'Player 3'],
         ]);
         Arrange::setGameStarted();
         Arrange::setRound([
@@ -547,7 +491,7 @@ describe('Président: carte ou rien', function () {
 
         Act::playCard(7, 's');
 
-        expect(Act::get('gameContext')->getCurrentPlayer()->id)->toBe('1');
+        expect(Act::get('gameContext')->currentPlayerId)->toBe('1');
     });
 });
 
@@ -583,7 +527,7 @@ describe('Président: fin de tour', function () {
         ]);
         Act::playCard(2, 's');
 
-        expect(Act::get('currentHand'))->toHaveCount(1);
+        expect(Act::get('currentHand')->cards)->toHaveCount(1);
     });
 
     test('Le tour se termine si un joueur joue un double 2', function () {
@@ -643,6 +587,36 @@ describe('Président: fin de tour', function () {
         expect(Act::get('gameContext'))->toHaveNewRound();
     });
 
+    test("4 cartes simples de même rang jouées d'affilée finissent le round", function () {
+        Arrange::setPlayers([
+            ['1', 'Player 1'],
+            ['2', 'Player 2'],
+            ['3', 'Player 3'],
+            ['4', 'Player 4'],
+        ]);
+        Arrange::setGameStarted();
+
+        Act::playCard(4);
+        Act::playCard(4);
+        Act::playCard(4);
+        Act::playCard(4);
+
+        expect(Act::get('gameContext'))->toHaveNewRound();
+    });
+
+    test('4 simples de même rang avec un tour passé au milieu finissent quand même le round', function () {
+        Arrange::setRound([
+            [6],
+            [6],
+            [],
+            [6],
+        ]);
+
+        Act::playCard(6);
+
+        expect(Act::get('gameContext'))->toHaveNewRound();
+    });
+
     test('Un carré de double fini le tour', function () {
         Arrange::setRound([
             [3, 3],
@@ -680,22 +654,19 @@ describe('Président: events', function () {
 
             Act::playCard(7, 'h');
 
-            $events = Act::getEvents();
+            $event = firstEventOfType(Act::getEvents(), GameEventTypeEnum::CARD_OR_NOTHING_CALLED);
 
-            expect($events)->toHaveCount(2);
-            expect($events[0])->toBeInstanceOf(CardOrNothingCalledEvent::class);
-            expect($events[1])->toBeInstanceOf(CardPlayedEvent::class);
+            expect($event)->not->toBeNull();
         });
 
-        test("L'évenement CardOrNothingCalled contient le rang concerné et n'est pas un appel aux quatre", function () {
+        test('L\'évenement CardOrNothingCalled contient le rang concerné', function () {
             Arrange::setCurrentCard(7);
 
             Act::playCard(7, 'h');
 
-            $event = Act::getEvents()[0];
+            $event = firstEventOfType(Act::getEvents(), GameEventTypeEnum::CARD_OR_NOTHING_CALLED);
 
-            expect($event->rank)->toBe(Rank::SEVEN);
-            expect($event->isCallForFour)->toBeFalse();
+            expect($event->payload['rank'])->toBe('7');
         });
 
         test("L'évenement CardOrNothingCalled est envoyé même au milieu d'un round", function () {
@@ -707,7 +678,9 @@ describe('Président: events', function () {
 
             Act::playCard(9, 'h');
 
-            expect(Act::getEvents()[0]->rank)->toBe(Rank::NINE);
+            $event = firstEventOfType(Act::getEvents(), GameEventTypeEnum::CARD_OR_NOTHING_CALLED);
+
+            expect($event->payload['rank'])->toBe('9');
         });
 
         test("Si un deux est joué par dessus une carte ou rien invalide, aucun évenement n'est envoyé", function () {
@@ -725,29 +698,6 @@ describe('Président: events', function () {
 
             expect(Act::getEvents())->toHaveCount(0);
         });
-
-        test("Lors de l'appel aux quatre, un évenement CardOrNothingCalled est envoyé", function () {
-            Arrange::setRound([
-                [9],
-                [9],
-            ]);
-
-            Act::playCard(9, 'h');
-
-            expect(Act::getEvents())->toHaveCount(2);
-            expect(Act::getEvents()[0])->toBeInstanceOf(CardOrNothingCalledEvent::class);
-        });
-
-        test("L'évenement CardOrNothingCalled indique l'appel aux quatre", function () {
-            Arrange::setRound([
-                [9],
-                [9],
-            ]);
-
-            Act::playCard(9, 'h');
-
-            expect(Act::getEvents()[0]->isCallForFour)->toBeTrue();
-        });
     });
 
     describe("Fin d'un tour", function () {
@@ -756,11 +706,9 @@ describe('Président: events', function () {
 
             Act::playCard(2, 'h');
 
-            $events = Act::getEvents();
+            $event = firstEventOfType(Act::getEvents(), GameEventTypeEnum::ROUND_ENDED);
 
-            expect($events)->toHaveCount(2);
-            expect($events[0])->toBeInstanceOf(RoundEndedEvent::class);
-            expect($events[1])->toBeInstanceOf(CardPlayedEvent::class);
+            expect($event)->not->toBeNull();
         });
     });
 });

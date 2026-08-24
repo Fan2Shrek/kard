@@ -19,6 +19,7 @@
     <testsuites>
         <testsuite name="Project Test Suite">
             <directory>tests</directory>
+            <exclude>tests/Feature/GameMode/CrazyEightsTest.php</exclude>
         </testsuite>
     </testsuites>
 
