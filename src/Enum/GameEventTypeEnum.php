@@ -12,5 +12,14 @@ enum GameEventTypeEnum: string
 	case ROUND_ENDED = 'round_ended';
 	case TURN_PLAYED = 'turn_played';
 	case TURN_ENDED = 'turn_ended';
+	case CARD_DRAWN = 'card_drawn';
+	case CARD_GIVEN = 'card_given';
+	case TURN_SKIPPED = 'turn_skipped';
+	case REVERSE_PLAYERS_ORDER = 'reverse_players_order';
+
+	// PRESIDENT
 	case CARD_OR_NOTHING_CALLED = 'card_or_nothing_called';
+
+	// CRAZY EIGHTS
+	case SUIT_CHANGED = 'suit_changed';
 }

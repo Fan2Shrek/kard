@@ -3,6 +3,7 @@
 namespace App\Game\Mode;
 
 use App\Enum\Card\Rank;
+use App\Enum\Card\Suit;
 use App\Game\Model\Card\Card;
 use App\Game\Model\State\Round;
 use App\Game\Model\State\Turn;

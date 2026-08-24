@@ -12,6 +12,7 @@ final class Turn
 	public function __construct(
 		public string $playerId,
 		public array $cardIds,
+		public array $data = [],
 	) {}
 
 	public function hasBeenSkipped(): bool

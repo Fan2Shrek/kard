@@ -94,7 +94,6 @@ final class GameManager implements ServiceSubscriberInterface
 			array_combine(array_map(fn (Card $card) => $card->id, $cards), $cards)
 		);
 
-
         if ($gameMode instanceof SetupGameModeInterface) {
 			$ctx = $this->createGameContext($state);
             $gameMode->setup($ctx);

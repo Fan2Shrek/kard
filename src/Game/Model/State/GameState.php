@@ -170,4 +170,17 @@ final readonly class GameState
 
 		return $this->playerOrder[$nextIndex];
 	}
+
+	public function withPlayerOrder(array $playerOrder): self
+	{
+		return new self(
+			$this->players,
+			$playerOrder,
+			$this->currentPlayerId,
+			$this->rounds,
+			$this->discardPile,
+			$this->drawPile,
+			$this->cards,
+		);
+	}
 }

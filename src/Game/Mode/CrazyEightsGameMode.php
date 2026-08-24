@@ -6,148 +6,169 @@ namespace App\Game\Mode;
 
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
-use App\Game\Event\CardDrawnEvent;
-use App\Game\Event\CardPlayedEvent;
-use App\Game\Event\PlayOrderReversedEvent;
-use App\Game\Event\SuitChangedEvent;
-use App\Game\Event\TurnSkippedEvent;
-use App\Game\Model\Card\Hand;
+use App\Enum\GameEventTypeEnum;
+use App\Game\Model\Card\Card;
 use App\Game\Model\GameContext;
-use App\Game\Model\GameState;
+use App\Game\Model\State\GameState;
+use App\Game\Model\State\PlayerState;
+use App\Game\Model\State\Round;
 
-final class CrazyEightsGameMode /*extends AbstractGameMode implements SetupGameModeInterface */
+final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameModeInterface
 {
-    use CardsHelperTrait;
+	use CardsHelperTrait;
 
-    public function getGameMode(): GameModeEnum
-    {
-        return GameModeEnum::CRAZY_EIGHTS;
-    }
+	public function getGameMode(): GameModeEnum
+	{
+		return GameModeEnum::CRAZY_EIGHTS;
+	}
 
-    public function getCardsCount(int $playerCount): int
-    {
-        return 7;
-    }
+	public function getCardsCount(int $playerCount): int
+	{
+		return 7;
+	}
 
-    public function setup(GameContext $ctx): void
-    {
-        [$ctx, $cards] = $ctx->withDrawnCards(1);
-        $ctx = $ctx->withCurrentCards($cards);
-    }
+	public function setup(GameContext $ctx): void
+	{
+		$firstCard = $ctx->gameState->drawPile->getNext();
+		$ctx->startNewRound();
+		$ctx->pushEvent(GameEventTypeEnum::CARD_DRAWN);
+		$ctx->pushTurn([$firstCard], 'game');
+	}
 
-    public function getPlayerOrder(array $hands): array
-    {
-        $ids = array_keys($hands);
-        shuffle($ids);
+	public function getPlayerOrder(GameState $state): array
+	{
+		// array_keys() would do here, but PHP silently casts numeric-looking
+		// string keys to int - reading ->id directly keeps these real strings
+		$ids = array_map(fn (PlayerState $player): string => $player->id, array_values($state->players));
+		shuffle($ids);
 
-        return $ids;
-    }
+		return $ids;
+	}
 
-    public function isGameFinished(GameState &$gameContext): bool
-    {
-        foreach ($gameContext->getPlayers() as $player) {
-            if (0 === $player->cardsCount) {
-                $gameContext = $gameContext->withWinner($player);
+	public function isGameFinished(GameState $gameContext): bool
+	{
+		foreach ($gameContext->players as $player) {
+			if (0 === $player->score) {
+				// todo winner
+				/* $gameContext = $gameContext->withWinner($player); */
 
-                return true;
-            }
-        }
+				return true;
+			}
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    protected function doPlay(array $cards, GameContext $context, Hand $hand, array $data): GameState
-    {
-        $gameContext = $context->getState();
+	public function refreshScore(GameContext $ctx): void
+	{
+		foreach ($ctx->gameState->players as $player) {
+			if ($player->score !== $player->hand->count()) {
+				$ctx->pushScoreUpdate($player->id, $player->hand->count());
+			}
+		}
+	}
 
-        if (empty($cards)) {
-            $player = $gameContext->getCurrentPlayer();
+	protected function doPlay(array $cards, GameContext $context, array $data): void
+	{
+		if (empty($cards)) {
+			$context->drawCard($context->gameState->currentPlayerId);
 
-            $drawnCards = $context->dispatch(new CardDrawnEvent($gameContext->getRoom(), $player, 1));
-            $hand->addMultipleCards($drawnCards);
+			return;
+		}
 
-            return $context->mutate(fn (GameState $s): GameState => $s->withNextPlayer());
-        }
+		if (!$this->allSameRank($cards)) {
+			throw $this->createRuleException('cards.same_rank');
+		}
 
-        $actingPlayer = $gameContext->getCurrentPlayer();
+		$round = $context->gameState->getCurrentRound();
 
-        $currentCards = $gameContext->getCurrentCards();
-        // always the last card played
-        $currentCard = end($currentCards);
+		$lastTurnCards = $round->getLastTurn()?->cardIds ?? [];
+		$lastCard = \end($lastTurnCards);
+		$lastCard = $context->gameState->getCardById($lastCard);
 
-        if (!$this->allSameRank($cards)) {
-            throw $this->createRuleException('cards.same_rank');
-        }
+		$activeSuit = $this->getActiveSuit($round, $lastCard);
+		$mainCard = $cards[0];
 
-        $mainCard = $cards[0];
+		if (Rank::EIGHT === $mainCard->rank) {
+			if (!isset($data['suit'])) {
+				throw $this->createRuleException('suit.not_set');
+			}
 
-        if (Rank::EIGHT === $mainCard->rank) {
-            if (!isset($data['name'])) {
-                throw new \LogicException('You must provide a name for the new suit');
-            }
+			$suit = Suit::tryFrom($data['suit']);
 
-            $newSuit = Suit::from(strtolower($data['name'][0]));
+			if (null === $suit) {
+				throw $this->createRuleException('suit.invalid');
+			}
 
-            $context->dispatch(new SuitChangedEvent($gameContext->getRoom(), $actingPlayer, $newSuit));
+			$context->pushEvent(GameEventTypeEnum::SUIT_CHANGED, [
+				'suit' => $suit->value,
+			]);
 
-            $hand->removeCards($cards);
+			// an eight is wild (playable regardless of rank/suit) but still needs to
+			// be recorded as a turn - it's the only way the chosen suit sticks for
+			// the next player's match via getActiveSuit()
+			$context->pushTurn($this->playedCardIds, null, ['suit' => $suit->value]);
 
-            return $context->mutate(fn (GameState $s): GameState => $s
-                ->withCurrentCards($cards)
-                ->withLastPlayer($actingPlayer->id) // @pest-mutate-ignore flemme
-                ->withNextPlayer());
-        }
+			return;
+		}
 
-        if (Rank::EIGHT === $currentCard->rank) {
-            $suit = $gameContext->getData('suit') ?? $currentCard->suit;
-            $suit = $suit instanceof Suit ? $suit : Suit::from($suit); // @pest-mutate-ignore as this is more a denormalization issue
+		if ($lastCard->rank !== $mainCard->rank && $activeSuit !== $mainCard->suit) {
+			throw $this->createRuleException('cards.same_rank_or_suit', ['%rank%' => $lastCard->rank->value, '%suit%' => $activeSuit?->getSymbol()]);
+		}
 
-            if ($suit !== $mainCard->suit) {
-                throw $this->createRuleException('cards.bad_suit', ['%suit%' => $suit->getSymbol()]);
-            }
-        }
+		if (!\in_array($mainCard->rank, $this->getSpecialCardRank(), true)) {
+			$context->pushTurn($this->playedCardIds);
 
-        if (Rank::EIGHT !== $currentCard->rank && !$this->isSameRank($mainCard, $currentCard) && !$this->isSameSuit($mainCard, $currentCard)) {
-            throw $this->createRuleException('cards.same_rank_or_suit', ['%rank%' => $currentCard->rank->value, '%suit%' => $currentCard->suit->getSymbol()]);
-        }
+			return;
+		}
 
-        if (Rank::ACE === $mainCard->rank) {
-            $context->dispatch(new PlayOrderReversedEvent($gameContext->getRoom()));
-            $gameContext = $context->getState();
+		if (Rank::JACK === $mainCard->rank) {
+			$context->skipNextPlayerTurn();
+		}
 
-            if (2 === count($gameContext->getPlayers())) {
-                $gameContext = $context->mutate(fn (GameState $s): GameState => $s->withNextPlayer());
-            }
-        }
+		if (Rank::ACE === $mainCard->rank) {
+			count($context->gameState->players) === 2 ? $context->skipNextPlayerTurn() : $context->reversePlayerOrder();
+		}
 
-        if (Rank::TWO === $mainCard->rank) {
-            $nextPlayer = $gameContext->getNextPlayer();
-            $nextHand = $this->handRepository->get($nextPlayer->id, $gameContext->getRoom());
-            $drawnCount = 2 * count($cards);
+		if (Rank::TWO === $mainCard->rank) {
+			$nextPlayerId = $context->gameState->getNextPlayerId();
 
-            $drawnCards = $context->dispatch(new CardDrawnEvent($gameContext->getRoom(), $nextPlayer, $drawnCount, true));
-            $gameContext = $context->getState();
-            $nextHand->addMultipleCards($drawnCards);
-            $this->handRepository->save($nextPlayer->id, $gameContext->getRoom(), $nextHand); // @pest-mutate-ignore
+			for ($i = 0; $i < 2 * count($this->playedCardIds); ++$i) {
+				$context->drawCard($nextPlayerId);
+			}
 
-            // todo maybe player can add a 2
-            $gameContext = $context->mutate(fn (GameState $s): GameState => $s->withNextPlayer()); // skip turn
-        }
+			$context->skipNextPlayerTurn();
+		}
 
-        if (Rank::JACK === $mainCard->rank) {
-            $gameContext = $context->mutate(fn (GameState $s): GameState => $s->withNextPlayer());
-            $context->dispatch(new TurnSkippedEvent($gameContext->getRoom(), $gameContext->getCurrentPlayer()));
-        }
+		$context->pushTurn($this->playedCardIds);
+	}
 
-        $hand->removeCards($cards);
+	/**
+	 * @return array<Rank>
+	 */
+	private function getSpecialCardRank(): array
+	{
+		return [
+			Rank::EIGHT,
+			Rank::JACK,
+			Rank::TWO,
+			Rank::ACE,
+		];
+	}
 
-        $gameContext = $context->mutate(fn (GameState $s): GameState => $s
-            ->withCurrentCards($cards)
-            ->withLastPlayer($actingPlayer->id) // @pest-mutate-ignore flemme
-            ->withNextPlayer());
+	protected function getActiveSuit(Round $round, Card $card): ?Suit
+	{
+		$lastTurn = $round->getLastTurn();
 
-        $context->dispatch(new CardPlayedEvent($gameContext->getRoom(), $actingPlayer, $cards));
+		if (null === $lastTurn) {
+			return null;
+		}
 
-        return $context->getState();
-    }
+		if (isset($lastTurn->data['suit'])) {
+			return Suit::from($lastTurn->data['suit']);
+		}
+
+		return $card->suit;
+	}
+
 }

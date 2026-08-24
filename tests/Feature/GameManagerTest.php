@@ -104,7 +104,7 @@ test("play() joue un tour normal : sauvegarde la main et l'état, dispatch les e
 
     $gameManager->play($room, $user, ['7s']);
 
-    expect($savedState->getPlayerStateById($userId->toString())->hand->cards)->toBe(['8s']);
+    expect(array_values($savedState->getPlayerStateById($userId->toString())->hand->cards))->toBe(['8s']);
     expect($savedState->currentPlayerId)->toBe('2');
 
     $byType = fn (GameEventTypeEnum $type) => array_values(array_filter(

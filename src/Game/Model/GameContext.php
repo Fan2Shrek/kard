@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Game\Model;
 
 use App\Enum\GameEventTypeEnum;
+use App\Game\Model\Card\DrawPile;
 use App\Game\Model\Event\GameEvent;
 use App\Game\Model\State\GameState;
 
@@ -15,9 +16,15 @@ class GameContext
 	 */
 	private array $events = [];
 
+	// tracks cards already "virtually" drawn within this batch - $gameState
+	// itself never reflects events pushed earlier in the same doPlay() call,
+	// so a second drawCard() would otherwise see the same top card again
+	private DrawPile $pendingDrawPile;
+
 	public function __construct(
 		public GameState $gameState,
 	) {
+		$this->pendingDrawPile = $gameState->drawPile;
 	}
 
 	public function pushEvent(GameEventTypeEnum $type, array $payload = []): void
@@ -55,12 +62,15 @@ class GameContext
 	}
 
 	/**
-	* @param array<string> $cards
+	* @param array<string>        $cards
+	* @param array<string, mixed> $data
 	*/
-	public function pushTurn(array $cards): void
+	public function pushTurn(array $cards, ?string $playerId = null, array $data = []): void
 	{
 		$this->pushEvent(GameEventTypeEnum::TURN_PLAYED, [
 			'cards' => $cards,
+			'playerId' => $playerId ?? $this->gameState->currentPlayerId,
+			'data' => $data,
 		]);
 	}
 
@@ -83,4 +93,25 @@ class GameContext
 			'rank' => $rank,
 		]);
 	}
+
+	public function drawCard(string $playerId): void
+	{
+		$cardId = $this->pendingDrawPile->getNext();
+		$this->pendingDrawPile = $this->pendingDrawPile->removeCard($cardId);
+
+		$this->pushEvent(GameEventTypeEnum::CARD_DRAWN);
+		$this->pushEvent(GameEventTypeEnum::CARD_GIVEN, [
+			'cardId' => $cardId,
+			'toPlayerId' => $playerId,
+		]);
+	}
+
+	public function skipNextPlayerTurn(): void
+	{
+		$this->pushEvent(GameEventTypeEnum::TURN_SKIPPED);
+	}
+
+	public function reversePlayerOrder(): void
+	{
+		$this->pushEvent(GameEventTypeEnum::REVERSE_PLAYERS_ORDER); }
 }

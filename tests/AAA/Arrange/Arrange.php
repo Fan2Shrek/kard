@@ -60,7 +60,9 @@ abstract /* static */ class Arrange
         $ids = [];
 
         for ($i = 0; $i < $count; ++$i) {
-            $ids[] = Act::card((string) ($i + 1), $suits[$i % 4])->id;
+            // DrawPile is keyed by card id (getNext()/removeCard() rely on it)
+            $id = Act::card((string) ($i + 1), $suits[$i % 4])->id;
+            $ids[$id] = $id;
         }
 
         Act::addContext('drawPill', $ids);
@@ -117,12 +119,12 @@ abstract /* static */ class Arrange
             ['player3-id', 'Player 3'],
         ];
 
+        // keyed by player id (matches how setHands() callers key by id, e.g. '1' => [...])
         $hands = Act::get('hands') ?? [];
 
         $players = array_map(
-            fn (array $s, int $index) => new PlayerState($s[0], $s[1], $s[2] ?? 0, $hands[$index] ?? new Hand([])),
+            fn (array $s) => new PlayerState($s[0], $s[1], $s[2] ?? 0, $hands[$s[0]] ?? new Hand([])),
             $specs,
-            array_keys($specs),
         );
 
         // always a round, even with zero turns - a "no round at all" state

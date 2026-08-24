@@ -25,6 +25,16 @@ final readonly class PlayerState
 		return new self($this->id, $this->playerName, $this->score, $hand);
 	}
 
+	public function addCard(string $cardId): self
+	{
+		return new self(
+			$this->id,
+			$this->playerName,
+			$this->score,
+			$this->hand->addCard($cardId)
+		);
+	}
+
 	public function discardCard(string $cardId): self
 	{
 		return new self(

@@ -24,4 +24,9 @@ final readonly class Round
 	{
 		return [] === $this->turns;
 	}
+
+	public function getLastTurn(): ?Turn
+	{
+		return $this->turns[array_key_last($this->turns)] ?? null;
+	}
 }

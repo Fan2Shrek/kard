@@ -18,13 +18,47 @@ final class GameEventApplier
 			GameEventTypeEnum::ROUND_STARTED => $this->handleRoundStarted($gameState),
 			GameEventTypeEnum::TURN_PLAYED => $this->handleTurnPlayed($gameState, $event),
 			GameEventTypeEnum::TURN_ENDED => $this->handleTurnEnded($gameState),
+			GameEventTypeEnum::TURN_SKIPPED => $this->handleTurnSkipped($gameState),
 			GameEventTypeEnum::CARD_DISCARDED => $this->handleCardDiscarded($gameState, $event),
+			GameEventTypeEnum::CARD_DRAWN => $this->handleCardDrawn($gameState),
+			GameEventTypeEnum::CARD_GIVEN => $this->handleCardGiven($gameState, $event),
 			GameEventTypeEnum::SCORE_UPDATED => $this->handleScoreUpdated($gameState, $event),
 			GameEventTypeEnum::ROUND_ENDED => $this->handleRoundEnded($gameState),
-			GameEventTypeEnum::CARD_OR_NOTHING_CALLED => $gameState,
+			GameEventTypeEnum::REVERSE_PLAYERS_ORDER => $this->handleReversePlayersOrder($gameState),
+
+			GameEventTypeEnum::CARD_OR_NOTHING_CALLED,
+			GameEventTypeEnum::SUIT_CHANGED => $gameState,
 		};
 
 		return $newState;
+	}
+
+	private function handleReversePlayersOrder(GameState $state): GameState
+	{
+		$order = array_reverse($state->playerOrder);
+
+		return $state->withPlayerOrder($order);
+	}
+
+	private function handleCardDrawn(GameState $state): GameState
+	{
+		$cardToDraw = $state->drawPile->getNext();
+
+		return $state->withDrawPile($state->drawPile->removeCard($cardToDraw));
+	}
+
+	private function handleCardGiven(GameState $state, GameEvent $event): GameState
+	{
+		$cardId = $event->payload['cardId'] ?? null;
+		$toPlayerId = $event->payload['toPlayerId'] ?? null;
+
+		if ($cardId === null || $toPlayerId === null) {
+			throw new \RuntimeException('No cardId, fromPlayerId or toPlayerId found in event payload.');
+		}
+
+		$toPlayerState = $state->getPlayerStateById($toPlayerId);
+
+		return $state->withPlayerState($toPlayerState->addCard($cardId));
 	}
 
 	private function handleRoundStarted(GameState $state): GameState
@@ -35,18 +69,27 @@ final class GameEventApplier
 	private function handleTurnPlayed(GameState $state, GameEvent $event): GameState
 	{
 		$cards = $event->payload['cards'] ?? [];
+		$playerId = $event->payload['playerId'] ?? [];
+		$data = $event->payload['data'] ?? [];
 		$round = $state->getCurrentRound();
 
 		if ($round === null) {
 			throw new \RuntimeException('No round found in game state.');
 		}
 
-		$newRound = $round->addTurn(new Turn($state->currentPlayerId, $cards));
+		$newRound = $round->addTurn(new Turn($playerId, $cards, $data));
 
 		return $state->withUpdatedRound($newRound);
 	}
 
 	private function handleTurnEnded(GameState $state): GameState
+	{
+		$nextPlayerId = $state->getNextPlayerId();
+
+		return $state->withCurrentPlayer($nextPlayerId);
+	}
+
+	private function handleTurnSkipped(GameState $state): GameState
 	{
 		$nextPlayerId = $state->getNextPlayerId();
 

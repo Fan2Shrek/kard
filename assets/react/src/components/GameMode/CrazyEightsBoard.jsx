@@ -47,7 +47,7 @@ export default ({ ctx, player }) => {
                     <a
                         key={name}
                         className="button button--medium"
-                        onClick={() => handlePlay({ name })}
+                        onClick={() => handlePlay({ suit: name })}
                     >
                     {icon}
                     </a>
