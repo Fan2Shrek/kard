@@ -7,6 +7,7 @@ use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
 use App\Game\Card\HandRepositoryInterface;
 use App\Game\Event\CardPlayedEvent;
+use App\Game\Event\GameEventApplier;
 use App\Game\GameManager;
 use App\Game\GameStateProvider;
 use App\Game\Mode\CrazyEightsGameMode;
@@ -100,7 +101,7 @@ test("play() joue un tour normal : sauvegarde la main et l'état, dispatch les e
 
     $gameMode = new CrazyEightsGameMode($handRepository);
 
-    $gameManager = new GameManager([$gameMode], $container, $gameStateProvider, $handRepository);
+    $gameManager = new GameManager([$gameMode], $container, $gameStateProvider, $handRepository, new GameEventApplier());
 
     $gameManager->play($room, $player1, [new Card(Rank::SEVEN, Suit::SPADES)]);
 

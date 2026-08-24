@@ -4,6 +4,7 @@ namespace App\Tests\AAA\Act;
 
 use App\Enum\Card\Rank;
 use App\Enum\Card\Suit;
+use App\Game\Event\GameEventApplier;
 use App\Game\Model\Card\Card;
 use App\Game\Model\Card\Hand;
 use App\Game\Model\GameContext;
@@ -85,7 +86,7 @@ abstract /* static */ class Act
         $hand = $hands[$currentPlayer?->id] ?? new Hand($handCards);
         self::$context['currentHand'] = $hand;
 
-        $context = new GameContext($gameState);
+        $context = new GameContext($gameState, new GameEventApplier());
         self::$context['events'] = [];
         static::get('gamePlayer')->play($cards, $context, $hand, $data);
         self::$context['events'] = $context->flushEvents();

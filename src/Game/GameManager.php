@@ -8,6 +8,7 @@ use App\Enum\GameStatusEnum;
 use App\Game\Card\CachedHandRepositoryInterface;
 use App\Game\Card\CardGenerator;
 use App\Game\Card\HandRepositoryInterface;
+use App\Game\Event\GameEventApplierInterface;
 use App\Game\Event\GameFinishedEvent;
 use App\Game\Mode\GameModeEnum;
 use App\Game\Mode\GameModeInterface;
@@ -33,6 +34,7 @@ final class GameManager implements ServiceSubscriberInterface
         private ContainerInterface $container,
         private GameStateProvider $gameStateProvider,
         private HandRepositoryInterface $handRepository,
+        private GameEventApplierInterface $applier,
     ) {
     }
 
@@ -134,7 +136,7 @@ final class GameManager implements ServiceSubscriberInterface
 
         $gameMode = $this->getGameMode($room->getGameMode()->getValue());
 
-        $context = new GameContext($ctx);
+        $context = new GameContext($ctx, $this->applier);
         $gameMode->play($cards, $context, $hand, $data);
         $ctx = $context->getState();
 

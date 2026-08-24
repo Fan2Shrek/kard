@@ -69,12 +69,10 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
         if (empty($cards)) {
             $player = $gameContext->getCurrentPlayer();
 
-            [$gameContext, $drawnCards] = $gameContext->withDrawnCards(1);
+            $drawnCards = $context->dispatch(new CardDrawnEvent($gameContext->getRoom(), $player, 1));
             $hand->addMultipleCards($drawnCards);
-            $context->addEvent(new CardDrawnEvent($gameContext->getRoom(), $player, 1));
-            $gameContext = $gameContext->withNextPlayer();
 
-            return $gameContext;
+            return $context->mutate(fn (GameState $s): GameState => $s->withNextPlayer());
         }
 
         $actingPlayer = $gameContext->getCurrentPlayer();
@@ -96,15 +94,14 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
 
             $newSuit = Suit::from(strtolower($data['name'][0]));
 
-            $context->addEvent(new SuitChangedEvent($gameContext->getRoom(), $actingPlayer, $newSuit));
+            $context->dispatch(new SuitChangedEvent($gameContext->getRoom(), $actingPlayer, $newSuit));
 
             $hand->removeCards($cards);
-            $gameContext = $gameContext->withData('suit', $newSuit);
-            $gameContext = $gameContext->withCurrentCards($cards);
-            $gameContext = $gameContext->withData('lastPlayer', $actingPlayer->id); // @pest-mutate-ignore flemme
-            $gameContext = $gameContext->withNextPlayer();
 
-            return $gameContext;
+            return $context->mutate(fn (GameState $s): GameState => $s
+                ->withCurrentCards($cards)
+                ->withData('lastPlayer', $actingPlayer->id) // @pest-mutate-ignore flemme
+                ->withNextPlayer());
         }
 
         if (Rank::EIGHT === $currentCard->rank) {
@@ -121,11 +118,11 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
         }
 
         if (Rank::ACE === $mainCard->rank) {
-            $gameContext = $gameContext->withPlayerOrder(array_reverse($gameContext->getPlayers()), true);
-            $context->addEvent(new PlayOrderReversedEvent($gameContext->getRoom()));
+            $context->dispatch(new PlayOrderReversedEvent($gameContext->getRoom()));
+            $gameContext = $context->getState();
 
             if (2 === count($gameContext->getPlayers())) {
-                $gameContext = $gameContext->withNextPlayer();
+                $gameContext = $context->mutate(fn (GameState $s): GameState => $s->withNextPlayer());
             }
         }
 
@@ -134,30 +131,29 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
             $nextHand = $this->handRepository->get($nextPlayer->id, $gameContext->getRoom());
             $drawnCount = 2 * count($cards);
 
-            [$gameContext, $drawnCards] = $gameContext->withDrawnCards($drawnCount);
+            $drawnCards = $context->dispatch(new CardDrawnEvent($gameContext->getRoom(), $nextPlayer, $drawnCount, true));
+            $gameContext = $context->getState();
             $nextHand->addMultipleCards($drawnCards);
             $this->handRepository->save($nextPlayer->id, $gameContext->getRoom(), $nextHand); // @pest-mutate-ignore
 
-            $context->addEvent(new CardDrawnEvent($gameContext->getRoom(), $nextPlayer, $drawnCount, true));
-
-            $gameContext = $gameContext->withUpdatedPlayer($nextPlayer->withCardsCount($nextPlayer->cardsCount + $drawnCount));
-
             // todo maybe player can add a 2
-            $gameContext = $gameContext->withNextPlayer(); // skip turn
+            $gameContext = $context->mutate(fn (GameState $s): GameState => $s->withNextPlayer()); // skip turn
         }
 
         if (Rank::JACK === $mainCard->rank) {
-            $gameContext = $gameContext->withNextPlayer();
-            $context->addEvent(new TurnSkippedEvent($gameContext->getRoom(), $gameContext->getCurrentPlayer()));
+            $gameContext = $context->mutate(fn (GameState $s): GameState => $s->withNextPlayer());
+            $context->dispatch(new TurnSkippedEvent($gameContext->getRoom(), $gameContext->getCurrentPlayer()));
         }
 
         $hand->removeCards($cards);
-        $gameContext = $gameContext->withCurrentCards($cards);
-        $gameContext = $gameContext->withData('lastPlayer', $actingPlayer->id); // @pest-mutate-ignore flemme
-        $gameContext = $gameContext->withNextPlayer();
 
-        $context->addEvent(new CardPlayedEvent($gameContext->getRoom(), $actingPlayer, $cards));
+        $gameContext = $context->mutate(fn (GameState $s): GameState => $s
+            ->withCurrentCards($cards)
+            ->withData('lastPlayer', $actingPlayer->id) // @pest-mutate-ignore flemme
+            ->withNextPlayer());
 
-        return $gameContext;
+        $context->dispatch(new CardPlayedEvent($gameContext->getRoom(), $actingPlayer, $cards));
+
+        return $context->getState();
     }
 }
