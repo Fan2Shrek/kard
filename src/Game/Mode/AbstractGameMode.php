@@ -24,7 +24,9 @@ abstract class AbstractGameMode implements GameModeInterface
         $this->cards = $cards;
         $this->gameContext = $context->getState();
 
-        $this->doPlay($cards, $context, $hand, $data);
+        $this->gameContext = $this->doPlay($cards, $context, $hand, $data);
+
+        $context->replaceState($this->gameContext);
     }
 
     /**
@@ -33,7 +35,7 @@ abstract class AbstractGameMode implements GameModeInterface
      * @param array<Card>          $cards
      * @param array<string, mixed> $data
      */
-    abstract protected function doPlay(array $cards, GameContext $context, Hand $hand, array $data): void;
+    abstract protected function doPlay(array $cards, GameContext $context, Hand $hand, array $data): GameState;
 
     /**
      * @param array<mixed> $params

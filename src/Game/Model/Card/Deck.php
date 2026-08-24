@@ -2,7 +2,7 @@
 
 namespace App\Game\Model\Card;
 
-final class Deck
+final readonly class Deck
 {
     /**
      * @param Card[] $cards
@@ -12,18 +12,27 @@ final class Deck
     ) {
     }
 
-    public function shuffle(): void
+    public function withShuffled(): self
     {
-        shuffle($this->cards);
+        $cards = $this->cards;
+        shuffle($cards);
+
+        return new self($cards);
     }
 
-    public function draw(): Card
+    /**
+     * @return array{0: self, 1: Card}
+     */
+    public function withDrawnCard(): array
     {
         if (empty($this->cards)) {
             throw new \RuntimeException('Deck is empty');
         }
 
-        return array_shift($this->cards);
+        $cards = $this->cards;
+        $card = array_shift($cards);
+
+        return [new self($cards), $card];
     }
 
     public function count(): int

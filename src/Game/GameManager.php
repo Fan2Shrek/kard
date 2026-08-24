@@ -51,17 +51,16 @@ final class GameManager implements ServiceSubscriberInterface
         [$hands, $drawPile] = $this->drawHands($room);
 
         $gameContext = $this->gameStateProvider->provide($room);
-        $gameContext->setDrawPile($drawPile);
-
-        $players = array_reduce($gameContext->getPlayers(), function (array $carry, Player $player) {
-            $carry[$player->id] = $player;
-
-            return $carry;
-        }, []);
+        $gameContext = $gameContext->withDrawPile($drawPile);
 
         foreach ($room->getParticipants() as $k => $player) {
             $this->handRepository->save($player, $room, $hands[$k]);
-            $players[$player->getId()->toString()]->cardsCount = count($hands[$k]);
+
+            $currentPlayer = current(array_filter(
+                $gameContext->getPlayers(),
+                fn (Player $p): bool => $p->id === $player->getId()->toString(),
+            ));
+            $gameContext = $gameContext->withUpdatedPlayer($currentPlayer->withCardsCount(count($hands[$k])));
         }
 
         $this->gameStateProvider->save($gameContext);
@@ -100,7 +99,7 @@ final class GameManager implements ServiceSubscriberInterface
             $gameMode->setup($ctx, $hands);
         }
 
-        $ctx->setPlayerOrder(
+        $ctx = $ctx->withPlayerOrder(
             array_map(
                 function ($id) use ($players) {
                     return $players[$id];
@@ -128,7 +127,7 @@ final class GameManager implements ServiceSubscriberInterface
                 return;
             }
 
-            $this->applyFastPlayOverride($ctx, $player);
+            $ctx = $this->applyFastPlayOverride($ctx, $player);
         }
 
         $hand = $this->loadAndValidateHand($room, $player, $cards);
@@ -137,8 +136,9 @@ final class GameManager implements ServiceSubscriberInterface
 
         $context = new GameContext($ctx);
         $gameMode->play($cards, $context, $hand, $data);
+        $ctx = $context->getState();
 
-        $this->persistPlayerState($room, $player, $hand, $ctx);
+        $ctx = $this->persistPlayerState($room, $player, $hand, $ctx);
         $this->dispatchEvents($context);
         $this->finishGameIfNeeded($room, $player, $ctx, $gameMode);
     }
@@ -169,9 +169,9 @@ final class GameManager implements ServiceSubscriberInterface
         }
     }
 
-    private function applyFastPlayOverride(GameState $ctx, Player $player): void
+    private function applyFastPlayOverride(GameState $ctx, Player $player): GameState
     {
-        $ctx->setCurrentPlayer(
+        return $ctx->withCurrentPlayer(
             current(array_filter(
                 $ctx->getPlayers(),
                 fn (Player $p): bool => $p->id === $player->id,
@@ -193,13 +193,15 @@ final class GameManager implements ServiceSubscriberInterface
         return $hand;
     }
 
-    private function persistPlayerState(Room $room, Player $player, Hand $hand, GameState $ctx): void
+    private function persistPlayerState(Room $room, Player $player, Hand $hand, GameState $ctx): GameState
     {
         $this->handRepository->save($player->id, $room, $hand);
 
-        $player->cardsCount = count($hand);
+        $ctx = $ctx->withUpdatedPlayer($player->withCardsCount(count($hand)));
 
         $this->gameStateProvider->save($ctx);
+
+        return $ctx;
     }
 
     private function dispatchEvents(GameContext $context): void

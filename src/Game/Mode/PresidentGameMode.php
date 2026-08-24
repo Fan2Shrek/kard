@@ -49,11 +49,11 @@ final class PresidentGameMode extends AbstractGameMode
         return $order;
     }
 
-    public function isGameFinished(GameState $gameContext): bool
+    public function isGameFinished(GameState &$gameContext): bool
     {
         foreach ($gameContext->getPlayers() as $player) {
             if (0 === $player->cardsCount) {
-                $gameContext->setWinner($player);
+                $gameContext = $gameContext->withWinner($player);
 
                 return true;
             }
@@ -62,20 +62,17 @@ final class PresidentGameMode extends AbstractGameMode
         return false;
     }
 
-    protected function doPlay(array $cards, GameContext $context, Hand $hand, array $data): void
+    protected function doPlay(array $cards, GameContext $context, Hand $hand, array $data): GameState
     {
-        $gameContext = $context->getState();
-
         $this->cards = $cards;
-        $this->gameContext = $gameContext;
+        $this->gameContext = $context->getState();
         $this->context = $context;
 
         if (\count($cards) > 3) {
             throw $this->createRuleException('card.count.invalid');
         }
 
-        $gameContext->addData('fastPlay', false); // reset
-        $currentCards = $gameContext->getCurrentCards();
+        $this->gameContext = $this->gameContext->withData('fastPlay', false); // reset
         $previousTurns = array_reverse($this->gameContext->getRound()->getTurns());
         $nonSkippedTurns = array_values(array_filter($previousTurns, fn ($turn): bool => !empty($turn->getCards())));
 
@@ -86,24 +83,23 @@ final class PresidentGameMode extends AbstractGameMode
         }
 
         if ([] === $cards) {
-            if ([] === $gameContext->getRound()->getTurns()) {
+            if ([] === $this->gameContext->getRound()->getTurns()) {
                 throw $this->createRuleException('turn.first.at_least_one_card');
             }
 
             // skip
-            $passingPlayer = $gameContext->getCurrentPlayer();
-            $gameContext->setCurrentCards([]);
-            $gameContext->nextPlayer();
-            $context->addEvent(new TurnSkippedEvent($gameContext->getRoom(), $passingPlayer));
+            $passingPlayer = $this->gameContext->getCurrentPlayer();
+            $this->gameContext = $this->gameContext->withCurrentCards([])->withNextPlayer();
+            $context->addEvent(new TurnSkippedEvent($this->gameContext->getRoom(), $passingPlayer));
 
-            if ($gameContext->getCurrentPlayer()->id === $gameContext->getData('lastPlayer')) {
+            if ($this->gameContext->getCurrentPlayer()->id === $this->gameContext->getData('lastPlayer')) {
                 $this->handleRoundEnd();
             }
 
-            return;
+            return $this->gameContext;
         }
 
-        $actingPlayer = $gameContext->getCurrentPlayer();
+        $actingPlayer = $this->gameContext->getCurrentPlayer();
 
         match (\count($currentCards)) { // @phpstan-ignore-line
             0 => $this->handleStart($cards),
@@ -114,15 +110,18 @@ final class PresidentGameMode extends AbstractGameMode
 
         $hand->removeCards($cards);
 
-        $context->addEvent(new CardPlayedEvent($gameContext->getRoom(), $actingPlayer, $cards));
+        $context->addEvent(new CardPlayedEvent($this->gameContext->getRoom(), $actingPlayer, $cards));
 
         if ($this->isTurnFinished ?? false) {
-            return;
+            return $this->gameContext;
         }
 
-        $gameContext->setCurrentCards($cards);
-        $gameContext->addData('lastPlayer', $gameContext->getCurrentPlayer()->id);
-        $gameContext->nextPlayer();
+        $this->gameContext = $this->gameContext
+            ->withCurrentCards($cards)
+            ->withData('lastPlayer', $actingPlayer->id)
+            ->withNextPlayer();
+
+        return $this->gameContext;
     }
 
     /**
@@ -176,7 +175,7 @@ final class PresidentGameMode extends AbstractGameMode
             if (3 === count($count)) {
                 $this->handleRoundEnd();
             } else {
-                $this->gameContext->addData('fastPlay', true);
+                $this->gameContext = $this->gameContext->withData('fastPlay', true);
             }
         }
 
@@ -201,7 +200,7 @@ final class PresidentGameMode extends AbstractGameMode
         }
 
         if (2 === count($cards)) {
-            $this->gameContext->addData('fastPlay', true);
+            $this->gameContext = $this->gameContext->withData('fastPlay', true);
 
             return;
         }
@@ -238,7 +237,7 @@ final class PresidentGameMode extends AbstractGameMode
             throw $this->createRuleException('card.values.higher');
         }
 
-        $this->gameContext->addData('fastPlay', true);
+        $this->gameContext = $this->gameContext->withData('fastPlay', true);
     }
 
     /**
@@ -295,8 +294,7 @@ final class PresidentGameMode extends AbstractGameMode
 
     private function handleRoundEnd(): void
     {
-        $this->gameContext->setCurrentCards($this->cards);
-        $this->gameContext->newRound();
+        $this->gameContext = $this->gameContext->withCurrentCards($this->cards)->withNewRound();
         $this->context->addEvent(new RoundEndedEvent($this->gameContext->getRoom()));
         $this->isTurnFinished = true;
     }

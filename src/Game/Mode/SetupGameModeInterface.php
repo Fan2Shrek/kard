@@ -14,5 +14,5 @@ interface SetupGameModeInterface extends GameModeInterface
      *
      * @param array<string, Hand> $hands
      */
-    public function setup(GameState $ctx, array $hands): void;
+    public function setup(GameState &$ctx, array $hands): void;
 }

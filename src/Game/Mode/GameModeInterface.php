@@ -29,5 +29,5 @@ interface GameModeInterface
      */
     public function getPlayerOrder(array $players): array;
 
-    public function isGameFinished(GameState $gameContext): bool;
+    public function isGameFinished(GameState &$gameContext): bool;
 }

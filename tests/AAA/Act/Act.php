@@ -44,10 +44,9 @@ abstract /* static */ class Act
 
     public static function setup(): void
     {
-        static::get('gamePlayer')->setup(
-            static::get('gameContext'),
-            static::get('handCards') ?? []
-        );
+        $gameContext = static::get('gameContext');
+        static::get('gamePlayer')->setup($gameContext, static::get('handCards') ?? []);
+        self::$context['gameContext'] = $gameContext;
     }
 
     public static function orderPlayers(array $hands): array
@@ -57,7 +56,11 @@ abstract /* static */ class Act
 
     public static function isGameFinished(): bool
     {
-        return static::get('gamePlayer')->isGameFinished(static::get('gameContext'));
+        $gameContext = static::get('gameContext');
+        $result = static::get('gamePlayer')->isGameFinished($gameContext);
+        self::$context['gameContext'] = $gameContext;
+
+        return $result;
     }
 
     private static function createCard(string $value, string $color): Card
@@ -86,5 +89,6 @@ abstract /* static */ class Act
         self::$context['events'] = [];
         static::get('gamePlayer')->play($cards, $context, $hand, $data);
         self::$context['events'] = $context->flushEvents();
+        self::$context['gameContext'] = $context->getState();
     }
 }

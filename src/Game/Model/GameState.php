@@ -6,13 +6,13 @@ use App\Entity\Room;
 use App\Game\Model\Card\Card;
 use App\Game\Model\Card\Deck;
 
-final class GameState
+final readonly class GameState
 {
     private PlayersList $players;
 
     private GameRound $currentRound;
 
-    private ?Player $winner = null;
+    private ?Player $winner;
 
     private Deck $drawPill;
 
@@ -32,27 +32,38 @@ final class GameState
         array $drawPill = [],
         private array $discarded = [],
         private array $data = [],
+        ?Player $winner = null,
     ) {
         $this->players = new PlayersList($players, $currentPlayer);
         $this->currentRound = new GameRound($turns);
         $this->drawPill = new Deck($drawPill);
+        $this->winner = $winner;
     }
 
-    public function newRound(): void
+    public function withNewRound(): self
     {
+        $discarded = $this->discarded;
         foreach ($this->currentRound->getTurns() as $turn) {
-            $this->discarded = array_merge($this->discarded, $turn->getCards());
+            $discarded = [...$discarded, ...$turn->getCards()];
         }
 
-        $this->currentRound = new GameRound();
+        return $this->cloneWith(turns: [], discarded: $discarded);
     }
 
     /**
      * @param Player[] $players
      */
-    public function setPlayerOrder(array $players, bool $keepCurrentPlayer = false): void
+    public function withPlayerOrder(array $players, bool $keepCurrentPlayer = false): self
     {
-        $this->players = new PlayersList($players, $keepCurrentPlayer ? $this->players->getCurrentPlayer() : $players[0]);
+        return $this->cloneWith(
+            players: $players,
+            currentPlayer: $keepCurrentPlayer ? $this->players->getCurrentPlayer() : $players[0],
+        );
+    }
+
+    public function withNextPlayer(): self
+    {
+        return $this->cloneWith(currentPlayer: $this->players->getNextPlayer());
     }
 
     public function getNextPlayer(): Player
@@ -63,26 +74,29 @@ final class GameState
     /**
      * @param Card[] $drawPile
      */
-    public function setDrawPile(array $drawPile): void
+    public function withDrawPile(array $drawPile): self
     {
-        $this->drawPill = new Deck($drawPile);
+        return $this->cloneWith(drawPill: $drawPile);
     }
 
     /**
-     * @return Card[] an array of drawn cards
+     * @return array{0: self, 1: Card[]} the new state and the drawn cards
      */
-    public function draw(int $count): array
+    public function withDrawnCards(int $count): array
     {
-        if (empty($this->drawPill->getCards())) {
-            return [];
+        if ([] === $this->drawPill->getCards()) {
+            return [$this, []];
         }
 
+        $deck = $this->drawPill;
         $cards = [];
+
         for ($i = 0; $i < $count; ++$i) {
-            $cards[] = $this->drawPill->draw();
+            [$deck, $card] = $deck->withDrawnCard();
+            $cards[] = $card;
         }
 
-        return $cards;
+        return [$this->cloneWith(drawPill: $deck->getCards()), $cards];
     }
 
     /**
@@ -107,9 +121,12 @@ final class GameState
         return $this->data;
     }
 
-    public function addData(string $key, mixed $value): void
+    public function withData(string $key, mixed $value): self
     {
-        $this->data[$key] = $value;
+        $data = $this->data;
+        $data[$key] = $value;
+
+        return $this->cloneWith(data: $data);
     }
 
     public function getRoom(): Room
@@ -138,21 +155,9 @@ final class GameState
         return $this->currentRound->getCurrentTurn()?->getCards() ?? [];
     }
 
-    public function addCurrentCard(Card $card): void
-    {
-        $this->currentRound->getCurrentTurn()->addCard($card);
-    }
-
     public function getRound(): GameRound
     {
         return $this->currentRound;
-    }
-
-    public function setRound(GameRound $round): self
-    {
-        $this->currentRound = $round;
-
-        return $this;
     }
 
     /**
@@ -163,25 +168,20 @@ final class GameState
         return $this->discarded;
     }
 
-    public function addDiscarded(Card $card): void
+    /**
+     * @param Card[] $cards
+     */
+    public function withCurrentCards(array $cards): self
     {
-        $this->discarded[] = $card;
+        return $this->cloneWith(turns: [...$this->currentRound->getTurns(), new Turn($cards)]);
     }
 
     /**
      * @param Card[] $cards
      */
-    public function setCurrentCards(array $cards): void
+    public function withDiscarded(array $cards): self
     {
-        $this->currentRound->addTurn(new Turn($cards));
-    }
-
-    /**
-     * @param Card[] $cards
-     */
-    public function setDiscarded(array $cards): void
-    {
-        $this->discarded = $cards;
+        return $this->cloneWith(discarded: $cards);
     }
 
     public function getWinner(): ?Player
@@ -189,31 +189,65 @@ final class GameState
         return $this->winner;
     }
 
-    public function setWinner(Player $winner): void
+    public function withWinner(Player $winner): self
     {
-        $this->winner = $winner;
+        return $this->cloneWith(winner: $winner);
     }
 
-    public function addPlayer(Player $player): void
+    public function withAddedPlayer(Player $player): self
     {
-        $this->players[] = $player;
+        return $this->cloneWith(players: [...$this->players->toArray(), $player]);
     }
 
-    public function setCurrentPlayer(Player $player): void
+    public function withUpdatedPlayer(Player $player): self
     {
-        $this->players->setCurrentPlayer($player);
+        $players = array_map(
+            fn (Player $p): Player => $p->id === $player->id ? $player : $p,
+            $this->players->toArray(),
+        );
+
+        return $this->cloneWith(players: $players);
     }
 
-    public function nextPlayer(): void
+    public function withCurrentPlayer(Player $player): self
     {
-        $this->players->nextPlayer();
+        return $this->cloneWith(currentPlayer: $player);
+    }
+
+    /**
+     * @param Player[]|null $players
+     * @param Turn[]|null   $turns
+     * @param Card[]|null   $drawPill
+     * @param Card[]|null   $discarded
+     * @param mixed[]|null  $data
+     */
+    private function cloneWith(
+        ?array $players = null,
+        ?Player $currentPlayer = null,
+        ?array $turns = null,
+        ?array $drawPill = null,
+        ?array $discarded = null,
+        ?array $data = null,
+        ?Player $winner = null,
+    ): self {
+        return new self(
+            $this->id,
+            $this->room,
+            $players ?? $this->players->toArray(),
+            $currentPlayer ?? $this->players->getCurrentPlayer(),
+            $turns ?? $this->currentRound->getTurns(),
+            $drawPill ?? $this->drawPill->getCards(),
+            $discarded ?? $this->discarded,
+            $data ?? $this->data,
+            $winner ?? $this->winner,
+        );
     }
 }
 
 /**
  * @internal
  */
-class PlayersList
+final readonly class PlayersList
 {
     private int $currentIndex;
 
@@ -222,14 +256,14 @@ class PlayersList
      */
     public function __construct(
         private array $players,
-        private Player $currentPlayer,
+        Player $currentPlayer,
     ) {
-        $this->currentIndex = array_search($currentPlayer, $players, true);
+        $this->currentIndex = $this->findIndex($currentPlayer->id);
     }
 
     public function getCurrentPlayer(): Player
     {
-        return $this->currentPlayer;
+        return $this->players[$this->currentIndex];
     }
 
     public function getNextPlayer(): Player
@@ -241,28 +275,22 @@ class PlayersList
         return $this->players[$this->currentIndex + 1];
     }
 
-    public function setCurrentPlayer(Player $player): void
-    {
-        $this->currentPlayer = $player;
-        $this->currentIndex = array_search($player, $this->players, true);
-    }
-
-    public function nextPlayer(): void
-    {
-        if ($this->currentIndex === count($this->players) - 1) {
-            $this->currentIndex = 0;
-        } else {
-            ++$this->currentIndex;
-        }
-
-        $this->currentPlayer = $this->players[$this->currentIndex];
-    }
-
     /**
      * @return Player[]
      */
     public function toArray(): array
     {
         return $this->players;
+    }
+
+    private function findIndex(string $playerId): int
+    {
+        foreach ($this->players as $index => $player) {
+            if ($player->id === $playerId) {
+                return $index;
+            }
+        }
+
+        throw new \InvalidArgumentException(\sprintf('Player "%s" is not part of this players list', $playerId));
     }
 }

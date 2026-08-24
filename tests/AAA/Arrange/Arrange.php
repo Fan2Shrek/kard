@@ -105,9 +105,10 @@ abstract /* static */ class Arrange
         }
 
         if (null !== $hands = Act::get('hands')) {
-            foreach ($players as $player) {
-                $player->cardsCount = count($hands[$player->id] ?? []);
-            }
+            $players = array_map(
+                fn (Player $player) => $player->withCardsCount(count($hands[$player->id] ?? [])),
+                $players,
+            );
         }
 
         return new GameState(

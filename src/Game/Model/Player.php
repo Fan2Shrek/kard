@@ -4,11 +4,11 @@ namespace App\Game\Model;
 
 use App\Entity\User;
 
-final class Player
+final readonly class Player
 {
     public function __construct(
-        public readonly string $id,
-        public readonly string $username,
+        public string $id,
+        public string $username,
         public int $cardsCount = 0,
     ) {
     }
@@ -16,5 +16,10 @@ final class Player
     public static function fromUser(User $user): self
     {
         return new self($user->getId()->toString(), $user->getUsername());
+    }
+
+    public function withCardsCount(int $cardsCount): self
+    {
+        return new self($this->id, $this->username, $cardsCount);
     }
 }

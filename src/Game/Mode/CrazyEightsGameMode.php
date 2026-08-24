@@ -35,9 +35,10 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
         return 7;
     }
 
-    public function setup(GameState $ctx, array $hands): void
+    public function setup(GameState &$ctx, array $hands): void
     {
-        $ctx->setCurrentCards($ctx->draw(1));
+        [$ctx, $cards] = $ctx->withDrawnCards(1);
+        $ctx = $ctx->withCurrentCards($cards);
     }
 
     public function getPlayerOrder(array $hands): array
@@ -48,11 +49,11 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
         return $ids;
     }
 
-    public function isGameFinished(GameState $gameContext): bool
+    public function isGameFinished(GameState &$gameContext): bool
     {
         foreach ($gameContext->getPlayers() as $player) {
             if (0 === $player->cardsCount) {
-                $gameContext->setWinner($player);
+                $gameContext = $gameContext->withWinner($player);
 
                 return true;
             }
@@ -61,18 +62,19 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
         return false;
     }
 
-    protected function doPlay(array $cards, GameContext $context, Hand $hand, array $data): void
+    protected function doPlay(array $cards, GameContext $context, Hand $hand, array $data): GameState
     {
         $gameContext = $context->getState();
 
         if (empty($cards)) {
             $player = $gameContext->getCurrentPlayer();
 
-            $hand->addMultipleCards($gameContext->draw(1));
+            [$gameContext, $drawnCards] = $gameContext->withDrawnCards(1);
+            $hand->addMultipleCards($drawnCards);
             $context->addEvent(new CardDrawnEvent($gameContext->getRoom(), $player, 1));
-            $gameContext->nextPlayer();
+            $gameContext = $gameContext->withNextPlayer();
 
-            return;
+            return $gameContext;
         }
 
         $actingPlayer = $gameContext->getCurrentPlayer();
@@ -97,12 +99,12 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
             $context->addEvent(new SuitChangedEvent($gameContext->getRoom(), $actingPlayer, $newSuit));
 
             $hand->removeCards($cards);
-            $gameContext->addData('suit', $newSuit);
-            $gameContext->setCurrentCards($cards);
-            $gameContext->addData('lastPlayer', $gameContext->getCurrentPlayer()->id); // @pest-mutate-ignore flemme
-            $gameContext->nextPlayer();
+            $gameContext = $gameContext->withData('suit', $newSuit);
+            $gameContext = $gameContext->withCurrentCards($cards);
+            $gameContext = $gameContext->withData('lastPlayer', $actingPlayer->id); // @pest-mutate-ignore flemme
+            $gameContext = $gameContext->withNextPlayer();
 
-            return;
+            return $gameContext;
         }
 
         if (Rank::EIGHT === $currentCard->rank) {
@@ -119,11 +121,11 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
         }
 
         if (Rank::ACE === $mainCard->rank) {
-            $gameContext->setPlayerOrder(array_reverse($gameContext->getPlayers()), true);
+            $gameContext = $gameContext->withPlayerOrder(array_reverse($gameContext->getPlayers()), true);
             $context->addEvent(new PlayOrderReversedEvent($gameContext->getRoom()));
 
             if (2 === count($gameContext->getPlayers())) {
-                $gameContext->nextPlayer();
+                $gameContext = $gameContext->withNextPlayer();
             }
         }
 
@@ -131,27 +133,31 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
             $nextPlayer = $gameContext->getNextPlayer();
             $nextHand = $this->handRepository->get($nextPlayer->id, $gameContext->getRoom());
             $drawnCount = 2 * count($cards);
-            $nextHand->addMultipleCards($gameContext->draw($drawnCount));
+
+            [$gameContext, $drawnCards] = $gameContext->withDrawnCards($drawnCount);
+            $nextHand->addMultipleCards($drawnCards);
             $this->handRepository->save($nextPlayer->id, $gameContext->getRoom(), $nextHand); // @pest-mutate-ignore
 
             $context->addEvent(new CardDrawnEvent($gameContext->getRoom(), $nextPlayer, $drawnCount, true));
 
-            $gameContext->getNextPlayer()->cardsCount += $drawnCount;
+            $gameContext = $gameContext->withUpdatedPlayer($nextPlayer->withCardsCount($nextPlayer->cardsCount + $drawnCount));
 
             // todo maybe player can add a 2
-            $gameContext->nextPlayer(); // skip turn
+            $gameContext = $gameContext->withNextPlayer(); // skip turn
         }
 
         if (Rank::JACK === $mainCard->rank) {
-            $gameContext->nextPlayer();
+            $gameContext = $gameContext->withNextPlayer();
             $context->addEvent(new TurnSkippedEvent($gameContext->getRoom(), $gameContext->getCurrentPlayer()));
         }
 
         $hand->removeCards($cards);
-        $gameContext->setCurrentCards($cards);
-        $gameContext->addData('lastPlayer', $actingPlayer->id); // @pest-mutate-ignore flemme
-        $gameContext->nextPlayer();
+        $gameContext = $gameContext->withCurrentCards($cards);
+        $gameContext = $gameContext->withData('lastPlayer', $actingPlayer->id); // @pest-mutate-ignore flemme
+        $gameContext = $gameContext->withNextPlayer();
 
         $context->addEvent(new CardPlayedEvent($gameContext->getRoom(), $actingPlayer, $cards));
+
+        return $gameContext;
     }
 }

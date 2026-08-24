@@ -4,7 +4,7 @@ namespace App\Game\Model;
 
 use App\Game\Model\Card\Card;
 
-final class Turn
+final readonly class Turn
 {
     /**
      * @param Card[] $cards
@@ -20,10 +20,5 @@ final class Turn
     public function getCards(): array
     {
         return $this->cards;
-    }
-
-    public function addCard(Card $card): void
-    {
-        $this->cards[] = $card;
     }
 }

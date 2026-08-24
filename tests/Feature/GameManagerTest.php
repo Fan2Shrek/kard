@@ -63,9 +63,15 @@ test("play() joue un tour normal : sauvegarde la main et l'état, dispatch les e
         new Card(Rank::EIGHT, Suit::SPADES),
     ]);
 
+    $savedState = null;
+
     $gameStateProvider = $this->createMock(GameStateProvider::class);
     $gameStateProvider->method('provide')->willReturn($state);
-    $gameStateProvider->expects($this->once())->method('save')->with($state);
+    $gameStateProvider->expects($this->once())->method('save')->with($this->callback(function (GameState $newState) use (&$savedState): bool {
+        $savedState = $newState;
+
+        return true;
+    }));
 
     $dispatchedEvents = [];
     $eventDispatcher = new EventDispatcher();
@@ -82,7 +88,7 @@ test("play() joue un tour normal : sauvegarde la main et l'état, dispatch les e
         {
             return match ($id) {
                 'event_dispatcher' => $this->eventDispatcher,
-                default => throw new \LogicException(\sprintf('Unexpected service "%s" requested', $id)),
+                default => throw new LogicException(\sprintf('Unexpected service "%s" requested', $id)),
             };
         }
 
@@ -99,8 +105,8 @@ test("play() joue un tour normal : sauvegarde la main et l'état, dispatch les e
     $gameManager->play($room, $player1, [new Card(Rank::SEVEN, Suit::SPADES)]);
 
     expect($handRepository->saved['1']->getCards())->toHaveCount(1);
-    expect($player1->cardsCount)->toBe(1);
-    expect($state->getCurrentPlayer()->id)->toBe('2');
+    expect($savedState->getPlayers()[0]->cardsCount)->toBe(1);
+    expect($savedState->getCurrentPlayer()->id)->toBe('2');
 
     expect($dispatchedEvents)->toHaveCount(1);
     expect($dispatchedEvents[0])->toBeInstanceOf(CardPlayedEvent::class);

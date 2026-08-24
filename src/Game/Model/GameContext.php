@@ -14,13 +14,18 @@ final class GameContext
     private array $events = [];
 
     public function __construct(
-        private readonly GameState $state,
+        private GameState $state,
     ) {
     }
 
     public function getState(): GameState
     {
         return $this->state;
+    }
+
+    public function replaceState(GameState $state): void
+    {
+        $this->state = $state;
     }
 
     public function addEvent(GameEvent $event): void

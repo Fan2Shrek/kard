@@ -2,7 +2,7 @@
 
 namespace App\Game\Model;
 
-final class GameRound
+final readonly class GameRound
 {
     /**
      * @param Turn[] $turns
@@ -12,11 +12,6 @@ final class GameRound
     ) {
     }
 
-    public function addTurn(Turn $turn): void
-    {
-        $this->turns[] = $turn;
-    }
-
     public function getTurn(int $index): ?Turn
     {
         return $this->turns[$index] ?? null;
@@ -24,7 +19,9 @@ final class GameRound
 
     public function getCurrentTurn(): ?Turn
     {
-        return end($this->turns) ?: null;
+        $turns = $this->turns;
+
+        return end($turns) ?: null;
     }
 
     /**
@@ -33,15 +30,5 @@ final class GameRound
     public function getTurns(): array
     {
         return $this->turns;
-    }
-
-    /**
-     * @param Turn[] $turns
-     */
-    public function setTurns(array $turns): self
-    {
-        $this->turns = $turns;
-
-        return $this;
     }
 }

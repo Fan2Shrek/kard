@@ -20,20 +20,17 @@ final class CardGenerator
             }
         }
 
-		if ($withJokers) {
-			$cards[] = new Card(Rank::JOKER, null);
-			$cards[] = new Card(Rank::JOKER, null);
-		}
+        if ($withJokers) {
+            $cards[] = new Card(Rank::JOKER, null);
+            $cards[] = new Card(Rank::JOKER, null);
+        }
 
         return new Deck($cards);
     }
 
     public function generateShuffled(): Deck
     {
-        $deck = $this->generate();
-        $deck->shuffle();
-
-        return $deck;
+        return $this->generate()->withShuffled();
     }
 
     /**
@@ -65,7 +62,8 @@ final class CardGenerator
             $hand = new Hand();
 
             foreach (range(0, $cards - 1) as $j) {
-                $hand->add($deck->draw());
+                [$deck, $card] = $deck->withDrawnCard();
+                $hand->add($card);
             }
 
             $hands[] = $hand;

@@ -20,7 +20,7 @@ final class TraceableGameMode implements GameModeInterface, SetupGameModeInterfa
     ) {
     }
 
-    public function setup(GameState $gameContext, array $hands): void
+    public function setup(GameState &$gameContext, array $hands): void
     {
         if ($this->gameMode instanceof SetupGameModeInterface) {
             $this->gameMode->setup($gameContext, $hands);
@@ -59,7 +59,7 @@ final class TraceableGameMode implements GameModeInterface, SetupGameModeInterfa
         return $this->gameMode->getPlayerOrder($players);
     }
 
-    public function isGameFinished(GameState $gameContext): bool
+    public function isGameFinished(GameState &$gameContext): bool
     {
         return $this->gameMode->isGameFinished($gameContext);
     }
