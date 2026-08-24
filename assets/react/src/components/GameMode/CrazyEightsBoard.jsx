@@ -75,7 +75,9 @@ export default ({ ctx, player }) => {
                 <div className='middle'>
                     <div id='middle'>
                         <StackedPlayedCard ref={playedCardRef} turns={currentRoundTurns} />
-                        <Stack cards={drawPileCards} style='drawPile'/>
+                        <div title={`${ctx.drawPileCount} carte${ctx.drawPileCount > 1 ? 's' : ''} restante${ctx.drawPileCount > 1 ? 's' : ''}`}>
+                            <Stack cards={drawPileCards} style='drawPile'/>
+                        </div>
                     </div>
                 </div>
                 <div className='bottom'>
