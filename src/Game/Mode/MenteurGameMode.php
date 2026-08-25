@@ -89,5 +89,48 @@ final class MenteurGameMode extends AbstractGameMode implements SetupGameModeInt
 
     protected function doPlay(array $cards, GameContext $context, array $data): void
     {
+        if ([] === $cards) {
+            throw $this->createRuleException('turn.at_least_one_card');
+        }
+
+        $rankValue = $data['rank'] ?? null;
+
+        if (null === $rankValue) {
+            throw $this->createRuleException('rank.not_set');
+        }
+
+        $rank = Rank::tryFrom($rankValue);
+
+        if (null === $rank) {
+            throw $this->createRuleException('rank.invalid');
+        }
+
+        $currentRound = $context->gameState->getCurrentRound();
+
+        if ($currentRound === null) {
+            throw new \RuntimeException('No round found in game state.');
+        }
+
+        if (!$currentRound->isNew()) {
+            $lastTurn = $currentRound->getLastTurn();
+            $expectedRank = $this->getNextRankInCycle(Rank::from($lastTurn->data['rank']));
+
+            if ($rank !== $expectedRank) {
+                throw $this->createRuleException('rank.sequence.invalid', [
+                    '%declared_rank%' => $rank->value,
+                    '%expected_rank%' => $expectedRank->value,
+                ]);
+            }
+        }
+
+        $context->pushTurn($this->playedCardIds, null, ['rank' => $rank->value]);
+    }
+
+    private function getNextRankInCycle(Rank $rank): Rank
+    {
+        $ranks = $this->getRanks();
+        $index = array_search($rank, $ranks, true);
+
+        return $ranks[($index + 1) % count($ranks)];
     }
 }
