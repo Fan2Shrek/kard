@@ -111,7 +111,9 @@ class GameContext
 
     public function skipNextPlayerTurn(): void
     {
-        $this->pushEvent(GameEventTypeEnum::TURN_SKIPPED);
+        $this->pushEvent(GameEventTypeEnum::TURN_SKIPPED, [
+            'playerId' => $this->gameState->getNextPlayerId(),
+        ]);
     }
 
     public function reversePlayerOrder(): void

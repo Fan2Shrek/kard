@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import useMercure from '../hook/useMercure.js';
 import GameContext from '../Context/GameContext.js';
 import { AnimationContext } from '../Context/AnimationContext.js';
+import { suitsIcons } from '../enum.js';
 import {
     Board,
     CrazyEightsBoard,
@@ -15,6 +16,13 @@ import './game.css';
 const eventMessages = {
     round_ended: () => 'Fin du tour',
     card_or_nothing_called: (payload) => `${payload.rank} ou rien`,
+    suit_changed: (payload) => `La couleur devient ${suitsIcons[payload.suit] ?? payload.suit}`,
+    turn_skipped: (payload, ctx) => {
+        const username = ctx.players.find((p) => p.id === payload.playerId)?.username;
+
+        return username ? `Le tour de ${username} est passé` : null;
+    },
+    reverse_players_order: () => 'Le sens du jeu est inversé',
     turn_played: (payload, ctx) => {
         if (0 !== (payload.cards ?? []).length) {
             return null;
@@ -23,6 +31,11 @@ const eventMessages = {
         const username = ctx.players.find((p) => p.id === ctx.currentPlayerId)?.username;
 
         return username ? `${username} passe son tour` : null;
+    },
+    card_given: (payload, ctx) => {
+        const username = ctx.players.find((p) => p.id === payload.toPlayerId)?.username;
+
+        return username ? `${username} pioche une carte` : null;
     },
 };
 
