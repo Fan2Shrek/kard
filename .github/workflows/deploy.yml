@@ -1,0 +1,26 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Add server to known hosts
+        shell: bash
+        run: |
+          ssh-keyscan  -p ${{ secrets.SSH_PORT }} -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        shell: bash
+        run: |
+          ssh \
+            -p "${{ secrets.SSH_PORT }}" \
+            "${{ secrets.SSH_USER }}@${{ secrets.HOST }}" \
+            "cd '${{ secrets.PROD_PATH }}' && make deploy"
