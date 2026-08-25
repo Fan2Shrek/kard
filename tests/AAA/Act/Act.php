@@ -69,7 +69,7 @@ abstract /* static */ class Act
     public static function setup(): void
     {
         $gameState = static::get('gameContext');
-        $context = new GameContext($gameState);
+        $context = new GameContext($gameState, static::get('configuration'));
 
         static::get('gamePlayer')->setup($context);
 
@@ -144,7 +144,7 @@ abstract /* static */ class Act
             $gameState->getPlayerStateById($playerId)->withHand($hand)
         );
 
-        $context = new GameContext($gameState);
+        $context = new GameContext($gameState, static::get('configuration'));
         self::$context['events'] = [];
 
         static::get('gamePlayer')->play($cardIds, $context, $playerId, $data);

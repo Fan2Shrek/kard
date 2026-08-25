@@ -27,6 +27,15 @@
                     {% endfor %}
                 </select>
             </label>
+            {% if room.gameMode.value.value == 'crazy_eights' %}
+                <label class="room-configuration__field room-configuration__field--toggle">
+                    <span>
+                        <twig:UX:Icon name="lucide:layers-3" />
+                        Empiler les 2
+                    </span>
+                    <input type="checkbox" name="stackTwos" value="1" {{ configuration.get('stackTwos') ? 'checked' : '' }} />
+                </label>
+            {% endif %}
             <twig:Button
                 type="submit"
                 text="Mettre à jour"
@@ -50,6 +59,13 @@
                 Skin
                 <strong>{{ configuration.getSkin.value|capitalize }}</strong>
             </li>
+            {% if room.gameMode.value.value == 'crazy_eights' %}
+                <li>
+                    <twig:UX:Icon name="lucide:layers-3" />
+                    Empiler les 2
+                    <strong>{{ configuration.get('stackTwos') ? 'Oui' : 'Non' }}</strong>
+                </li>
+            {% endif %}
         </ul>
     {% endif %}
 </div>

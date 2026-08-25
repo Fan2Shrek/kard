@@ -115,7 +115,7 @@ final class GameManager implements ServiceSubscriberInterface
         );
 
         if ($gameMode instanceof SetupGameModeInterface) {
-            $ctx = $this->createGameContext($state);
+            $ctx = $this->createGameContext($state, $room->getConfiguration());
             $gameMode->setup($ctx);
 
             foreach ($ctx->flushEvents() as $event) {
@@ -149,7 +149,7 @@ final class GameManager implements ServiceSubscriberInterface
 
         $gameMode = $this->getGameMode($room->getGameMode()->getValue());
 
-        $context = new GameContext($state);
+        $context = new GameContext($state, $room->getConfiguration());
         $gameMode->play($cards, $context, $player->id, $data);
         $events = $context->flushEvents();
 
@@ -157,7 +157,7 @@ final class GameManager implements ServiceSubscriberInterface
             $state = $this->gea->apply($event, $state);
         }
 
-        $context = new GameContext($state);
+        $context = new GameContext($state, $room->getConfiguration());
         $gameMode->refreshScore($context);
         $scoreEvents = $context->flushEvents();
 
@@ -279,8 +279,8 @@ final class GameManager implements ServiceSubscriberInterface
         return [$hands, $remainingCards];
     }
 
-    private function createGameContext(GameState $state): GameContext
+    private function createGameContext(GameState $state, GameConfiguration $configuration): GameContext
     {
-        return new GameContext($state);
+        return new GameContext($state, $configuration);
     }
 }

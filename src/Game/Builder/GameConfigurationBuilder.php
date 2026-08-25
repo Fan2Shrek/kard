@@ -23,10 +23,12 @@ final class GameConfigurationBuilder
             'withJokers' => false,
             'deckCount' => 1,
             'skin' => DeckSkinEnum::DEFAULT,
+            'stackTwos' => false,
         ]);
         $resolver->setAllowedTypes('withJokers', 'bool');
         $resolver->setAllowedTypes('deckCount', 'int');
         $resolver->setAllowedValues('deckCount', fn ($value) => $value > 0 && $value <= self::MAX_DECK_COUNT);
+        $resolver->setAllowedTypes('stackTwos', 'bool');
 
         $mode->configureOptions($resolver);
 

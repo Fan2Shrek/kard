@@ -14,6 +14,7 @@ use App\Game\Model\Card\DiscardPile;
 use App\Game\Model\Card\DrawPile;
 use App\Game\Model\Card\Hand;
 use App\Game\Model\Event\GameEvent;
+use App\Game\Model\GameConfiguration;
 use App\Game\Model\State\GameState;
 use App\Game\Model\State\PlayerState;
 use App\Game\Model\State\Round;
@@ -30,6 +31,7 @@ covers(GameManager::class);
 
 test("play() joue un tour normal : sauvegarde la main et l'état, dispatch les events, sans passer par Mercure directement", function () {
     $room = new Room(new GameMode(GameModeEnum::PRESIDENT), Uuid::uuid4());
+    $room->setConfiguration(GameConfiguration::fromArray([]));
 
     $userId = Uuid::uuid4();
     $user = new User('player1', 'player1@test.com');

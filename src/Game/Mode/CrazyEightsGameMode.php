@@ -70,8 +70,22 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
 
     protected function doPlay(array $cards, GameContext $context, array $data): void
     {
+        $round = $context->gameState->getCurrentRound();
+        $stackTwos = (bool) $context->getData('stackTwos', false);
+        $pendingPenalty = $stackTwos ? $this->getPendingDrawPenalty($round) : 0;
+
         if (empty($cards)) {
-            $context->drawCard($context->gameState->currentPlayerId);
+            $drawCount = $pendingPenalty > 0 ? $pendingPenalty : 1;
+
+            for ($i = 0; $i < $drawCount; ++$i) {
+                $context->drawCard($context->gameState->currentPlayerId);
+            }
+
+            if ($pendingPenalty > 0) {
+                // records the penalty as resolved so it doesn't carry over to the
+                // following player - see getPendingDrawPenalty()
+                $context->pushTurn([], null, ['drawPenalty' => 0]);
+            }
 
             return;
         }
@@ -80,14 +94,25 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
             throw $this->createRuleException('cards.same_rank');
         }
 
-        $round = $context->gameState->getCurrentRound();
+        $mainCard = $cards[0];
 
-        $lastTurnCards = $round->getLastTurn()->cardIds ?? [];
-        $lastCard = \end($lastTurnCards);
+        if ($pendingPenalty > 0) {
+            if (Rank::TWO !== $mainCard->rank) {
+                throw $this->createRuleException('cards.must_counter_two');
+            }
+
+            $newPenalty = $pendingPenalty + 2 * count($this->playedCardIds);
+            $context->pushTurn($this->playedCardIds, null, ['drawPenalty' => $newPenalty]);
+            $this->autoResolvePenaltyIfNoCounter($context, $newPenalty);
+
+            return;
+        }
+
+        $lastTurn = $this->getLastNonSkippedTurn($round);
+        $lastCard = \end($lastTurn->cardIds);
         $lastCard = $context->gameState->getCardById($lastCard);
 
         $activeSuit = $this->getActiveSuit($round, $lastCard);
-        $mainCard = $cards[0];
 
         if (Rank::EIGHT === $mainCard->rank || Rank::JOKER === $mainCard->rank) {
             if (!isset($data['suit'])) {
@@ -138,9 +163,18 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
         }
 
         if (Rank::TWO === $mainCard->rank) {
+            $penalty = 2 * count($this->playedCardIds);
+
+            if ($stackTwos) {
+                $context->pushTurn($this->playedCardIds, null, ['drawPenalty' => $penalty]);
+                $this->autoResolvePenaltyIfNoCounter($context, $penalty);
+
+                return;
+            }
+
             $nextPlayerId = $context->gameState->getNextPlayerId();
 
-            for ($i = 0; $i < 2 * count($this->playedCardIds); ++$i) {
+            for ($i = 0; $i < $penalty; ++$i) {
                 $context->drawCard($nextPlayerId);
             }
 
@@ -148,6 +182,49 @@ final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameMod
         }
 
         $context->pushTurn($this->playedCardIds);
+    }
+
+    /**
+     * The running total of cards the current player owes because of a chain of
+     * TWOs played by their predecessors (stackTwos config only) - read off the
+     * last turn's data, which is kept in sync by every TWO play/resolution.
+     */
+    private function getPendingDrawPenalty(?Round $round): int
+    {
+        return $round?->getLastTurn()?->data['drawPenalty'] ?? 0;
+    }
+
+    /**
+     * If the player about to inherit the pending penalty has no TWO to counter
+     * with, there's no decision for them to make - draw the penalty and skip
+     * straight to the player after them, in this same play, instead of waiting
+     * for them to explicitly pass.
+     */
+    private function autoResolvePenaltyIfNoCounter(GameContext $context, int $penalty): void
+    {
+        $nextPlayerId = $context->gameState->getNextPlayerId();
+
+        if ($this->playerHasTwo($context, $nextPlayerId)) {
+            return;
+        }
+
+        for ($i = 0; $i < $penalty; ++$i) {
+            $context->drawCard($nextPlayerId);
+        }
+
+        $context->pushTurn([], $nextPlayerId, ['drawPenalty' => 0]);
+        $context->pushEvent(GameEventTypeEnum::TURN_ENDED);
+    }
+
+    private function playerHasTwo(GameContext $context, string $playerId): bool
+    {
+        foreach ($context->gameState->getPlayerStateById($playerId)->hand->cards as $cardId) {
+            if (Rank::TWO === $context->gameState->getCardById($cardId)->rank) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

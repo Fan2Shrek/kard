@@ -286,6 +286,178 @@ describe('Huit américain: cartes spéciales', function () {
         expect(Act::get('gameContext')->getPlayerStateById('2')->hand->cards)->toHaveCount(3);
     });
 
+    test("Quand l'empilement des deux est désactivé (par défaut), poser un deux force la pioche et le saut de tour immédiats", function () {
+        Arrange::setDrawPillSize(3);
+        Arrange::setPlayers([
+            ['1', 'Player 1'],
+            ['2', 'Player 2'],
+        ]);
+        Arrange::setHands([
+            '1' => [[2, 's']],
+            '2' => [[6, 's']],
+        ]);
+        Arrange::setCurrentCard(5, 's');
+
+        Act::playCard(2, 's');
+
+        expect(Act::get('gameContext')->getPlayerStateById('2')->hand->cards)->toHaveCount(3);
+        expect(Act::get('gameContext')->currentPlayerId)->toBe('1');
+    });
+
+    test("Quand l'empilement des deux est activé et que le joueur suivant peut contrer, poser un deux passe la main sans piocher ni sauter de tour", function () {
+        Arrange::setConfiguration(['stackTwos' => true]);
+        Arrange::setDrawPillSize(3);
+        Arrange::setPlayers([
+            ['1', 'Player 1'],
+            ['2', 'Player 2'],
+        ]);
+        Arrange::setHands([
+            '1' => [[2, 's']],
+            '2' => [[2, 'd']],
+        ]);
+        Arrange::setCurrentCard(5, 's');
+
+        Act::playCard(2, 's');
+
+        expect(Act::get('gameContext')->getPlayerStateById('2')->hand->cards)->toHaveCount(1);
+        expect(Act::get('gameContext')->currentPlayerId)->toBe('2');
+        expect(Act::get('gameContext')->getCurrentRound()->getLastTurn()->data['drawPenalty'])->toBe(2);
+    });
+
+    test("Quand le joueur suivant n'a pas de deux, il pioche la pénalité et son tour est automatiquement sauté", function () {
+        Arrange::setConfiguration(['stackTwos' => true]);
+        Arrange::setDrawPillSize(3);
+        Arrange::setPlayers([
+            ['1', 'Player 1'],
+            ['2', 'Player 2'],
+            ['3', 'Player 3'],
+        ]);
+        Arrange::setHands([
+            '1' => [[2, 's']],
+            '2' => [[6, 's']],
+            '3' => [[7, 'd']],
+        ]);
+        Arrange::setCurrentCard(5, 's');
+
+        Act::playCard(2, 's');
+
+        expect(Act::get('gameContext')->getPlayerStateById('2')->hand->cards)->toHaveCount(3);
+        expect(Act::get('gameContext')->currentPlayerId)->toBe('3');
+        expect(Act::get('gameContext')->getCurrentRound()->getLastTurn()->data['drawPenalty'] ?? 0)->toBe(0);
+    });
+
+    test('Le saut automatique du joueur sans deux envoie ses évenements CARD_DRAWN dans le même coup', function () {
+        Arrange::setConfiguration(['stackTwos' => true]);
+        Arrange::setDrawPillSize(6);
+        Arrange::setPlayers([
+            ['1', 'Player 1'],
+            ['2', 'Player 2'],
+        ]);
+        Arrange::setHands([
+            '1' => [[2, 's'], [2, 'd']],
+            '2' => [[6, 's']],
+        ]);
+        Arrange::setCurrentCard(5, 's');
+
+        Act::playCards([[2, 's'], [2, 'd']]);
+
+        $drawnEvents = array_filter(
+            Act::getEvents(),
+            fn ($e) => GameEventTypeEnum::CARD_DRAWN === $e->type
+        );
+
+        expect($drawnEvents)->toHaveCount(4);
+        expect(Act::get('gameContext')->currentPlayerId)->toBe('1');
+    });
+
+    test('Contrer avec un deux augmente la pénalité et la fait suivre au joueur suivant', function () {
+        Arrange::setConfiguration(['stackTwos' => true]);
+        Arrange::setDrawPillSize(6);
+        Arrange::setPlayers([
+            ['1', 'Player 1'],
+            ['2', 'Player 2'],
+            ['3', 'Player 3'],
+        ]);
+        Arrange::setHands([
+            '1' => [[2, 's']],
+            '2' => [[2, 'd']],
+            '3' => [[2, 'h']],
+        ]);
+        Arrange::setCurrentCard(5, 's');
+
+        Act::playCard(2, 's');
+        Act::playCard(2, 'd');
+
+        expect(Act::get('gameContext')->getPlayerStateById('2')->hand->cards)->toHaveCount(0);
+        expect(Act::get('gameContext')->currentPlayerId)->toBe('3');
+        expect(Act::get('gameContext')->getCurrentRound()->getLastTurn()->data['drawPenalty'])->toBe(4);
+    });
+
+    test('Poser une carte qui n\'est pas un deux alors qu\'une pénalité est en attente est refusé', function () {
+        Arrange::setConfiguration(['stackTwos' => true]);
+        Arrange::setDrawPillSize(6);
+        Arrange::setPlayers([
+            ['1', 'Player 1'],
+            ['2', 'Player 2'],
+        ]);
+        Arrange::setHands([
+            '1' => [[2, 's']],
+            '2' => [[2, 'd'], [6, 's']],
+        ]);
+        Arrange::setCurrentCard(5, 's');
+
+        Act::playCard(2, 's');
+        Act::playCard(6, 's');
+    })->throws('cards.must_counter_two');
+
+    test('Piocher au lieu de contrer donne le total accumulé de la pénalité et la réinitialise pour le joueur suivant', function () {
+        Arrange::setConfiguration(['stackTwos' => true]);
+        Arrange::setDrawPillSize(6);
+        Arrange::setPlayers([
+            ['1', 'Player 1'],
+            ['2', 'Player 2'],
+            ['3', 'Player 3'],
+        ]);
+        Arrange::setHands([
+            '1' => [[2, 's']],
+            '2' => [[2, 'd']],
+            '3' => [[2, 'h'], [6, 'h']],
+        ]);
+        Arrange::setCurrentCard(5, 's');
+
+        Act::playCard(2, 's');
+        Act::playCard(2, 'd');
+        Act::playCard(null);
+
+        expect(Act::get('gameContext')->getPlayerStateById('3')->hand->cards)->toHaveCount(6);
+        expect(Act::get('gameContext')->currentPlayerId)->toBe('1');
+        expect(Act::get('gameContext')->getCurrentRound()->getLastTurn()->data['drawPenalty'] ?? 0)->toBe(0);
+    });
+
+    test("Piocher pour contrer une pénalité empilée envoie autant d'évenements CARD_DRAWN que le total accumulé", function () {
+        Arrange::setConfiguration(['stackTwos' => true]);
+        Arrange::setDrawPillSize(6);
+        Arrange::setPlayers([
+            ['1', 'Player 1'],
+            ['2', 'Player 2'],
+        ]);
+        Arrange::setHands([
+            '1' => [[2, 's'], [2, 'd']],
+            '2' => [[2, 'h'], [6, 's']],
+        ]);
+        Arrange::setCurrentCard(5, 's');
+
+        Act::playCards([[2, 's'], [2, 'd']]);
+        Act::playCard(null);
+
+        $drawnEvents = array_filter(
+            Act::getEvents(),
+            fn ($e) => GameEventTypeEnum::CARD_DRAWN === $e->type
+        );
+
+        expect($drawnEvents)->toHaveCount(4);
+    });
+
     test('Le huit permet de changer de couleur', function () {
         Arrange::setCurrentCard(5, 's');
 

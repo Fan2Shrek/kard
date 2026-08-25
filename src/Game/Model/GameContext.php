@@ -23,8 +23,14 @@ class GameContext
 
     public function __construct(
         public GameState $gameState,
+        public ?GameConfiguration $configuration = null,
     ) {
         $this->pendingDrawPile = $gameState->drawPile;
+    }
+
+    public function getData(string $key, mixed $default = null): mixed
+    {
+        return $this->configuration?->get($key, $default) ?? $default;
     }
 
     /**
