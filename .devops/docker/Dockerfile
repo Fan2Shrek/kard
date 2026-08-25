@@ -51,3 +51,5 @@ RUN bin/console sass:build
 RUN bin/console asset-map:compile
 
 RUN chown -R www-data:www-data /app/var
+
+CMD ["multirun", "php-fpm -R -F", "nginx -g 'daemon off;'"]
