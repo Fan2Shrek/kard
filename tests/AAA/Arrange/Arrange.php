@@ -7,6 +7,7 @@ namespace App\Tests\AAA\Arrange;
 use App\Game\Model\Card\DiscardPile;
 use App\Game\Model\Card\DrawPile;
 use App\Game\Model\Card\Hand;
+use App\Game\Model\GameConfiguration;
 use App\Game\Model\State\GameState;
 use App\Game\Model\State\PlayerState;
 use App\Game\Model\State\Round;
@@ -108,6 +109,14 @@ abstract /* static */ class Arrange
     public static function setPlayers(array $players): void
     {
         Act::addContext('gameContextPlayers', $players);
+    }
+
+    /**
+     * @param array<string, mixed> $options
+     */
+    public static function setConfiguration(array $options): void
+    {
+        Act::addContext('configuration', new GameConfiguration($options));
     }
 
     /**

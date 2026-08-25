@@ -147,6 +147,7 @@ final class RoomController extends AbstractController
             'withJokers' => $payload->getBoolean('withJokers'),
             'deckCount' => $payload->getInt('deckCount', 1),
             'skin' => $payload->getEnum('skin', DeckSkinEnum::class, DeckSkinEnum::DEFAULT),
+            'stackTwos' => $payload->getBoolean('stackTwos'),
         ];
 
         $room->setConfiguration($this->gameManager->buildConfiguration($room->getGameMode()->getValue(), $rawOptions));
