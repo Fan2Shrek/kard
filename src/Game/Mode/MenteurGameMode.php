@@ -3,6 +3,7 @@
 namespace App\Game\Mode;
 
 use App\Enum\Card\Rank;
+use App\Game\Model\Card\Card;
 use App\Game\Model\GameContext;
 use App\Game\Model\State\GameState;
 use App\Game\Model\State\PlayerState;
@@ -89,6 +90,12 @@ final class MenteurGameMode extends AbstractGameMode implements SetupGameModeInt
 
     protected function doPlay(array $cards, GameContext $context, array $data): void
     {
+        if ($data['challenge'] ?? false) {
+            $this->doChallenge($cards, $context);
+
+            return;
+        }
+
         if ([] === $cards) {
             throw $this->createRuleException('turn.at_least_one_card');
         }
@@ -132,5 +139,47 @@ final class MenteurGameMode extends AbstractGameMode implements SetupGameModeInt
         $index = array_search($rank, $ranks, true);
 
         return $ranks[($index + 1) % count($ranks)];
+    }
+
+    /**
+     * @param Card[] $cards
+     */
+    private function doChallenge(array $cards, GameContext $context): void
+    {
+        if ([] !== $cards) {
+            throw $this->createRuleException('challenge.no_cards');
+        }
+
+        $currentRound = $context->gameState->getCurrentRound();
+
+        if ($currentRound === null) {
+            throw new \RuntimeException('No round found in game state.');
+        }
+
+        if ($currentRound->isNew()) {
+            throw $this->createRuleException('challenge.nothing_to_challenge');
+        }
+
+        $lastTurn = $currentRound->getLastTurn();
+        $declaredRank = Rank::from($lastTurn->data['rank']);
+
+        $wasLying = false;
+        foreach ($lastTurn->cardIds as $cardId) {
+            if ($context->gameState->getCardById($cardId)->rank !== $declaredRank) {
+                $wasLying = true;
+                break;
+            }
+        }
+
+        $challengerId = $context->gameState->currentPlayerId;
+        $declarerId = $lastTurn->playerId;
+        $loserId = $wasLying ? $declarerId : $challengerId;
+        $winnerId = $wasLying ? $challengerId : $declarerId;
+
+        $context->givePileToPlayer($loserId);
+        $context->setCurrentPlayer($winnerId);
+        $context->pushChallengeResult($challengerId, $declarerId, $declaredRank->value, $wasLying);
+
+        $this->shouldPushEndTurn = false;
     }
 }
