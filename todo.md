@@ -15,8 +15,6 @@
 - [X] Data in gameContext
 - [X] Assets context
 
-- [ ] (?) Integrate https://github.com/MattCain/svg-playing-cards/tree/master
-
 - [ ] Fix real time issues in current game
 
-- [ ] Add per room option
+- [X] Add per room option
