@@ -63,13 +63,13 @@
                     </thead>
                     <tbody id="current-games">
                         <div {{ stimulus_controller('stream', {url: mercure('current_games')}) }}></div>
-						{% if currentGames is not empty %}
-							{% for game in currentGames %}
-								{{ include('components/turbo/game-details.html.twig') }}
-							{% endfor %}
-						{% else %}
-							<tr id="no-games-row"><th class="empty" colspan="4">Il n'y a aucune partie en cours</th></tr>
-						{% endif %}
+                        {% if currentGames is not empty %}
+                            {% for game in currentGames %}
+                                {{ include('components/turbo/game-details.html.twig') }}
+                            {% endfor %}
+                        {% else %}
+                            <tr id="no-games-row"><th class="empty" colspan="4">Il n'y a aucune partie en cours</th></tr>
+                        {% endif %}
                     </tbody>
                 </table>
         </section>

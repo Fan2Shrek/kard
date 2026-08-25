@@ -16,17 +16,17 @@ final class RedisGameStateProvider implements GameStateProviderInterface
 
     public function get(string $id): GameState
     {
-		if ('' === $state = $this->redis->get($id)) {
-			throw new \RuntimeException('Game state not found');
-		}
+        if ('' === $state = $this->redis->get($id)) {
+            throw new \RuntimeException('Game state not found');
+        }
 
-		$state = unserialize($state);
+        $state = unserialize($state);
 
-		if (!$state instanceof GameState) {
-			throw new \RuntimeException('Invalid game state');
-		}
+        if (!$state instanceof GameState) {
+            throw new \RuntimeException('Invalid game state');
+        }
 
-		return $state;
+        return $state;
     }
 
     public function save(string $id, GameState $state): void

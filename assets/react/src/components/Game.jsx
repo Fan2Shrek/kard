@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import useMercure from '../hook/useMercure.js';
 import GameContext from '../Context/GameContext.js';
 import { AnimationContext } from '../Context/AnimationContext.js';
+import { suitsIcons } from '../enum.js';
 import {
     Board,
     CrazyEightsBoard,
@@ -16,6 +17,13 @@ import './game.css';
 const eventMessages = {
     round_ended: () => 'Fin du tour',
     card_or_nothing_called: (payload) => `${payload.rank} ou rien`,
+    suit_changed: (payload) => `La couleur devient ${suitsIcons[payload.suit] ?? payload.suit}`,
+    turn_skipped: (payload, ctx) => {
+        const username = ctx.players.find((p) => p.id === payload.playerId)?.username;
+
+        return username ? `Le tour de ${username} est passé` : null;
+    },
+    reverse_players_order: () => 'Le sens du jeu est inversé',
     turn_played: (payload, ctx) => {
         if (0 !== (payload.cards ?? []).length) {
             return null;
@@ -24,6 +32,11 @@ const eventMessages = {
         const username = ctx.players.find((p) => p.id === ctx.currentPlayerId)?.username;
 
         return username ? `${username} passe son tour` : null;
+    },
+    card_given: (payload, ctx) => {
+        const username = ctx.players.find((p) => p.id === payload.toPlayerId)?.username;
+
+        return username ? `${username} pioche une carte` : null;
     },
 };
 
@@ -63,13 +76,13 @@ export default ({ gameContext, player: userJson, gameMode, roomId }) => {
     }, [ctx]);
 
     // The topic carries two different message shapes: ContinueRoomSubscriber's
-    // { action: 'end', data: { context, url } } when the game is over, and
+    // { action: 'end', data: { context, winner, url } } when the game is over, and
     // EventPublisher's { events } on every play (state is deliberately not
     // published there - it's the raw, unredacted GameState including every
     // player's hand - so a play just triggers a proper refetch instead).
     const onGameEvent = useMemo(() => (data) => {
         if ('end' === data.action) {
-            displayText(`${data.data.context.winner.username} a gagné`);
+            displayText(`${data.data.winner.username} a gagné`);
             setAnimate(true);
 
             setTimeout(() => {

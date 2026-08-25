@@ -39,7 +39,7 @@ ENV APP_ENV=prod
 
 # Build env
 
-RUN .devops/docker/build-env.sh
+ENTRYPOINT ["bin/entrypoint.sh"]
 
 RUN composer install --no-dev --no-interaction --no-progress
 
@@ -51,3 +51,5 @@ RUN bin/console sass:build
 RUN bin/console asset-map:compile
 
 RUN chown -R www-data:www-data /app/var
+
+CMD ["multirun", "php-fpm -R -F", "nginx -g 'daemon off;'"]

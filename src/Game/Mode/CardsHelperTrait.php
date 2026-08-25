@@ -3,7 +3,6 @@
 namespace App\Game\Mode;
 
 use App\Enum\Card\Rank;
-use App\Enum\Card\Suit;
 use App\Game\Model\Card\Card;
 use App\Game\Model\State\Round;
 use App\Game\Model\State\Turn;
@@ -78,24 +77,24 @@ trait CardsHelperTrait
         return Rank::cases();
     }
 
-	protected function getLastNonSkippedTurn(Round $round): Turn
-	{
-		foreach (array_reverse($round->turns) as $turn) {
-			if (!$turn->hasBeenSkipped()) {
-				return $turn;
-			}
-		}
+    protected function getLastNonSkippedTurn(Round $round): Turn
+    {
+        foreach (array_reverse($round->turns) as $turn) {
+            if (!$turn->hasBeenSkipped()) {
+                return $turn;
+            }
+        }
 
-		throw new \RuntimeException('No non-skipped turn found in round.');
-	}
+        throw new \RuntimeException('No non-skipped turn found in round.');
+    }
 
-	/**
-	 * @return Turn[] the last $count non-skipped turns, in chronological order - skips are ignored, not treated as breaking the sequence
-	 */
-	protected function getLastNonSkippedTurns(Round $round, int $count): array
-	{
-		$nonSkipped = array_values(array_filter($round->turns, fn (Turn $turn): bool => !$turn->hasBeenSkipped()));
+    /**
+     * @return Turn[] the last $count non-skipped turns, in chronological order - skips are ignored, not treated as breaking the sequence
+     */
+    protected function getLastNonSkippedTurns(Round $round, int $count): array
+    {
+        $nonSkipped = array_values(array_filter($round->turns, fn (Turn $turn): bool => !$turn->hasBeenSkipped()));
 
-		return array_slice($nonSkipped, -$count);
-	}
+        return array_slice($nonSkipped, -$count);
+    }
 }

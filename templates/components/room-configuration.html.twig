@@ -2,15 +2,13 @@
     <h2><twig:UX:Icon name="lucide:settings-2" /> Configuration</h2>
     {% if (editable is defined ? editable : (room.owner == app.user)) %}
         <form method="POST" action="{{ path('game_configuration', {id: room.id}) }}" class="room-configuration__form">
-			{% if configuration.hasJokers is defined %}
-				<label class="room-configuration__field room-configuration__field--toggle">
-					<span>
-						<twig:UX:Icon name="lucide:sparkles" />
-						Inclure les jokers
-					</span>
-					<input type="checkbox" name="withJokers" value="1" {{ configuration.hasJokers ? 'checked' : '' }} />
-				</label>
-			{% endif %}
+            <label class="room-configuration__field room-configuration__field--toggle">
+                <span>
+                    <twig:UX:Icon name="lucide:sparkles" />
+                    Inclure les jokers
+                </span>
+                <input type="checkbox" name="withJokers" value="1" {{ configuration.hasJokers ? 'checked' : '' }} />
+            </label>
             <label class="room-configuration__field">
                 <span>
                     <twig:UX:Icon name="lucide:layers" />

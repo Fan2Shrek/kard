@@ -19,7 +19,7 @@ final class RoomConfigurationType extends Type
 
     public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
     {
-        if ($value === null) {
+        if (null === $value) {
             return null;
         }
 
@@ -32,14 +32,14 @@ final class RoomConfigurationType extends Type
 
     public function convertToPHPValue($value, AbstractPlatform $platform): ?GameConfiguration
     {
-        if ($value === null || $value instanceof GameConfiguration) {
+        if (null === $value || $value instanceof GameConfiguration) {
             return $value;
         }
 
         /** @var array<string, mixed> $data */
         $data = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
 
-		return GameConfiguration::fromArray($data);
+        return GameConfiguration::fromArray($data);
     }
 
     public function getName(): string

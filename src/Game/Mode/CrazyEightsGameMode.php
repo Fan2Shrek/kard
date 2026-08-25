@@ -15,167 +15,166 @@ use App\Game\Model\State\Round;
 
 final class CrazyEightsGameMode extends AbstractGameMode implements SetupGameModeInterface
 {
-	use CardsHelperTrait;
+    use CardsHelperTrait;
 
-	public function getGameMode(): GameModeEnum
-	{
-		return GameModeEnum::CRAZY_EIGHTS;
-	}
+    public function getGameMode(): GameModeEnum
+    {
+        return GameModeEnum::CRAZY_EIGHTS;
+    }
 
-	public function getCardsCount(int $playerCount): int
-	{
-		return 7;
-	}
+    public function getCardsCount(int $playerCount): int
+    {
+        return 7;
+    }
 
-	public function setup(GameContext $ctx): void
-	{
-		$firstCard = $ctx->gameState->drawPile->getNext();
-		$ctx->startNewRound();
-		$ctx->pushEvent(GameEventTypeEnum::CARD_DRAWN);
-		$ctx->pushTurn([$firstCard], 'game');
-	}
+    public function setup(GameContext $ctx): void
+    {
+        $firstCard = $ctx->gameState->drawPile->getNext();
+        $ctx->startNewRound();
+        $ctx->pushEvent(GameEventTypeEnum::CARD_DRAWN);
+        $ctx->pushTurn([$firstCard], 'game');
+    }
 
-	public function getPlayerOrder(GameState $state): array
-	{
-		// array_keys() would do here, but PHP silently casts numeric-looking
-		// string keys to int - reading ->id directly keeps these real strings
-		$ids = array_map(fn (PlayerState $player): string => $player->id, array_values($state->players));
-		shuffle($ids);
+    public function getPlayerOrder(GameState $state): array
+    {
+        // array_keys() would do here, but PHP silently casts numeric-looking
+        // string keys to int - reading ->id directly keeps these real strings
+        $ids = array_map(fn (PlayerState $player): string => $player->id, array_values($state->players));
+        shuffle($ids);
 
-		return $ids;
-	}
+        return $ids;
+    }
 
-	public function isGameFinished(GameState $gameContext): bool
-	{
-		foreach ($gameContext->players as $player) {
-			if (0 === $player->score) {
-				// todo winner
-				/* $gameContext = $gameContext->withWinner($player); */
+    public function isGameFinished(GameState $gameContext): bool
+    {
+        foreach ($gameContext->players as $player) {
+            if (0 === $player->score) {
+                // todo winner
+                /* $gameContext = $gameContext->withWinner($player); */
 
-				return true;
-			}
-		}
+                return true;
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public function refreshScore(GameContext $ctx): void
-	{
-		foreach ($ctx->gameState->players as $player) {
-			if ($player->score !== $player->hand->count()) {
-				$ctx->pushScoreUpdate($player->id, $player->hand->count());
-			}
-		}
-	}
+    public function refreshScore(GameContext $ctx): void
+    {
+        foreach ($ctx->gameState->players as $player) {
+            if ($player->score !== $player->hand->count()) {
+                $ctx->pushScoreUpdate($player->id, $player->hand->count());
+            }
+        }
+    }
 
-	protected function doPlay(array $cards, GameContext $context, array $data): void
-	{
-		if (empty($cards)) {
-			$context->drawCard($context->gameState->currentPlayerId);
+    protected function doPlay(array $cards, GameContext $context, array $data): void
+    {
+        if (empty($cards)) {
+            $context->drawCard($context->gameState->currentPlayerId);
 
-			return;
-		}
+            return;
+        }
 
-		if (!$this->allSameRank($cards)) {
-			throw $this->createRuleException('cards.same_rank');
-		}
+        if (!$this->allSameRank($cards)) {
+            throw $this->createRuleException('cards.same_rank');
+        }
 
-		$round = $context->gameState->getCurrentRound();
+        $round = $context->gameState->getCurrentRound();
 
-		$lastTurnCards = $round->getLastTurn()->cardIds ?? [];
-		$lastCard = \end($lastTurnCards);
-		$lastCard = $context->gameState->getCardById($lastCard);
+        $lastTurnCards = $round->getLastTurn()->cardIds ?? [];
+        $lastCard = \end($lastTurnCards);
+        $lastCard = $context->gameState->getCardById($lastCard);
 
-		$activeSuit = $this->getActiveSuit($round, $lastCard);
-		$mainCard = $cards[0];
+        $activeSuit = $this->getActiveSuit($round, $lastCard);
+        $mainCard = $cards[0];
 
-		if (Rank::EIGHT === $mainCard->rank || Rank::JOKER === $mainCard->rank) {
-			if (!isset($data['suit'])) {
-				throw $this->createRuleException('suit.not_set');
-			}
+        if (Rank::EIGHT === $mainCard->rank || Rank::JOKER === $mainCard->rank) {
+            if (!isset($data['suit'])) {
+                throw $this->createRuleException('suit.not_set');
+            }
 
-			$suit = Suit::tryFrom($data['suit']);
+            $suit = Suit::tryFrom($data['suit']);
 
-			if (null === $suit) {
-				throw $this->createRuleException('suit.invalid');
-			}
+            if (null === $suit) {
+                throw $this->createRuleException('suit.invalid');
+            }
 
-			$context->pushEvent(GameEventTypeEnum::SUIT_CHANGED, [
-				'suit' => $suit->value,
-			]);
+            $context->pushEvent(GameEventTypeEnum::SUIT_CHANGED, [
+                'suit' => $suit->value,
+            ]);
 
-			$context->pushTurn($this->playedCardIds, null, ['suit' => $suit->value]);
+            $context->pushTurn($this->playedCardIds, null, ['suit' => $suit->value]);
 
-			if (Rank::JOKER === $mainCard->rank) {
-				$nextPlayerId = $context->gameState->getNextPlayerId();
+            if (Rank::JOKER === $mainCard->rank) {
+                $nextPlayerId = $context->gameState->getNextPlayerId();
 
-				for ($i = 0; $i < 4 * count($this->playedCardIds); ++$i) {
-					$context->drawCard($nextPlayerId);
-				}
+                for ($i = 0; $i < 4 * count($this->playedCardIds); ++$i) {
+                    $context->drawCard($nextPlayerId);
+                }
 
-				$context->skipNextPlayerTurn();
-			}
+                $context->skipNextPlayerTurn();
+            }
 
-			return;
-		}
+            return;
+        }
 
-		if ($lastCard->rank !== $mainCard->rank && $activeSuit !== $mainCard->suit) {
-			throw $this->createRuleException('cards.same_rank_or_suit', ['%rank%' => $lastCard->rank->value, '%suit%' => $activeSuit?->getSymbol()]);
-		}
+        if ($lastCard->rank !== $mainCard->rank && $activeSuit !== $mainCard->suit) {
+            throw $this->createRuleException('cards.same_rank_or_suit', ['%rank%' => $lastCard->rank->value, '%suit%' => $activeSuit?->getSymbol()]);
+        }
 
-		if (!\in_array($mainCard->rank, $this->getSpecialCardRank(), true)) {
-			$context->pushTurn($this->playedCardIds);
+        if (!\in_array($mainCard->rank, $this->getSpecialCardRank(), true)) {
+            $context->pushTurn($this->playedCardIds);
 
-			return;
-		}
+            return;
+        }
 
-		if (Rank::JACK === $mainCard->rank) {
-			$context->skipNextPlayerTurn();
-		}
+        if (Rank::JACK === $mainCard->rank) {
+            $context->skipNextPlayerTurn();
+        }
 
-		if (Rank::ACE === $mainCard->rank) {
-			count($context->gameState->players) === 2 ? $context->skipNextPlayerTurn() : $context->reversePlayerOrder();
-		}
+        if (Rank::ACE === $mainCard->rank) {
+            2 === count($context->gameState->players) ? $context->skipNextPlayerTurn() : $context->reversePlayerOrder();
+        }
 
-		if (Rank::TWO === $mainCard->rank) {
-			$nextPlayerId = $context->gameState->getNextPlayerId();
+        if (Rank::TWO === $mainCard->rank) {
+            $nextPlayerId = $context->gameState->getNextPlayerId();
 
-			for ($i = 0; $i < 2 * count($this->playedCardIds); ++$i) {
-				$context->drawCard($nextPlayerId);
-			}
+            for ($i = 0; $i < 2 * count($this->playedCardIds); ++$i) {
+                $context->drawCard($nextPlayerId);
+            }
 
-			$context->skipNextPlayerTurn();
-		}
+            $context->skipNextPlayerTurn();
+        }
 
-		$context->pushTurn($this->playedCardIds);
-	}
+        $context->pushTurn($this->playedCardIds);
+    }
 
-	/**
-	 * @return array<Rank>
-	 */
-	private function getSpecialCardRank(): array
-	{
-		return [
-			Rank::EIGHT,
-			Rank::JACK,
-			Rank::TWO,
-			Rank::ACE,
-		];
-	}
+    /**
+     * @return array<Rank>
+     */
+    private function getSpecialCardRank(): array
+    {
+        return [
+            Rank::EIGHT,
+            Rank::JACK,
+            Rank::TWO,
+            Rank::ACE,
+        ];
+    }
 
-	protected function getActiveSuit(Round $round, Card $card): ?Suit
-	{
-		$lastTurn = $round->getLastTurn();
+    protected function getActiveSuit(Round $round, Card $card): ?Suit
+    {
+        $lastTurn = $round->getLastTurn();
 
-		if (null === $lastTurn) {
-			return null;
-		}
+        if (null === $lastTurn) {
+            return null;
+        }
 
-		if (isset($lastTurn->data['suit'])) {
-			return Suit::from($lastTurn->data['suit']);
-		}
+        if (isset($lastTurn->data['suit'])) {
+            return Suit::from($lastTurn->data['suit']);
+        }
 
-		return $card->suit;
-	}
-
+        return $card->suit;
+    }
 }

@@ -4,16 +4,16 @@ namespace App\Game\Model\Card;
 
 final readonly class Hand extends AbstractCardStack
 {
-	public function has(string $cardId): bool
-	{
-		return \in_array($cardId, $this->cards, true);
-	}
+    public function has(string $cardId): bool
+    {
+        return \in_array($cardId, $this->cards, true);
+    }
 
-	/**
-	 * @param string[] $cardIds
-	 */
-	public function hasCards(array $cardIds): bool
-	{
-		return empty(array_diff($cardIds, $this->cards));
-	}
+    /**
+     * @param string[] $cardIds
+     */
+    public function hasCards(array $cardIds): bool
+    {
+        return empty(array_diff($cardIds, $this->cards));
+    }
 }

@@ -8,7 +8,7 @@ use App\Game\Model\State\GameState;
 
 interface GameStateProviderInterface
 {
-	public function get(string $id): GameState;
+    public function get(string $id): GameState;
 
-	public function save(string $id, GameState $gameState): void;
+    public function save(string $id, GameState $gameState): void;
 }

@@ -28,7 +28,7 @@ interface GameModeInterface
 
     public function isGameFinished(GameState $state): bool;
 
-	public function refreshScore(GameContext $ctx): void;
+    public function refreshScore(GameContext $ctx): void;
 
-	public function configureOptions(OptionsResolver $resolver): void;
+    public function configureOptions(OptionsResolver $resolver): void;
 }
