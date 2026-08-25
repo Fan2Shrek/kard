@@ -355,6 +355,68 @@ describe('Président: cartes triples', function () {
     })->throws('card.count.invalid');
 });
 
+describe('Président: jokers', function () {
+    test('Un joker joué seul compte comme un 2 et termine le tour', function () {
+        Arrange::setCurrentCard(7);
+
+        Act::playCard('joker', 's');
+
+        expect(Act::get('gameContext'))->toHaveNewRound();
+    });
+
+    test('Des jokers joués ensemble comptent comme des 2 et terminent le tour', function () {
+        Arrange::setCurrentCards([7, 7]);
+
+        Act::playCards([
+            ['joker', 's'],
+            ['joker', 'h'],
+        ]);
+
+        expect(Act::get('gameContext'))->toHaveNewRound();
+    });
+
+    test('Un joker joué avec une carte normale prend sa valeur', function () {
+        Arrange::setCurrentCards([8, 8]);
+
+        Act::playCards([
+            ['joker', 's'],
+            [9, 'h'],
+        ]);
+
+        // pas un 2, donc le tour continue simplement
+        expect(Act::get('gameContext'))->toHaveTurns(2);
+    });
+
+    test('La valeur prise par le joker doit respecter les règles habituelles', function () {
+        Arrange::setCurrentCards([9, 9]);
+
+        Act::playCards([
+            ['joker', 's'],
+            [8, 'h'],
+        ]);
+    })->throws('card.value.higher');
+
+    test('Un joker ne peut pas compenser des cartes de valeurs différentes', function () {
+        Arrange::setCurrentCard(3);
+
+        Act::playCards([
+            ['joker', 's'],
+            [8, 'h'],
+            [9, 'd'],
+        ]);
+    })->throws('card.values.not_same');
+
+    test('Un triple avec deux cartes normales et un joker est valide si les deux cartes ont la même valeur', function () {
+        Arrange::setCurrentCards([7, 7, 7]);
+
+        Act::playCards([
+            ['joker', 's'],
+            [8, 'h'],
+            [8, 'd'],
+        ]);
+    })->throwsNoExceptions();
+});
+
 describe('Président: début de partie', function () {
     beforeEach(function () {
         Arrange::setGameStarted();

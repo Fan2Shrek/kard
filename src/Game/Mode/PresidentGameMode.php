@@ -74,6 +74,8 @@ final class PresidentGameMode extends AbstractGameMode implements SetupGameModeI
             throw $this->createRuleException('card.count.invalid');
         }
 
+		$cards = $this->resolveJokerRanks($cards);
+
 		$currentRound = $context->gameState->getCurrentRound();
 
 		if ($currentRound === null) {
@@ -226,5 +228,24 @@ final class PresidentGameMode extends AbstractGameMode implements SetupGameModeI
 		$context->startNewRound();
 
 		$this->shouldPushEndTurn = false;
+	}
+
+	/**
+	 * Jokers played alone (or together with other jokers only) count as a Two.
+	 * Jokers played alongside a non-joker card take that card's rank instead.
+	 *
+	 * @param Card[] $cards
+	 *
+	 * @return Card[]
+	 */
+	private function resolveJokerRanks(array $cards): array
+	{
+		$nonJoker = array_find($cards, fn (Card $card): bool => Rank::JOKER !== $card->rank);
+		$rank = null !== $nonJoker ? $nonJoker->rank : Rank::TWO;
+
+		return array_map(
+			fn (Card $card): Card => Rank::JOKER === $card->rank ? new Card($card->id, $rank, $card->suit) : $card,
+			$cards,
+		);
 	}
 }
