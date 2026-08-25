@@ -1,0 +1,12 @@
+turn:
+  at_least_one_card: "Au moins une carte doit être jouée."
+
+rank:
+  not_set: "Le rang annoncé doit être précisé."
+  invalid: "Le rang annoncé n'est pas valide."
+  sequence:
+    invalid: "Rang invalide : %declared_rank% annoncé, %expected_rank% attendu."
+
+challenge:
+  no_cards: "Une contestation ne peut pas être accompagnée de cartes."
+  nothing_to_challenge: "Il n'y a rien à contester en tout début de round."
