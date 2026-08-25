@@ -5,12 +5,14 @@
         position: absolute;
         width: 100%;
         height: 100%;
+        pointer-events: none;
 
         .player-hand {
             position: absolute;
             display: flex;
             justify-content: center;
             align-items: center;
+            filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.35));
 
             &--top {
                 top: 20px;
@@ -48,23 +50,37 @@
         bottom: 10px;
         left: 50%;
         transform: translateX(-50%);
-        background-color: var(--bg-game-card);
-        padding: 10px 20px;
-        border-radius: 10px;
+        background: rgba(1, 59, 40, 0.75);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 10px 22px;
+        border-radius: 999px;
         font-size: 1.2rem;
         font-weight: bold;
         color: var(--text-primary);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         z-index: 100;
+        animation: helper-pop 0.25s ease-out;
     }
 
     .game {
-        background-color: var(--bg-game-card);
+        position: relative;
+        background:
+            radial-gradient(ellipse at 50% 35%, var(--bg-game-card-light) 0%, var(--bg-game-card) 55%, #013b28 100%);
+
+        &::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background-image: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.015) 0, rgba(255, 255, 255, 0.015) 2px, transparent 2px, transparent 6px);
+        }
 
         &__background {
             position: absolute;
-            border: 5px solid white;
-            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 16px;
             color: white;
             height: 75vh;
             width: 90vw;
@@ -74,8 +90,9 @@
             align-items: center;
             top: 50%;
             left: 50%;
-            opacity: 0.1;
+            opacity: 0.12;
             transform: translate(-50%, -50%);
+            box-shadow: inset 0 0 60px rgba(255, 255, 255, 0.08);
 
             .title {
                 font-size: 10rem;
@@ -83,6 +100,7 @@
                 font-optical-sizing: auto;
                 font-weight: 400;
                 font-style: normal;
+                text-shadow: 0 0 40px rgba(255, 255, 255, 0.45);
                 font-variation-settings:
                     "EDPT" 100,
                     "EHLT" 12;
@@ -91,12 +109,26 @@
             .subtitle {
                 font-size: 2rem;
                 margin-top: -20px;
+                letter-spacing: 0.05em;
             }
 
             .quote {
                 font-size: 1rem;
                 font-style: italic;
+                opacity: 0.85;
             }
         }
+    }
+}
+
+@keyframes helper-pop {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
     }
 }
