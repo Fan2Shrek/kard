@@ -41,7 +41,7 @@ final class GameManager implements ServiceSubscriberInterface
         private ContainerInterface $container,
         private GameStateProviderInterface $gameStateProvider,
         private GameEventApplier $gea,
-		private EventPublisher $publisher,
+        private EventPublisher $publisher,
     ) {
     }
 
@@ -54,76 +54,76 @@ final class GameManager implements ServiceSubscriberInterface
         ];
     }
 
-	public function getDefaultConfiguration(GameModeEnum $gameMode): GameConfiguration
-	{
-		return $this->buildConfiguration($gameMode, []);
-	}
+    public function getDefaultConfiguration(GameModeEnum $gameMode): GameConfiguration
+    {
+        return $this->buildConfiguration($gameMode, []);
+    }
 
-	/**
-	 * @param array<string, mixed> $rawOptions
-	 */
-	public function buildConfiguration(GameModeEnum $gameModeEnum, array $rawOptions): GameConfiguration
-	{
-		$gameMode = $this->getGameMode($gameModeEnum);
+    /**
+     * @param array<string, mixed> $rawOptions
+     */
+    public function buildConfiguration(GameModeEnum $gameModeEnum, array $rawOptions): GameConfiguration
+    {
+        $gameMode = $this->getGameMode($gameModeEnum);
 
-		return new GameConfigurationBuilder()->build($gameMode, $rawOptions);
-	}
+        return new GameConfigurationBuilder()->build($gameMode, $rawOptions);
+    }
 
     public function start(Room $room): GameState
     {
         $gameMode = $this->getGameMode($room->getGameMode()->getValue());
-		$deck = $this->createDeck($room->getConfiguration());
-		$cards = $deck->cards;
+        $deck = $this->createDeck($room->getConfiguration());
+        $cards = $deck->cards;
         [$hands, $drawPile] = $this->drawHands($deck, $room->getParticipants()->count(), $gameMode);
-		// DrawPile is keyed by card id with id values too (like Hand/DiscardPile),
-		// not the Card objects themselves - array_map preserves the id keys here
-		$drawPileIds = array_map(fn (Card $card): string => $card->id, $drawPile);
+        // DrawPile is keyed by card id with id values too (like Hand/DiscardPile),
+        // not the Card objects themselves - array_map preserves the id keys here
+        $drawPileIds = array_map(fn (Card $card): string => $card->id, $drawPile);
 
-		$players = [];
+        $players = [];
 
-		foreach ($room->getParticipants() as $k => $player) {
-			$hand = $hands[$k];
+        foreach ($room->getParticipants() as $k => $player) {
+            $hand = $hands[$k];
 
-			$players[] = new PlayerState(
-				$player->getId()->toString(),
-				$player->getUsername(),
-				count($hand),
-				new Hand(array_map(fn (Card $card): string => $card->id, $hand)),
-			);
-		}
+            $players[] = new PlayerState(
+                $player->getId()->toString(),
+                $player->getUsername(),
+                count($hand),
+                new Hand(array_map(fn (Card $card): string => $card->id, $hand)),
+            );
+        }
 
-		$state = new GameState(
-			$players,
-			[],
-			'',
-			[],
-			new DiscardPile([]),
-			new DrawPile($drawPileIds),
-			array_combine(array_map(fn (Card $card) => $card->id, $cards), $cards)
-		);
+        $state = new GameState(
+            $players,
+            [],
+            '',
+            [],
+            new DiscardPile([]),
+            new DrawPile($drawPileIds),
+            array_combine(array_map(fn (Card $card) => $card->id, $cards), $cards)
+        );
 
         $order = $gameMode->getPlayerOrder($state);
 
-		$state = new GameState(
-			$players,
-			$order,
-			current($order),
-			[],
-			new DiscardPile([]),
-			new DrawPile($drawPileIds),
-			array_combine(array_map(fn (Card $card) => $card->id, $cards), $cards)
-		);
+        $state = new GameState(
+            $players,
+            $order,
+            current($order),
+            [],
+            new DiscardPile([]),
+            new DrawPile($drawPileIds),
+            array_combine(array_map(fn (Card $card) => $card->id, $cards), $cards)
+        );
 
         if ($gameMode instanceof SetupGameModeInterface) {
-			$ctx = $this->createGameContext($state);
+            $ctx = $this->createGameContext($state);
             $gameMode->setup($ctx);
 
-			foreach ($ctx->flushEvents() as $event) {
-				$state = $this->gea->apply($event, $state);
-			}
+            foreach ($ctx->flushEvents() as $event) {
+                $state = $this->gea->apply($event, $state);
+            }
         }
 
-		$this->gameStateProvider->save($room->getId()->toString(), $state);
+        $this->gameStateProvider->save($room->getId()->toString(), $state);
 
         return $state;
     }
@@ -134,7 +134,7 @@ final class GameManager implements ServiceSubscriberInterface
      */
     public function play(Room $room, User $user, array $cards, array $data = []): void
     {
-		$state = $this->gameStateProvider->get($room->getId()->toString());
+        $state = $this->gameStateProvider->get($room->getId()->toString());
         $player = $this->resolveActingPlayer($state, $user->getId()->toString());
 
         $this->assertCanPlay($state, $player);
@@ -153,26 +153,26 @@ final class GameManager implements ServiceSubscriberInterface
         $gameMode->play($cards, $context, $player->id, $data);
         $events = $context->flushEvents();
 
-		foreach ($events as $event) {
-			$state = $this->gea->apply($event, $state);
-		}
+        foreach ($events as $event) {
+            $state = $this->gea->apply($event, $state);
+        }
 
-		$context = new GameContext($state);
-		$gameMode->refreshScore($context);
-		$scoreEvents = $context->flushEvents();
+        $context = new GameContext($state);
+        $gameMode->refreshScore($context);
+        $scoreEvents = $context->flushEvents();
 
-		foreach ($scoreEvents as $event) {
-			$state = $this->gea->apply($event, $state);
-		}
+        foreach ($scoreEvents as $event) {
+            $state = $this->gea->apply($event, $state);
+        }
 
-		$events = array_merge($events, $scoreEvents);
+        $events = array_merge($events, $scoreEvents);
 
         $this->dispatchEvents($events);
         $this->finishGameIfNeeded($room, $player, $state, $gameMode);
 
-		$this->gameStateProvider->save($room->getId()->toString(), $state);
+        $this->gameStateProvider->save($room->getId()->toString(), $state);
 
-		$this->publisher->publish($room, $events);
+        $this->publisher->publish($room, $events);
     }
 
     private function getGameMode(GameModeEnum $gameModeEnum): GameModeInterface
@@ -206,9 +206,9 @@ final class GameManager implements ServiceSubscriberInterface
         return $state->withCurrentPlayer($player->id);
     }
 
-	/**
-	 * @param GameEvent[] $events
-	 */
+    /**
+     * @param GameEvent[] $events
+     */
     private function dispatchEvents(array $events): void
     {
         foreach ($events as $event) {
@@ -233,20 +233,20 @@ final class GameManager implements ServiceSubscriberInterface
         $this->container->get('result_repository')->save($result);
     }
 
-	private function createDeck(GameConfiguration $config): Deck
-	{
-		$deck = new DeckBuilder();
+    private function createDeck(GameConfiguration $config): Deck
+    {
+        $deck = new DeckBuilder();
 
-		if ($config->hasJokers()) {
-			$deck->withJokers();
-		}
+        if ($config->hasJokers()) {
+            $deck->withJokers();
+        }
 
-		if ($config->deckCount() > 1) {
-			$deck->withDeckCount($config->deckCount());
-		}
+        if ($config->deckCount() > 1) {
+            $deck->withDeckCount($config->deckCount());
+        }
 
-		return $deck->build()->shuffle();
-	}
+        return $deck->build()->shuffle();
+    }
 
     /**
      * @return array{
@@ -256,32 +256,32 @@ final class GameManager implements ServiceSubscriberInterface
      */
     private function drawHands(Deck $deck, int $count, GameModeInterface $gameMode): array
     {
-		$cardPerPlayer = $gameMode->getCardsCount($count);
+        $cardPerPlayer = $gameMode->getCardsCount($count);
 
-		if (null === $cardPerPlayer) {
-			$baseCards = intdiv(count($deck->cards), $count);
-			$remainder = count($deck->cards) % $count;
+        if (null === $cardPerPlayer) {
+            $baseCards = intdiv(count($deck->cards), $count);
+            $remainder = count($deck->cards) % $count;
 
-			$cardsPerPlayer = array_fill(0, $count, $baseCards);
-			for ($i = 0; $i < $remainder; ++$i) {
-				++$cardsPerPlayer[$i];
-			}
-		} else {
-			$cardsPerPlayer = array_fill(0, $count, $cardPerPlayer);
-		}
+            $cardsPerPlayer = array_fill(0, $count, $baseCards);
+            for ($i = 0; $i < $remainder; ++$i) {
+                ++$cardsPerPlayer[$i];
+            }
+        } else {
+            $cardsPerPlayer = array_fill(0, $count, $cardPerPlayer);
+        }
 
-		$remainingCards = $deck->cards;
-		$hands = [];
+        $remainingCards = $deck->cards;
+        $hands = [];
 
-		foreach ($cardsPerPlayer as $count) {
-			$hands[] = array_splice($remainingCards, 0, $count);
-		}
+        foreach ($cardsPerPlayer as $count) {
+            $hands[] = array_splice($remainingCards, 0, $count);
+        }
 
-		return [$hands, $remainingCards];
+        return [$hands, $remainingCards];
     }
 
-	private function createGameContext(GameState $state): GameContext
-	{
-		return new GameContext($state);
-	}
+    private function createGameContext(GameState $state): GameContext
+    {
+        return new GameContext($state);
+    }
 }

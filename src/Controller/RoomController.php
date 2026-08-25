@@ -8,15 +8,15 @@ use App\Entity\Room;
 use App\Enum\DeckSkinEnum;
 use App\Enum\GameStatusEnum;
 use App\Event\Room\RoomEvent;
-use App\Repository\GameModeDescriptionRepository;
-use App\Repository\GameModeRepository;
-use App\Repository\RoomRepository;
-use App\Service\AssetsProvider;
 use App\Game\GameManager;
 use App\Game\Mode\GameModeEnum;
 use App\Game\Model\Card\Hand;
 use App\Game\Model\State\PlayerState;
 use App\Game\StateProvider\GameStateProviderInterface;
+use App\Repository\GameModeDescriptionRepository;
+use App\Repository\GameModeRepository;
+use App\Repository\RoomRepository;
+use App\Service\AssetsProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,7 +44,7 @@ final class RoomController extends AbstractController
         Request $request,
         GameModeRepository $gameModeRepository,
         GameModeDescriptionRepository $gameModeDescriptionRepository,
-		GameManager $gameManager,
+        GameManager $gameManager,
     ): Response {
         if (Request::METHOD_POST === $request->getMethod()) {
             $gameModeEnum = GameModeEnum::from($request->getPayload()->get('gameMode'));
@@ -54,7 +54,7 @@ final class RoomController extends AbstractController
             $room = new Room($gameMode);
             $room->setOwner($user);
             $room->addParticipant($user);
-			$room->setConfiguration($gameManager->getDefaultConfiguration($gameModeEnum));
+            $room->setConfiguration($gameManager->getDefaultConfiguration($gameModeEnum));
 
             $this->roomRepository->save($room);
             $this->eventDispatcher->dispatch(new RoomEvent($room), 'room.created');
@@ -104,30 +104,30 @@ final class RoomController extends AbstractController
                 \sprintf('game-%s-waiting', $room->getId()),
                 $this->renderView('components/turbo/player-join.html.twig', [
                     'player' => new PlayerState(
-						$user->getId()->toString(),
-						$user->getUsername(),
-						0,
-						new Hand([]),
-					),
+                        $user->getId()->toString(),
+                        $user->getUsername(),
+                        0,
+                        new Hand([]),
+                    ),
                 ])
             ));
         }
 
         $players = array_map(
             fn ($player): PlayerState => new PlayerState(
-				$player->getId()->toString(),
-				$player->getUsername(),
-				0,
-				new Hand([]),
-			),
+                $player->getId()->toString(),
+                $player->getUsername(),
+                0,
+                new Hand([]),
+            ),
             $room->getParticipants()->toArray(),
         );
 
         return $this->render('home/waiting.html.twig', [
             'room' => $room,
             'players' => $players,
-			'configuration' => $room->getConfiguration(),
-			'skins' => DeckSkinEnum::cases(),
+            'configuration' => $room->getConfiguration(),
+            'skins' => DeckSkinEnum::cases(),
         ]);
     }
 
@@ -259,11 +259,11 @@ final class RoomController extends AbstractController
     ): Response {
         $user = $this->getUser();
 
-		$state = $gameStateProvider->get($room->getId()->toString());
-		$assets = $assetsProvider->getAssets($state->cards, $room->getConfiguration()->getSkin());
-		$isParticipant = \in_array($user, $room->getParticipants()->toArray(), true);
-		$viewerId = $isParticipant ? $user->getId()->toString() : null;
-		$dto = GameStateDTO::fromState($state, $viewerId);
+        $state = $gameStateProvider->get($room->getId()->toString());
+        $assets = $assetsProvider->getAssets($state->cards, $room->getConfiguration()->getSkin());
+        $isParticipant = \in_array($user, $room->getParticipants()->toArray(), true);
+        $viewerId = $isParticipant ? $user->getId()->toString() : null;
+        $dto = GameStateDTO::fromState($state, $viewerId);
 
         if (!$isParticipant) {
             return $this->render('home/game.html.twig', [

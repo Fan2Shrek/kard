@@ -8,14 +8,13 @@ use App\Game\Exception\RuleException;
 use App\Game\Model\Card\Card;
 use App\Game\Model\GameContext;
 use App\Game\Model\State\GameState;
-use Override;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 abstract class AbstractGameMode implements GameModeInterface
 {
     protected GameState $gameState;
 
-	protected bool $shouldPushEndTurn = true;
+    protected bool $shouldPushEndTurn = true;
 
     /**
      * @var string[]
@@ -30,18 +29,18 @@ abstract class AbstractGameMode implements GameModeInterface
         // rather than relying on every round-ending branch to restore it itself
         $this->shouldPushEndTurn = true;
 
-		$this->validatePlay($cards, $context, $playerId, $data);
+        $this->validatePlay($cards, $context, $playerId, $data);
 
-		$cards = array_map(fn (string $c) => $context->gameState->getCardById($c), $cards);
+        $cards = array_map(fn (string $c) => $context->gameState->getCardById($c), $cards);
 
         $this->doPlay($cards, $context, $data);
 
-		$this->postPlay($context, $playerId, $data);
+        $this->postPlay($context, $playerId, $data);
     }
 
-	public function configureOptions(OptionsResolver $resolver): void
-	{
-	}
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+    }
 
     /**
      * This method implements the game rules.
@@ -62,30 +61,30 @@ abstract class AbstractGameMode implements GameModeInterface
         return $e;
     }
 
-	/**
-	 * @param string[]              $cards
-	 * @param array<string, mixed>  $data
-	 */
-	protected function validatePlay(array $cards, GameContext $context, string $playerId, array $data = []): void
-	{
-		$hand = $context->gameState->getPlayerStateById($playerId)->hand;
+    /**
+     * @param string[]             $cards
+     * @param array<string, mixed> $data
+     */
+    protected function validatePlay(array $cards, GameContext $context, string $playerId, array $data = []): void
+    {
+        $hand = $context->gameState->getPlayerStateById($playerId)->hand;
 
-		if (!$hand->hasCards($cards)) {
-			throw $this->createRuleException('Card not in your hand');
-		}
-	}
+        if (!$hand->hasCards($cards)) {
+            throw $this->createRuleException('Card not in your hand');
+        }
+    }
 
-	/**
-	 * @param array<string, mixed> $data
-	 */
-	protected function postPlay(GameContext $context, string $playerId, array $data = []): void
-	{
-		foreach ($this->playedCardIds as $cardId) {
-			$context->pushCardDiscarded($cardId, $playerId);
-		}
+    /**
+     * @param array<string, mixed> $data
+     */
+    protected function postPlay(GameContext $context, string $playerId, array $data = []): void
+    {
+        foreach ($this->playedCardIds as $cardId) {
+            $context->pushCardDiscarded($cardId, $playerId);
+        }
 
-		if ($this->shouldPushEndTurn) {
-			$context->pushEndTurn();
-		}
-	}
+        if ($this->shouldPushEndTurn) {
+            $context->pushEndTurn();
+        }
+    }
 }

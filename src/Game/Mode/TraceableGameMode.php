@@ -64,17 +64,17 @@ final class TraceableGameMode implements GameModeInterface, SetupGameModeInterfa
         return $this->gameMode->isGameFinished($state);
     }
 
-	public function refreshScore(GameContext $ctx): void
-	{
-		$event = $this->stopwatch->start('game_mode_refresh_score');
+    public function refreshScore(GameContext $ctx): void
+    {
+        $event = $this->stopwatch->start('game_mode_refresh_score');
 
-		$this->gameMode->refreshScore($ctx);
+        $this->gameMode->refreshScore($ctx);
 
-		$event->stop();
-	}
+        $event->stop();
+    }
 
-	public function configureOptions(OptionsResolver $resolver): void
-	{
-		$this->gameMode->configureOptions($resolver);
-	}
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $this->gameMode->configureOptions($resolver);
+    }
 }

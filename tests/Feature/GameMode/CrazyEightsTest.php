@@ -3,9 +3,9 @@
 use App\Entity\GameMode;
 use App\Enum\GameEventTypeEnum;
 use App\Game\Exception\RuleException;
-use App\Game\Model\Card\Hand;
 use App\Game\Mode\CrazyEightsGameMode;
 use App\Game\Mode\GameModeEnum;
+use App\Game\Model\Card\Hand;
 use App\Tests\AAA\Act\Act;
 use App\Tests\AAA\Arrange\Arrange;
 

@@ -6,7 +6,7 @@ namespace App\Enum;
 
 enum DeckSkinEnum: string
 {
-	case DEFAULT = 'default';
-	case BETA = 'beta';
-	case V1 = 'v1';
+    case DEFAULT = 'default';
+    case BETA = 'beta';
+    case V1 = 'v1';
 }
