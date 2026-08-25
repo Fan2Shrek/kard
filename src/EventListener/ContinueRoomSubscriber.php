@@ -48,6 +48,7 @@ final class ContinueRoomSubscriber implements EventSubscriberInterface
                 'action' => 'end',
                 'data' => [
                     'context' => $event->context,
+                    'winner' => ['username' => $event->winner->getUsername()],
                     'url' => $this->router->generate('waiting', ['id' => $newRoom->getId()]),
                 ],
             ], 'json'),

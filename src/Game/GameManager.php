@@ -224,12 +224,11 @@ final class GameManager implements ServiceSubscriberInterface
 
         $room->setStatus(GameStatusEnum::FINISHED);
 
-        $result = new Result(
-            $this->container->get('user_repository')->find($player->id),
-            $room,
-        );
+        $winner = $this->container->get('user_repository')->find($player->id);
 
-        $this->container->get('event_dispatcher')->dispatch(new GameFinishedEvent($room, $state));
+        $result = new Result($winner, $room);
+
+        $this->container->get('event_dispatcher')->dispatch(new GameFinishedEvent($room, $state, $winner));
         $this->container->get('result_repository')->save($result);
     }
 
