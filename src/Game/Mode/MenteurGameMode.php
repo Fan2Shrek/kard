@@ -177,6 +177,7 @@ final class MenteurGameMode extends AbstractGameMode implements SetupGameModeInt
         $winnerId = $wasLying ? $challengerId : $declarerId;
 
         $context->givePileToPlayer($loserId);
+        $context->startNewRound();
         $context->setCurrentPlayer($winnerId);
         $context->pushChallengeResult($challengerId, $declarerId, $declaredRank->value, $wasLying);
 
