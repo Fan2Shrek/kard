@@ -117,4 +117,50 @@ class GameContext
 	public function reversePlayerOrder(): void
 	{
 		$this->pushEvent(GameEventTypeEnum::REVERSE_PLAYERS_ORDER); }
+
+	public function resetRound(): void
+	{
+		$this->pushEvent(GameEventTypeEnum::ROUND_RESET);
+	}
+
+	public function setCurrentPlayer(string $playerId): void
+	{
+		$this->pushEvent(GameEventTypeEnum::CURRENT_PLAYER_SET, [
+			'playerId' => $playerId,
+		]);
+	}
+
+	public function pushChallengeResult(string $challengerId, string $declarerId, string $declaredRank, bool $wasLying): void
+	{
+		$this->pushEvent(GameEventTypeEnum::CHALLENGE_RESULT, [
+			'challengerId' => $challengerId,
+			'declarerId' => $declarerId,
+			'declaredRank' => $declaredRank,
+			'wasLying' => $wasLying,
+		]);
+	}
+
+	/**
+	 * Gives every card currently in the round's pile (not yet in the discard pile) to a player,
+	 * then resets the round so a fresh declaration cycle can start.
+	 */
+	public function givePileToPlayer(string $recipientId): void
+	{
+		$round = $this->gameState->getCurrentRound();
+
+		if ($round === null) {
+			throw new \RuntimeException('No round found in game state.');
+		}
+
+		foreach ($round->turns as $turn) {
+			foreach ($turn->cardIds as $cardId) {
+				$this->pushEvent(GameEventTypeEnum::CARD_GIVEN, [
+					'cardId' => $cardId,
+					'toPlayerId' => $recipientId,
+				]);
+			}
+		}
+
+		$this->resetRound();
+	}
 }
