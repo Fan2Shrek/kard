@@ -13,7 +13,7 @@ class GameConfiguration implements \JsonSerializable
 
 	public function hasJokers(): bool
 	{
-		return $this->options['withJokers'];
+		return $this->options['withJokers'] ?? false;
 	}
 
 	public function deckCount(): int

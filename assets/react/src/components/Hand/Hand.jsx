@@ -4,17 +4,23 @@ import s from 'react-sortablejs';
 import { Card, SortButton } from '../components.js';
 import { GameContext } from '../../Context/GameContext.js';
 import { AssetsContext } from '../../Context/AssetsContext.js';
+import { sortByRank } from '../../lib/sort.js';
 import api from '../../lib/api.js';
 
 import './hand.css';
 
+// Matches SortButton's own default rankOrder - kept here too so the hand is
+// sorted by value from the first render, whatever game mode is showing it.
+const DEFAULT_RANK_ORDER = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'j', 'q', 'k', '1'];
+
 export default forwardRef(({ hand, canPlay, order = null, gameActions = null }, ref) => {
 	const { roomId, currentPlayer } = useContext(GameContext);
 	const { getCardAsset } = useContext(AssetsContext);
+	const rankOrder = order ?? DEFAULT_RANK_ORDER;
 	const [selectedCards, setSelectedCards] = useState([]);
-	const [cards, setCards] = useState(hand);
+	const [cards, setCards] = useState(() => sortByRank([...hand], rankOrder));
 	const [error, setError] = useState(null);
-	const [currentSort, setCurrentSort] = useState(null);
+	const [currentSort, setCurrentSort] = useState(() => (c) => sortByRank(c, rankOrder));
 
 	useEffect(() => {
 		setCards(oldHand => (currentSort ? currentSort(hand) : [

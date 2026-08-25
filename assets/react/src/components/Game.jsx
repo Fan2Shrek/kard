@@ -6,6 +6,7 @@ import { AnimationContext } from '../Context/AnimationContext.js';
 import {
     Board,
     CrazyEightsBoard,
+    MenteurBoard,
     PresidentBoard,
 } from './components.js';
 
@@ -98,6 +99,7 @@ export default ({ gameContext, player: userJson, gameMode, roomId }) => {
             <Board players={ctx.players.filter((gamePlayer) => player?.id !== gamePlayer.id)}>
                 { 'president' === gameMode && <PresidentBoard ctx={ctx} player={player} /> }
                 { 'crazy_eights' === gameMode && <CrazyEightsBoard ctx={ctx} player={player} /> }
+                { 'menteur' === gameMode && <MenteurBoard ctx={ctx} player={player} /> }
             </Board>
         </GameContext>
     </div>;
