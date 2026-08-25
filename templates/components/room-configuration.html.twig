@@ -16,6 +16,17 @@
                 </span>
                 <input type="number" name="deckCount" min="1" max="{{ constant('App\\Game\\Builder\\GameConfigurationBuilder::MAX_DECK_COUNT') }}" value="{{ configuration.deckCount }}" />
             </label>
+            <label class="room-configuration__field">
+                <span>
+                    <twig:UX:Icon name="lucide:image" />
+                    Skin des cartes
+                </span>
+                <select name="skin">
+                    {% for skin in skins %}
+                        <option value="{{ skin.value }}" {{ skin == configuration.getSkin ? 'selected' : '' }}>{{ skin.value|capitalize }}</option>
+                    {% endfor %}
+                </select>
+            </label>
             <twig:Button
                 type="submit"
                 text="Mettre à jour"
@@ -33,6 +44,11 @@
                 <twig:UX:Icon name="lucide:layers" />
                 Decks
                 <strong>{{ configuration.deckCount }}</strong>
+            </li>
+            <li>
+                <twig:UX:Icon name="lucide:image" />
+                Skin
+                <strong>{{ configuration.getSkin.value|capitalize }}</strong>
             </li>
         </ul>
     {% endif %}

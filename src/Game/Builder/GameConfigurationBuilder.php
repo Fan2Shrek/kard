@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Game\Builder;
 
+use App\Enum\DeckSkinEnum;
 use App\Game\Mode\GameModeInterface;
 use App\Game\Model\GameConfiguration;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -18,6 +19,7 @@ final class GameConfigurationBuilder
         $resolver->setDefaults([
             'withJokers' => false,
             'deckCount' => 1,
+			'skin' => DeckSkinEnum::DEFAULT,
         ]);
         $resolver->setAllowedTypes('withJokers', 'bool');
         $resolver->setAllowedTypes('deckCount', 'int');

@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Domain\DTO\GameStateDTO;
 use App\Entity\GameModeDescription;
 use App\Entity\Room;
+use App\Enum\DeckSkinEnum;
 use App\Enum\GameStatusEnum;
 use App\Event\Room\RoomEvent;
 use App\Repository\GameModeDescriptionRepository;
@@ -126,6 +127,7 @@ final class RoomController extends AbstractController
             'room' => $room,
             'players' => $players,
 			'configuration' => $room->getConfiguration(),
+			'skins' => DeckSkinEnum::cases(),
         ]);
     }
 
@@ -144,6 +146,7 @@ final class RoomController extends AbstractController
         $rawOptions = [
             'withJokers' => $payload->getBoolean('withJokers'),
             'deckCount' => $payload->getInt('deckCount', 1),
+            'skin' => $payload->getEnum('skin', DeckSkinEnum::class, DeckSkinEnum::DEFAULT),
         ];
 
         $room->setConfiguration($this->gameManager->buildConfiguration($room->getGameMode()->getValue(), $rawOptions));
@@ -154,6 +157,7 @@ final class RoomController extends AbstractController
             $this->renderView('components/turbo/room-configuration.html.twig', [
                 'room' => $room,
                 'configuration' => $room->getConfiguration(),
+                'skins' => DeckSkinEnum::cases(),
             ])
         ));
 
@@ -256,7 +260,7 @@ final class RoomController extends AbstractController
         $user = $this->getUser();
 
 		$state = $gameStateProvider->get($room->getId()->toString());
-		$assets = $assetsProvider->getAssets($state->cards);
+		$assets = $assetsProvider->getAssets($state->cards, $room->getConfiguration()->getSkin());
 		$isParticipant = \in_array($user, $room->getParticipants()->toArray(), true);
 		$viewerId = $isParticipant ? $user->getId()->toString() : null;
 		$dto = GameStateDTO::fromState($state, $viewerId);
