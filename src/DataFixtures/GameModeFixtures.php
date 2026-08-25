@@ -24,5 +24,11 @@ class GameModeFixtures extends AbstractFixtures
             'value' => GameModeEnum::CRAZY_EIGHTS,
             'active' => false,
         ];
+
+        yield [
+            'name' => 'Menteur',
+            'value' => GameModeEnum::MENTEUR,
+            'active' => false,
+        ];
     }
 }

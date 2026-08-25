@@ -25,9 +25,12 @@ final class GameEventApplier
             GameEventTypeEnum::SCORE_UPDATED => $this->handleScoreUpdated($gameState, $event),
             GameEventTypeEnum::ROUND_ENDED => $this->handleRoundEnded($gameState),
             GameEventTypeEnum::REVERSE_PLAYERS_ORDER => $this->handleReversePlayersOrder($gameState),
+            GameEventTypeEnum::ROUND_RESET => $this->handleRoundReset($gameState),
+            GameEventTypeEnum::CURRENT_PLAYER_SET => $this->handleCurrentPlayerSet($gameState, $event),
 
             GameEventTypeEnum::CARD_OR_NOTHING_CALLED,
-            GameEventTypeEnum::SUIT_CHANGED => $gameState,
+            GameEventTypeEnum::SUIT_CHANGED,
+            GameEventTypeEnum::CHALLENGE_RESULT => $gameState,
         };
 
         return $newState;
@@ -38,6 +41,22 @@ final class GameEventApplier
         $order = array_reverse($state->playerOrder);
 
         return $state->withPlayerOrder($order);
+    }
+
+    private function handleRoundReset(GameState $state): GameState
+    {
+        return $state->withRounds([]);
+    }
+
+    private function handleCurrentPlayerSet(GameState $state, GameEvent $event): GameState
+    {
+        $playerId = $event->payload['playerId'] ?? null;
+
+        if (null === $playerId) {
+            throw new \RuntimeException('No playerId found in event payload.');
+        }
+
+        return $state->withCurrentPlayer($playerId);
     }
 
     private function handleCardDrawn(GameState $state): GameState

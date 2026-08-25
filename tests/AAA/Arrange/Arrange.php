@@ -85,6 +85,24 @@ abstract /* static */ class Arrange
     }
 
     /**
+     * Like setRound(), but each turn also carries the rank it declared (Menteur) -
+     * needed to arrange a round a challenge can be resolved against. Turns are
+     * attributed to 'player2-id' rather than 'other' so a challenge can actually
+     * give them the pile (CARD_GIVEN requires a player registered in the state).
+     *
+     * @param array<array{cards: array<int, int|string>, rank: int|string}> $turns
+     */
+    public static function setMenteurRound(array $turns): void
+    {
+        Act::addContext('gameContext', static::createGameState(
+            array_map(
+                fn (array $turn) => new Turn('player2-id', self::cardIdsForRanks($turn['cards']), ['rank' => (string) $turn['rank']]),
+                $turns,
+            ),
+        ));
+    }
+
+    /**
      * @param array<array{0: string, 1: string}|string> $players tuples of [id, name] or [id, name, score]
      */
     public static function setPlayers(array $players): void

@@ -106,11 +106,13 @@ final readonly class PlayerStateDTO
 final readonly class TurnDTO
 {
     /**
-     * @param Card[] $cards empty means this turn was a pass
+     * @param Card[]               $cards empty means this turn was a pass
+     * @param array<string, mixed> $data  game-mode-specific extras (e.g. Menteur's declared rank, Crazy Eights' chosen suit)
      */
     public function __construct(
         public string $playerId,
         public array $cards,
+        public array $data,
     ) {
     }
 
@@ -119,6 +121,7 @@ final readonly class TurnDTO
         return new self(
             $turn->playerId,
             array_values(array_map(fn (string $cardId): Card => $state->cards[$cardId], $turn->cardIds)),
+            $turn->data,
         );
     }
 }
