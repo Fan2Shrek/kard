@@ -24,6 +24,20 @@ const eventMessages = {
         return username ? `Le tour de ${username} est passé` : null;
     },
     reverse_players_order: () => 'Le sens du jeu est inversé',
+    challenge_result: (payload, ctx) => {
+        const challenger = ctx.players.find((p) => p.id === payload.challengerId)?.username;
+        const declarer = ctx.players.find((p) => p.id === payload.declarerId)?.username;
+
+        if (!challenger || !declarer) {
+            return null;
+        }
+
+        const outcome = payload.wasLying
+            ? `${declarer} avait menti et récupère le tas`
+            : `${declarer} disait vrai, ${challenger} récupère le tas`;
+
+        return `${challenger} crie Menteur ! ${outcome}`;
+    },
     turn_played: (payload, ctx) => {
         if (0 !== (payload.cards ?? []).length) {
             return null;
