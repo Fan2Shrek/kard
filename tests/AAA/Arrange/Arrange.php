@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace App\Tests\AAA\Arrange;
 
-use App\Entity\Room;
-use App\Enum\Card\Rank;
-use App\Enum\Card\Suit;
-use App\Model\Card\Card;
-use App\Model\Card\Hand;
-use App\Model\GameContext;
-use App\Model\Player;
-use App\Model\Turn;
+use App\Game\Model\Card\DiscardPile;
+use App\Game\Model\Card\DrawPile;
+use App\Game\Model\Card\Hand;
+use App\Game\Model\State\GameState;
+use App\Game\Model\State\PlayerState;
+use App\Game\Model\State\Round;
+use App\Game\Model\State\Turn;
 use App\Tests\AAA\Act\Act;
-use Ramsey\Uuid\Uuid;
 
 abstract /* static */ class Arrange
 {
@@ -28,98 +26,119 @@ abstract /* static */ class Arrange
             $rank = (string) $rank;
         }
 
-        $card = new Card(Suit::from($suit), Rank::from($rank));
-        Act::addContext('gameContext', self::createGameContext([new Turn([$card])]));
+        $cardId = Act::card($rank, $suit)->id;
+        Act::addContext('gameContext', self::createGameState([new Turn('other', [$cardId])]));
     }
 
     public static function setCurrentCards(array $cards): void
     {
-        Act::addContext('gameContext', self::createGameContext([new Turn(array_map(fn (int $card) => new Card(Suit::SPADES, Rank::from((string) $card)), $cards))]));
+        Act::addContext('gameContext', self::createGameState([new Turn('other', self::cardIdsForRanks($cards))]));
     }
 
     public static function setCurrentHand(array $cards): void
     {
-        Act::addContext('handCards', array_map(fn (array $card) => new Card(Suit::from($card[1]), Rank::from((string) $card[0])), $cards));
+        Act::addContext('handCards', array_map(
+            fn (array $card) => Act::card((string) $card[0], $card[1])->id,
+            $cards
+        ));
     }
 
     public static function setHands(array $hands): void
     {
-        Act::addContext('hands', array_reduce(
-            array_keys($hands),
-            static function (array $carry, int $index) use ($hands): array {
-                $carry[$index] = new Hand(array_map(
-                    fn (array $card) => new Card(Suit::from($card[1]), Rank::from((string) $card[0])),
-                    $hands[$index]
-                ));
-
-                return $carry;
-            },
-            []
+        Act::addContext('hands', array_map(
+            fn (array $cards) => new Hand(array_map(
+                fn (array $card) => Act::card((string) $card[0], $card[1])->id,
+                $cards
+            )),
+            $hands
         ));
     }
 
     public static function setDrawPillSize(int $count): void
     {
-        $cards = [];
+        $suits = ['s', 'h', 'd', 'c'];
+        $ids = [];
 
         for ($i = 0; $i < $count; ++$i) {
-            $cards[] = new Card(Suit::SPADES, Rank::from((string) ($i + 1)));
+            // DrawPile is keyed by card id (getNext()/removeCard() rely on it)
+            $id = Act::card((string) ($i + 1), $suits[$i % 4])->id;
+            $ids[$id] = $id;
         }
 
-        Act::addContext('drawPill', $cards);
-        Act::addContext('gameContext', self::createGameContext([]));
+        Act::addContext('drawPill', $ids);
+        Act::addContext('gameContext', self::createGameState([]));
     }
 
     public static function setGameStarted(): void
     {
-        Act::addContext('gameContext', static::createGameContext([]));
+        Act::addContext('gameContext', static::createGameState([]));
     }
 
     public static function setRound(array $cards): void
     {
-        Act::addContext('gameContext', static::createGameContext(
+        Act::addContext('gameContext', static::createGameState(
             array_map(
-                fn (array $turns) => new Turn(array_map(
-                    fn (int $value) => new Card(
-                        Suit::SPADES,
-                        Rank::from((string) $value)),
-                    $turns)),
+                fn (array $turnRanks) => new Turn('other', self::cardIdsForRanks($turnRanks)),
                 $cards
             ),
         ));
     }
 
+    /**
+     * @param array<array{0: string, 1: string}|string> $players tuples of [id, name] or [id, name, score]
+     */
     public static function setPlayers(array $players): void
     {
         Act::addContext('gameContextPlayers', $players);
     }
 
-    private static function createGameContext($turns): GameContext
+    /**
+     * @param array<int, int|string> $ranks
+     *
+     * @return string[]
+     */
+    private static function cardIdsForRanks(array $ranks): array
     {
-        if (null === $players = Act::get('gameContextPlayers')) {
-            $players = [
-                new Player('player-id', 'Player 1'),
-                new Player('player2-id', 'Player 2'),
-                new Player('player3-id', 'Player 3'),
-            ];
-        }
+        $suits = ['s', 'h', 'd', 'c'];
 
-        if (null !== $hands = Act::get('hands')) {
-            foreach ($players as $player) {
-                $player->cardsCount = count($hands[$player->id] ?? []);
-            }
-        }
+        return array_values(array_map(
+            fn (int $i, int|string $rank) => Act::card((string) $rank, $suits[$i % 4])->id,
+            array_keys($ranks),
+            $ranks
+        ));
+    }
 
-        return new GameContext(
-            'room-id',
-            new Room(
-                Act::get('gameMode'),
-                Uuid::uuid4(),
-            ),
+    /**
+     * @param Turn[] $turns
+     */
+    private static function createGameState(array $turns): GameState
+    {
+        $specs = Act::get('gameContextPlayers') ?? [
+            ['player-id', 'Player 1'],
+            ['player2-id', 'Player 2'],
+            ['player3-id', 'Player 3'],
+        ];
+
+        // keyed by player id (matches how setHands() callers key by id, e.g. '1' => [...])
+        $hands = Act::get('hands') ?? [];
+
+        $players = array_map(
+            fn (array $s) => new PlayerState($s[0], $s[1], $s[2] ?? 0, $hands[$s[0]] ?? new Hand([])),
+            $specs,
+        );
+
+        // always a round, even with zero turns - a "no round at all" state
+        // isn't reachable in the real game and PresidentGameMode requires one
+        $rounds = [0 => new Round(0, $turns)];
+
+        return new GameState(
             $players,
-            current($players),
-            $turns,
-            Act::get('drawPill') ?? [],
+            array_map(fn (PlayerState $p) => $p->id, $players),
+            $players[0]->id,
+            $rounds,
+            new DiscardPile([]),
+            new DrawPile(Act::get('drawPill') ?? []),
+            Act::cardRegistry(),
         );
     }
 }

@@ -8,11 +8,15 @@
             <h1>En attente de joueurs !</h1>
         </div>
         <div {{ stimulus_controller('stream', {url: mercure(mercure_room_url ~ '-waiting')}) }}></div>
-        <div id="player-join">
-            <h2>Joueurs</h2>
-            {% for player in players %}
-                {{ include('components/turbo/player-join.html.twig', {player: player}) }}
-            {% endfor %}
+        <div class="waiting__panels">
+            <div id="player-join" class="black-card">
+                <h2><twig:UX:Icon name="lucide:users" /> Joueurs</h2>
+                {% for player in players %}
+                    {{ include('components/turbo/player-join.html.twig', {player: player}) }}
+                {% endfor %}
+            </div>
+
+            {{ include('components/room-configuration.html.twig', {room: room, configuration: configuration}) }}
         </div>
 
         <div class="links-row">

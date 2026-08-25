@@ -6,7 +6,7 @@
 
         <twig:BlackCard>
             <twig:ColorsHeader />
-            <h1>Bienvenue sur Kard</h1>
+            <h1>Bienvenue sur Kard <span style="font-size: 0.4em; color: #ffd400; vertical-align: super;">v2</span></h1>
             <p>Le jeu de cartes en ligne</p>
             <div class="links-row">
                 {% if app.user %}
@@ -52,8 +52,6 @@
                 <twig:UX:Icon name="lucide:users" color="white" />
                 <h2>Parties en cours</h2>
             </div>
-
-            {% if currentGames is not empty %}
                 <table>
                     <thead>
                         <tr>
@@ -65,14 +63,15 @@
                     </thead>
                     <tbody id="current-games">
                         <div {{ stimulus_controller('stream', {url: mercure('current_games')}) }}></div>
-                        {% for game in currentGames %}
-                            {{ include('components/turbo/game-details.html.twig') }}
-                        {% endfor %}
+                        {% if currentGames is not empty %}
+                            {% for game in currentGames %}
+                                {{ include('components/turbo/game-details.html.twig') }}
+                            {% endfor %}
+                        {% else %}
+                            <tr id="no-games-row"><th class="empty" colspan="4">Il n'y a aucune partie en cours</th></tr>
+                        {% endif %}
                     </tbody>
                 </table>
-            {% else %}
-                <p>Il n'y a aucune partie en cours</p>
-            {% endif %}
         </section>
 
         {% if playerLeaderboard is not empty %}

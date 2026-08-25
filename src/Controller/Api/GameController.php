@@ -2,13 +2,11 @@
 
 namespace App\Controller\Api;
 
+use App\Domain\DTO\GameStateDTO;
 use App\Entity\Room;
 use App\Entity\User;
-use App\Enum\Card\Rank;
-use App\Enum\Card\Suit;
-use App\Model\Card\Card;
-use App\Model\Player;
-use App\Service\GameManager\GameManager;
+use App\Game\GameManager;
+use App\Game\StateProvider\GameStateProviderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,7 +18,23 @@ final class GameController extends AbstractController
 {
     public function __construct(
         private readonly GameManager $gameManager,
+        private readonly GameStateProviderInterface $gameStateProvider,
     ) {
+    }
+
+    /**
+     * Returns the public game state, plus the connected player's hand when they are a participant.
+     *
+     * Used by the front to resync after receiving a game event over Mercure.
+     */
+    #[Route('/{id}', name: 'state', methods: ['GET'])]
+    public function state(Room $room): Response
+    {
+        $state = $this->gameStateProvider->get($room->getId()->toString());
+        $user = parent::getUser();
+        $viewerId = $user instanceof User ? $user->getId()->toString() : null;
+
+        return $this->json(GameStateDTO::fromState($state, $viewerId));
     }
 
     /**
@@ -33,20 +47,10 @@ final class GameController extends AbstractController
     {
         $request->attributes->set('_format', 'json');
         $user = $this->getUser();
-        $card = $request->toArray()['cards'];
+        $cards = $request->toArray()['cards'];
         $data = $request->toArray()['data'];
 
-        $cards = array_map(fn ($card): Card => new Card(Suit::from($card['suit']), Rank::from($card['rank'])), $card);
-        $player = current(array_filter(
-            $room->getPlayers(),
-            fn (Player $p): bool => $p->id === $user->getId()->toString(),
-        ));
-
-        if (false === $player) {
-            return new JsonResponse(['error' => 'Player not found'], Response::HTTP_NOT_FOUND);
-        }
-
-        $this->gameManager->play($room, $player, $cards, $data);
+        $this->gameManager->play($room, $user, $cards, $data);
 
         return new JsonResponse();
     }

@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use App\Service\GameManager\GameMode\GameModeInterface;
+use App\Game\Mode\GameModeInterface;
 use PHPUnit\Framework\TestCase;
 
 abstract class GameModeTestCase extends TestCase

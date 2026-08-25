@@ -30,6 +30,7 @@ const quotes = [
 	'Dos de la carte',
 	'I use Arch btw',
 	'I use Neovim btw',
+	'Enfin la v2 Pierrot',
 	'Pierrot est vraiment trop fort',
 	'Pierrot est vraiment trop fort',
 	'Pierrot est vraiment trop fort',

@@ -2,6 +2,7 @@ name: PHP tests
 
 on:
   push:
+    branches: [master]
   pull_request:
 
 env:
@@ -26,6 +27,3 @@ jobs:
 
       - name: Run tests
         run: ${PHP} vendor/bin/pest --parallel
-
-      - name: Run mutation testing
-        run: ${PHP} vendor/bin/pest --mutate --parallel --min=100

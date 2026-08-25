@@ -11,34 +11,43 @@ import {
     Stack,
 } from '../components.js';
 
-export default ({ ctx, hand, player }) => {
-    const { gameContext: { currentCards } } = useContext(GameContext);
+export default ({ ctx, player }) => {
+    const { gameContext } = useContext(GameContext);
     const { animateCards, getHandRef } = useContext(AnimationContext);
 
     const playedCardRef = useRef();
     const handRef = useRef();
 
-    const lastPlayerHandRef = ctx.data.lastPlayer && getHandRef(ctx.data.lastPlayer);
+    // Current round is whatever's last in ctx.rounds - past rounds are
+    // already resolved to the discard pile.
+    const currentRoundTurns = gameContext.rounds[gameContext.rounds.length - 1] ?? [];
+    const lastTurn = currentRoundTurns[currentRoundTurns.length - 1] ?? null;
+    const currentCards = lastTurn?.cards ?? [];
+    const lastPlayerId = lastTurn?.playerId ?? null;
+
+    const hand = ctx.players.find((p) => p.id === player?.id)?.hand ?? [];
+
+    const lastPlayerHandRef = lastPlayerId && getHandRef(lastPlayerId);
 
     useEffect(() => {
         if (player && animateCards && currentCards && playedCardRef.current)  {
-            const fromDiv = ctx.data.lastPlayer === player.id ? handRef : lastPlayerHandRef;
+            const fromDiv = lastPlayerId === player.id ? handRef : lastPlayerHandRef;
 
             fromDiv && fromDiv.current && animateCards(currentCards, fromDiv.current, playedCardRef.current );
         }
     }, [animateCards, currentCards]);
 
     return <>
-            <PlayerList players={ctx.players} currentPlayer={ctx.currentPlayer} />
+            <PlayerList players={ctx.players} currentPlayerId={ctx.currentPlayerId} />
             <div className='game__right'>
                 <div className='middle'>
                     <div id='middle'>
-                        <PlayedCard ref={playedCardRef} turns={ctx.round.turns} />
-                        <Stack cards={ctx.discarded} />
+                        <PlayedCard ref={playedCardRef} turns={currentRoundTurns} />
+                        <Stack cards={ctx.discardPile} />
                     </div>
                 </div>
                 <div className='bottom'>
-					{player && <Hand ref={handRef} order={['3', '4', '5', '6', '7', '8', '9', '10', 'j', 'q', 'k', '1', '2']} hand={hand} canPlay={ctx.currentPlayer.id === player.id || ctx.data.fastPlay} />}
+					{player && <Hand ref={handRef} order={['3', '4', '5', '6', '7', '8', '9', '10', 'j', 'q', 'k', '1', '2']} hand={hand} canPlay={ctx.currentPlayerId === player.id || ctx.everyoneCanPlay} />}
                 </div>
             </div>
         </>

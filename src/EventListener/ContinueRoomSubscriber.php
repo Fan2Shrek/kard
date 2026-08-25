@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\EventListener;
 
 use App\Entity\Room;
-use App\Event\GameFinishedEvent;
+use App\Game\Event\GameFinishedEvent;
 use App\Repository\RoomRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Mercure\HubInterface;

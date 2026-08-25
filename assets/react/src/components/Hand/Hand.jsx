@@ -33,7 +33,7 @@ export default forwardRef(({ hand, canPlay, order = null, gameActions = null }, 
 
 	const handlePlay = async (data = {}) => {
 		setError(null);
-		const response = await api.game.play(roomId, { cards: selectedCards, player: currentPlayer, data });
+		const response = await api.game.play(roomId, { cards: selectedCards.map((card) => card.id), player: currentPlayer, data });
 
 		if (!response.ok) {
 			const errorData = await response.json();

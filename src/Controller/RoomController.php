@@ -2,19 +2,21 @@
 
 namespace App\Controller;
 
+use App\Domain\DTO\GameStateDTO;
 use App\Entity\GameModeDescription;
 use App\Entity\Room;
+use App\Enum\DeckSkinEnum;
 use App\Enum\GameStatusEnum;
 use App\Event\Room\RoomEvent;
-use App\Model\Player;
+use App\Game\GameManager;
+use App\Game\Mode\GameModeEnum;
+use App\Game\Model\Card\Hand;
+use App\Game\Model\State\PlayerState;
+use App\Game\StateProvider\GameStateProviderInterface;
 use App\Repository\GameModeDescriptionRepository;
 use App\Repository\GameModeRepository;
 use App\Repository\RoomRepository;
 use App\Service\AssetsProvider;
-use App\Service\Card\HandRepositoryInterface;
-use App\Service\GameContextProvider;
-use App\Service\GameManager\GameManager;
-use App\Service\GameManager\GameMode\GameModeEnum;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -42,15 +44,17 @@ final class RoomController extends AbstractController
         Request $request,
         GameModeRepository $gameModeRepository,
         GameModeDescriptionRepository $gameModeDescriptionRepository,
+        GameManager $gameManager,
     ): Response {
         if (Request::METHOD_POST === $request->getMethod()) {
-            $gameMode = $request->getPayload()->get('gameMode');
-            $gameMode = $gameModeRepository->findByGameMode(GameModeEnum::from($gameMode));
+            $gameModeEnum = GameModeEnum::from($request->getPayload()->get('gameMode'));
+            $gameMode = $gameModeRepository->findByGameMode($gameModeEnum);
 
             $user = $this->getUser();
             $room = new Room($gameMode);
             $room->setOwner($user);
             $room->addParticipant($user);
+            $room->setConfiguration($gameManager->getDefaultConfiguration($gameModeEnum));
 
             $this->roomRepository->save($room);
             $this->eventDispatcher->dispatch(new RoomEvent($room), 'room.created');
@@ -99,20 +103,65 @@ final class RoomController extends AbstractController
             $this->hub->publish(new Update(
                 \sprintf('game-%s-waiting', $room->getId()),
                 $this->renderView('components/turbo/player-join.html.twig', [
-                    'player' => Player::fromUser($user),
+                    'player' => new PlayerState(
+                        $user->getId()->toString(),
+                        $user->getUsername(),
+                        0,
+                        new Hand([]),
+                    ),
                 ])
             ));
         }
 
         $players = array_map(
-            fn ($player): Player => Player::fromUser($player),
+            fn ($player): PlayerState => new PlayerState(
+                $player->getId()->toString(),
+                $player->getUsername(),
+                0,
+                new Hand([]),
+            ),
             $room->getParticipants()->toArray(),
         );
 
         return $this->render('home/waiting.html.twig', [
             'room' => $room,
             'players' => $players,
+            'configuration' => $room->getConfiguration(),
+            'skins' => DeckSkinEnum::cases(),
         ]);
+    }
+
+    #[Route('/configuration/{id}', name: 'game_configuration', methods: ['POST'])]
+    public function updateConfiguration(Room $room, Request $request): Response
+    {
+        if ($room->getOwner() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if (GameStatusEnum::PLAYING === $room->getStatus()) {
+            return $this->redirectToRoute('game', ['id' => $room->getId()]);
+        }
+
+        $payload = $request->getPayload();
+        $rawOptions = [
+            'withJokers' => $payload->getBoolean('withJokers'),
+            'deckCount' => $payload->getInt('deckCount', 1),
+            'skin' => $payload->getEnum('skin', DeckSkinEnum::class, DeckSkinEnum::DEFAULT),
+        ];
+
+        $room->setConfiguration($this->gameManager->buildConfiguration($room->getGameMode()->getValue(), $rawOptions));
+        $this->roomRepository->save($room);
+
+        $this->hub->publish(new Update(
+            \sprintf('game-%s-waiting', $room->getId()),
+            $this->renderView('components/turbo/room-configuration.html.twig', [
+                'room' => $room,
+                'configuration' => $room->getConfiguration(),
+                'skins' => DeckSkinEnum::cases(),
+            ])
+        ));
+
+        return $this->redirectToRoute('waiting', ['id' => $room->getId()]);
     }
 
     #[Route('/leave/{id}', name: 'game_leave')]
@@ -148,6 +197,13 @@ final class RoomController extends AbstractController
                     "<turbo-stream action=\"remove\" target=\"game-{$id}\"></turbo-stream>"
                 ));
 
+                if ([] === $this->roomRepository->findAllCurrent()) {
+                    $this->hub->publish(new Update(
+                        'current_games',
+                        $this->renderView('components/turbo/no-games.html.twig')
+                    ));
+                }
+
                 return $this->redirectToRoute('home');
             }
 
@@ -169,15 +225,20 @@ final class RoomController extends AbstractController
         $response = $this->redirectToRoute('game', ['id' => $room->getId()]);
         $room->setStatus(GameStatusEnum::PLAYING);
 
-        $gameContext = $this->gameManager->setupRoom($room);
-
-        $this->gameManager->start($gameContext);
+        $gameContext = $this->gameManager->start($room);
         $this->roomRepository->save($room);
 
         $this->hub->publish(new Update(
             'current_games',
             "<turbo-stream action=\"remove\" target=\"game-{$room->getId()}\"></turbo-stream>"
         ));
+
+        if ([] === $this->roomRepository->findAllCurrent()) {
+            $this->hub->publish(new Update(
+                'current_games',
+                $this->renderView('components/turbo/no-games.html.twig')
+            ));
+        }
 
         $this->hub->publish(new Update(
             sprintf('game-%s', $room->getId()),
@@ -194,26 +255,32 @@ final class RoomController extends AbstractController
         Room $room,
         SerializerInterface $serializer,
         AssetsProvider $assetsProvider,
-        GameContextProvider $gameContextProvider,
-        HandRepositoryInterface $handRepository,
+        GameStateProviderInterface $gameStateProvider,
     ): Response {
         $user = $this->getUser();
 
-        if (!\in_array($user, $room->getParticipants()->toArray(), true)) {
+        $state = $gameStateProvider->get($room->getId()->toString());
+        $assets = $assetsProvider->getAssets($state->cards, $room->getConfiguration()->getSkin());
+        $isParticipant = \in_array($user, $room->getParticipants()->toArray(), true);
+        $viewerId = $isParticipant ? $user->getId()->toString() : null;
+        $dto = GameStateDTO::fromState($state, $viewerId);
+
+        if (!$isParticipant) {
             return $this->render('home/game.html.twig', [
-                'assets' => $assetsProvider->getAllCardsAssets(),
-                'game' => $serializer->serialize($gameContextProvider->provide($room), 'json'),
+                'assets' => $assets,
+                'game' => $serializer->serialize($dto, 'json'),
                 'room' => $room,
+                'gameMode' => $room->getGameMode()->getValue()->value,
             ]);
         }
 
         return $this->render('home/game.html.twig', [
-            'assets' => $assetsProvider->getAllCardsAssets(),
-            'game' => $serializer->serialize($gameContextProvider->provide($room), 'json'),
+            'assets' => $assets,
+            'game' => $serializer->serialize($dto, 'json'),
             'player' => $serializer->serialize($this->getUser(), 'json'),
-            'hand' => $handRepository->get($user, $room)->getCards(),
             'playerId' => $user->getId(),
             'room' => $room,
+            'gameMode' => $room->getGameMode()->getValue()->value,
         ]);
     }
 }

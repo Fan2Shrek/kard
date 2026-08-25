@@ -1,0 +1,55 @@
+<?php
+
+namespace App\Game\Exception;
+
+use App\Domain\Exception\TranslatableException;
+use App\Game\Mode\GameModeEnum;
+
+class RuleException extends \Exception implements TranslatableException
+{
+    private GameModeEnum $gameMode;
+
+    /**
+     * @var array<mixed>
+     */
+    private array $params = [];
+
+    public function __construct(GameModeEnum $gameMode, string $message = '', int $code = 0, ?\Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+        $this->gameMode = $gameMode;
+    }
+
+    public function getGameMode(): GameModeEnum
+    {
+        return $this->gameMode;
+    }
+
+    public function getTranslationCode(): string
+    {
+        return $this->getMessage();
+    }
+
+    public function setMessage(string $message): void
+    {
+        $this->message = $message;
+    }
+
+    public function getDomain(): string
+    {
+        return $this->getGameMode()->value;
+    }
+
+    /**
+     * @param array<mixed> $params
+     */
+    public function setParams(array $params): void
+    {
+        $this->params = $params;
+    }
+
+    public function getParams(): array
+    {
+        return $this->params;
+    }
+}

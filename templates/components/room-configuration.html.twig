@@ -1,0 +1,55 @@
+<div id="room-configuration" class="room-configuration black-card">
+    <h2><twig:UX:Icon name="lucide:settings-2" /> Configuration</h2>
+    {% if (editable is defined ? editable : (room.owner == app.user)) %}
+        <form method="POST" action="{{ path('game_configuration', {id: room.id}) }}" class="room-configuration__form">
+            <label class="room-configuration__field room-configuration__field--toggle">
+                <span>
+                    <twig:UX:Icon name="lucide:sparkles" />
+                    Inclure les jokers
+                </span>
+                <input type="checkbox" name="withJokers" value="1" {{ configuration.hasJokers ? 'checked' : '' }} />
+            </label>
+            <label class="room-configuration__field">
+                <span>
+                    <twig:UX:Icon name="lucide:layers" />
+                    Nombre de decks
+                </span>
+                <input type="number" name="deckCount" min="1" max="{{ constant('App\\Game\\Builder\\GameConfigurationBuilder::MAX_DECK_COUNT') }}" value="{{ configuration.deckCount }}" />
+            </label>
+            <label class="room-configuration__field">
+                <span>
+                    <twig:UX:Icon name="lucide:image" />
+                    Skin des cartes
+                </span>
+                <select name="skin">
+                    {% for skin in skins %}
+                        <option value="{{ skin.value }}" {{ skin == configuration.getSkin ? 'selected' : '' }}>{{ skin.value|capitalize }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <twig:Button
+                type="submit"
+                text="Mettre à jour"
+                iconLeft="lucide:save"
+            />
+        </form>
+    {% else %}
+        <ul class="room-configuration__list">
+            <li>
+                <twig:UX:Icon name="lucide:sparkles" />
+                Jokers
+                <strong>{{ configuration.hasJokers ? 'Oui' : 'Non' }}</strong>
+            </li>
+            <li>
+                <twig:UX:Icon name="lucide:layers" />
+                Decks
+                <strong>{{ configuration.deckCount }}</strong>
+            </li>
+            <li>
+                <twig:UX:Icon name="lucide:image" />
+                Skin
+                <strong>{{ configuration.getSkin.value|capitalize }}</strong>
+            </li>
+        </ul>
+    {% endif %}
+</div>

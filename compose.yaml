@@ -71,6 +71,15 @@ services:
   #     - .:/app
   #   command: "php -d memory_limit=-1 bin/console messenger:consume async"
 
+  pma:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: db
+    ports:
+      - "8888:80"
+    depends_on:
+      - db
+
 volumes:
   db_data:
   mercure_data:
