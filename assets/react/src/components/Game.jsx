@@ -62,13 +62,13 @@ export default ({ gameContext, player: userJson, gameMode, roomId }) => {
     }, [ctx]);
 
     // The topic carries two different message shapes: ContinueRoomSubscriber's
-    // { action: 'end', data: { context, url } } when the game is over, and
+    // { action: 'end', data: { context, winner, url } } when the game is over, and
     // EventPublisher's { events } on every play (state is deliberately not
     // published there - it's the raw, unredacted GameState including every
     // player's hand - so a play just triggers a proper refetch instead).
     const onGameEvent = useMemo(() => (data) => {
         if ('end' === data.action) {
-            displayText(`${data.data.context.winner.username} a gagné`);
+            displayText(`${data.data.winner.username} a gagné`);
             setAnimate(true);
 
             setTimeout(() => {

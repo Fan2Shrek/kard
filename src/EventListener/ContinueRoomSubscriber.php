@@ -38,15 +38,17 @@ final class ContinueRoomSubscriber implements EventSubscriberInterface
         foreach ($event->room->getParticipants() as $player) {
             $newRoom->addParticipant($player);
         }
+        $newRoom->setConfiguration($event->room->getConfiguration());
 
         $this->roomRepository->save($newRoom);
 
         $this->hub->publish(new Update(
-            sprintf('room-%s', $event->room->getId()),
+            sprintf('game-%s', $event->room->getId()),
             $this->serializer->serialize([
                 'action' => 'end',
                 'data' => [
                     'context' => $event->context,
+                    'winner' => ['username' => $event->winner->getUsername()],
                     'url' => $this->router->generate('waiting', ['id' => $newRoom->getId()]),
                 ],
             ], 'json'),
