@@ -33,12 +33,7 @@
                     iconLeft="lucide:circle-play"
                     variant="success"
                 />
-                <twig:Button
-                    onClick='{addBot()}'
-                    text="Ajouter un bot"
-                    iconLeft="lucide:bot"
-                    variant="danger"
-                />
+                {{ include('components/bot-stepper.html.twig', {room: room}) }}
             {% endif %}
             <twig:Button
                 text="copier le lien"
@@ -57,15 +52,16 @@
         const copyLink = () => {
             navigator.clipboard.writeText(window.location.href);
         }
-		const addBot = () => {
-			fetch("{{ path('add_ai', {id: room.id}) }}", {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				}
-			}).catch(error => {
-				console.error('Erreur:', error);
-			});
-		}
+        const post = (url) => fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }).catch(error => {
+            console.error('Erreur:', error);
+        });
+
+        const addBot = () => post("{{ path('add_ai', {id: room.id}) }}");
+        const removeBot = () => post("{{ path('remove_ai', {id: room.id}) }}");
     </script>
 {% endblock %}

@@ -13,17 +13,18 @@ final readonly class PlayerState
         public string $playerName,
         public int $score,
         public Hand $hand,
+        public bool $isBot = false,
     ) {
     }
 
     public function withScore(int $score): self
     {
-        return new self($this->id, $this->playerName, $score, $this->hand);
+        return new self($this->id, $this->playerName, $score, $this->hand, $this->isBot);
     }
 
     public function withHand(Hand $hand): self
     {
-        return new self($this->id, $this->playerName, $this->score, $hand);
+        return new self($this->id, $this->playerName, $this->score, $hand, $this->isBot);
     }
 
     public function addCard(string $cardId): self
@@ -32,7 +33,8 @@ final readonly class PlayerState
             $this->id,
             $this->playerName,
             $this->score,
-            $this->hand->addCard($cardId)
+            $this->hand->addCard($cardId),
+            $this->isBot,
         );
     }
 
@@ -42,7 +44,8 @@ final readonly class PlayerState
             $this->id,
             $this->playerName,
             $this->score,
-            $this->hand->removeCard($cardId)
+            $this->hand->removeCard($cardId),
+            $this->isBot,
         );
     }
 }

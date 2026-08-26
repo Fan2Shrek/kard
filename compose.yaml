@@ -83,12 +83,12 @@ services:
   bot:
     build:
       context: ./python
-    image: ghcr.io/fan2shrek/kard:${VERSION:-latest}
+    image: ghcr.io/fan2shrek/kard-bot:${VERSION:-latest}
     working_dir: /app
     volumes:
       - ./python:/app
     ports:
-      - "5000:5000"
+      - "5001:5000"
 
 volumes:
   db_data:

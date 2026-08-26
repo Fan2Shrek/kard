@@ -4,19 +4,17 @@ declare(strict_types=1);
 
 namespace App\Service\Bot;
 
+use App\Game\Mode\GameModeEnum;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @phpstan-type BotResponse array{
- *		cards?: array<array{
- *		   suit: string,
- *		   rank: string,
- *	    }>,
- *	    data?: array<string, mixed>,
- *	}
+ *     cards?: array<string>,
+ *     data?: array<string, mixed>,
+ * }
  */
-final class BotClient
+class BotClient
 {
     private HttpClientInterface $client;
 
@@ -27,13 +25,15 @@ final class BotClient
     }
 
     /**
-     * @param array<mixed> $body
+     * @param array<string, mixed> $body
      *
      * @return BotResponse
      */
-    public function play(array $body = []): array
+    public function play(GameModeEnum $gameMode, array $body = []): array
     {
-        $response = $this->client->request('POST', '/move', ['json' => $body]);
+        // one route per game mode - same container today, trivially splittable
+        // into one service per game if a strategy ever needs its own runtime
+        $response = $this->client->request('POST', '/move/'.$gameMode->value, ['json' => $body]);
 
         return $response->toArray();
     }
