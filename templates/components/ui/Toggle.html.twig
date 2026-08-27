@@ -1,0 +1,9 @@
+{# <twig:ui:Toggle name="withJokers" label="Inclure les jokers" icon="lucide:sparkles" checked="{{ ... }}" /> #}
+{% props name, label, icon = null, checked = false, value = '1' %}
+<label class="field field--toggle {{ attributes.render('class') }}">
+    <span class="field__label">
+        {% if icon %}<twig:UX:Icon name="{{ icon }}" />{% endif %}
+        {{ label }}
+    </span>
+    <input type="checkbox" class="switch" name="{{ name }}" value="{{ value|default('1') }}" {{ checked|default(false) ? 'checked' : '' }} {{ attributes.without('class') }} />
+</label>

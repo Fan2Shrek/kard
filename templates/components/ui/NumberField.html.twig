@@ -1,0 +1,17 @@
+{% props name, label, value, icon = null, min = null, max = null, step = null %}
+<label class="field {{ attributes.render('class') }}">
+    <span class="field__label">
+        {% if icon %}<twig:UX:Icon name="{{ icon }}" />{% endif %}
+        {{ label }}
+    </span>
+    <input
+        type="number"
+        class="number-input"
+        name="{{ name }}"
+        value="{{ value }}"
+        {% if min is not null %}min="{{ min }}"{% endif %}
+        {% if max is not null %}max="{{ max }}"{% endif %}
+        {% if step is not null %}step="{{ step }}"{% endif %}
+        {{ attributes.without('class') }}
+    />
+</label>

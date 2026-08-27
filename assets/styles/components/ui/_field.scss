@@ -1,0 +1,127 @@
+// Shared look for the <twig:ui:Toggle|NumberField|SelectField> components.
+.field {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.95rem;
+  color: var(--text-gray);
+  cursor: pointer;
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--text-gray-accent);
+    flex: none;
+  }
+}
+
+// ponytail: appearance:none + a pseudo-element knob, no JS, no lib
+.switch {
+  appearance: none;
+  position: relative;
+  width: 2.6rem;
+  height: 1.5rem;
+  flex: none;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.5);
+  border: 1px solid rgb(255 255 255 / 0.15);
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0.15rem;
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+    background: var(--text-gray);
+    transform: translateY(-50%);
+    transition: transform 0.2s, background-color 0.2s;
+  }
+
+  &:checked {
+    background: var(--bg-green-accent);
+    border-color: var(--text-green-light);
+
+    &::after {
+      background: #fff;
+      transform: translate(1.05rem, -50%);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--text-green);
+    outline-offset: 2px;
+  }
+}
+
+.number-input {
+  width: 4.5rem;
+  color: var(--text-primary);
+  padding: 0.4rem 0.6rem;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: 0.5rem;
+  background-color: rgb(0 0 0 / 0.5);
+  font-size: 1rem;
+  text-align: center;
+  transition: border-color 0.2s;
+
+  &:hover {
+    border-color: rgb(255 255 255 / 0.25);
+  }
+
+  &:focus {
+    outline: 2px solid var(--text-green);
+    outline-offset: 1px;
+  }
+}
+
+.select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+
+  select {
+    appearance: none;
+    color: var(--text-primary);
+    padding: 0.4rem 2rem 0.4rem 0.75rem;
+    border: 1px solid rgb(255 255 255 / 0.1);
+    border-radius: 0.5rem;
+    background-color: rgb(0 0 0 / 0.5);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: border-color 0.2s;
+
+    &:hover {
+      border-color: rgb(255 255 255 / 0.25);
+    }
+
+    &:focus {
+      outline: 2px solid var(--text-green);
+      outline-offset: 1px;
+    }
+
+    option {
+      background: #111;
+      color: var(--text-primary);
+    }
+  }
+
+  // arrow sits on top of the native select, clicks pass through
+  svg {
+    position: absolute;
+    right: 0.6rem;
+    width: 1rem;
+    height: 1rem;
+    pointer-events: none;
+  }
+}
