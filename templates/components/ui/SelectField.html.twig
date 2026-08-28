@@ -7,8 +7,8 @@
     </span>
     <span class="select">
         <select name="{{ name }}" {{ attributes.without('class') }}>
-            {% for optionLabel, optionValue in choices %}
-                <option value="{{ optionValue }}" {{ optionValue == value ? 'selected' : '' }}>{{ optionLabel }}</option>
+            {% for option_label, option_value in choices %}
+                <option value="{{ option_value }}" {{ option_value == value ? 'selected' : '' }}>{{ option_label }}</option>
             {% endfor %}
         </select>
         <twig:UX:Icon name="lucide:chevron-down" />
