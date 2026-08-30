@@ -1,0 +1,25 @@
+{% props field = null, label = null, icon = null, id = null, widget = {} %}
+
+{% set field_id = field ? field.vars.id : id %}
+
+<div class="form-section">
+    {% if label is not null %}
+        <label for="{{ field_id }}">{{ label }}</label>
+    {% endif %}
+
+    <div class="input-group">
+        {% if icon is not null %}
+            <twig:UX:Icon name="{{ icon }}" />
+        {% endif %}
+
+        {% if field %}
+            {{ form_widget(field, widget) }}
+        {% else %}
+            <input id="{{ id }}" {{ attributes }}>
+        {% endif %}
+    </div>
+
+    {% if field %}
+        {{ form_errors(field) }}
+    {% endif %}
+</div>

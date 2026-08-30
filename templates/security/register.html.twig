@@ -18,23 +18,19 @@
             {% endif %}
 
             {{ form_start(registrationForm, {attr: {id: 'registration-form'}}) }}
-            <div class="form-section">
-                <label for="registration_form_username">Nom d'utilisateur</label>
-                <div class="input-group">
-                    <twig:UX:Icon name="lucide:user" />
-                    {{ form_widget(registrationForm.username, {attr: {placeholder: 'Votre pseudo', autocomplete: 'username'}}) }}
-                </div>
-            </div>
+            <twig:ui:InputField
+                :field="registrationForm.username"
+                label="Nom d'utilisateur"
+                icon="lucide:user"
+                :widget="{attr: {placeholder: 'Votre pseudo', autocomplete: 'username'}}"
+            />
 
-            <div class="form-section">
-                <label for="registration_form_plainPassword">Mot de passe</label>
-                <div class="input-group">
-                    <twig:UX:Icon name="lucide:lock" />
-                    {{ form_widget(registrationForm.plainPassword, {attr: {placeholder: '••••••••', autocomplete: 'new-password'}}) }}
-                </div>
-            </div>
-
-            {{ form_errors(registrationForm.plainPassword) }}
+            <twig:ui:InputField
+                :field="registrationForm.plainPassword"
+                label="Mot de passe"
+                icon="lucide:lock"
+                :widget="{attr: {placeholder: '••••••••', autocomplete: 'new-password'}}"
+            />
             {{ form_end(registrationForm) }}
 
             <twig:Button

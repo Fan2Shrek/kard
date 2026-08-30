@@ -2,10 +2,19 @@
 
 {% block body %}
     <main class='home bg-card-image'>
-        <twig:FloatingBackground />
+        <div class="profile-button">
+            <twig:BlackCard>
+                <twig:Button
+                        :href="path('app_profile')"
+                        iconLeft="lucide:user-circle"
+                        variant="transparent"
+                />
+            </twig:BlackCard>
+        </div>
+        <twig:FloatingBackground/>
 
         <twig:BlackCard>
-            <twig:ColorsHeader />
+            <twig:ColorsHeader/>
             <h1>Bienvenue sur Kard <span style="font-size: 0.4em; color: #ffd400; vertical-align: super;">v2</span></h1>
             <p>Le jeu de cartes en ligne</p>
             <div class="links-row">
@@ -62,11 +71,12 @@
                         </tr>
                     </thead>
                     <tbody id="current-games">
-                        <div {{ stimulus_controller('stream', {url: mercure('current_games')}) }}></div>
-                        {% if currentGames is not empty %}
+                    <div {{ stimulus_controller('stream', {url: mercure('current_games')}) }}></div>
+                    {% if currentGames is not empty %}
                             {% for game in currentGames %}
-                                {{ include('components/turbo/game-details.html.twig') }}
-                            {% endfor %}
+                        {{ include('components/turbo/game-details.html.twig') }}
+                    {% endfor %}
+
                         {% else %}
                             <tr id="no-games-row"><th class="empty" colspan="4">Il n'y a aucune partie en cours</th></tr>
                         {% endif %}

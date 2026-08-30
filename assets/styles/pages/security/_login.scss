@@ -24,52 +24,5 @@
       flex-direction: column;
       gap: 1.5rem;
     }
-
-    & .form-section {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-
-      & label {
-        display: block;
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: var(--text-gray);
-      }
-
-      & .input-group {
-        position: relative;
-
-        & svg {
-          position: absolute;
-          top: 50%;
-          left: 0.75rem;
-          width: 1.25rem;
-          height: 1.25rem;
-          color: var(--text-gray-accent);
-          transform: translateY(-50%);
-        }
-
-        & input {
-          color: var(--text-gray);
-          width: 100%;
-          padding: 0.75rem 1rem 0.75rem 3rem;
-          border: 1px solid rgb(255 255 255 / 0.1);
-          border-radius: 0.5rem;
-          background-color: rgb(0 0 0 / 0.5);
-          border-color: transparent;
-          font-size: 1rem;
-
-          &:focus {
-            outline: 2px solid var(--text-green);
-            outline-offset: 1px;
-          }
-
-          &::placeholder {
-            color: var(--text-gray-accent);
-          }
-        }
-      }
-    }
   }
 }

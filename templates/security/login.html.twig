@@ -18,20 +18,28 @@
             {% endif %}
 
             <form method="post" id="login-form">
-                <div class="form-section">
-                    <label for="username">Nom d'utilisateur</label>
-                    <div class="input-group">
-                        <twig:UX:Icon name="lucide:mail" />
-                        <input type="text" value="{{ last_username }}" name="_username" id="username" placeholder="test@example.com" autocomplete="username" required autofocus>
-                    </div>
-                </div>
-                <div class="form-section">
-                    <label for="password">Mot de passe</label>
-                    <div class="input-group">
-                        <twig:UX:Icon name="lucide:lock" />
-                        <input type="password" name="_password" id="password" placeholder="••••••••" autocomplete="current-password" required>
-                    </div>
-                </div>
+                <twig:ui:InputField
+                    id="username"
+                    label="Nom d'utilisateur"
+                    icon="lucide:user"
+                    type="text"
+                    name="_username"
+                    value="{{ last_username }}"
+                    placeholder="Votre pseudo"
+                    autocomplete="username"
+                    required
+                    autofocus
+                />
+                <twig:ui:InputField
+                    id="password"
+                    label="Mot de passe"
+                    icon="lucide:lock"
+                    type="password"
+                    name="_password"
+                    placeholder="••••••••"
+                    autocomplete="current-password"
+                    required
+                />
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
             </form>
 

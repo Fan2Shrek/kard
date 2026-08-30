@@ -114,7 +114,7 @@ final class RoomController extends AbstractController
         }
 
         $players = array_map(
-            fn ($player): PlayerState => new PlayerState(
+            fn (\App\Entity\User $player): PlayerState => new PlayerState(
                 $player->getId()->toString(),
                 $player->getUsername(),
                 0,

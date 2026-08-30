@@ -138,6 +138,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * Anonymise le compte : on ne supprime pas la ligne car `result`, `leaderboard`
+     * et `room` la référencent en NOT NULL, et l'historique appartient aussi aux
+     * autres joueurs de la partie.
+     *
+     * ponytail: anonymisation plutôt que purge RGPD complète (cascade + réécriture
+     * des Result), à faire le jour où c'est une vraie exigence légale.
+     */
+    public function anonymize(): void
+    {
+        $this->username = 'joueur-supprime-'.bin2hex(random_bytes(4));
+        $this->email = '';
+        $this->roles = [];
+        // valeur qui ne peut correspondre à aucun hash : plus aucune connexion possible
+        $this->password = '';
+    }
+
+    /**
      * @see UserInterface
      */
     public function eraseCredentials(): void

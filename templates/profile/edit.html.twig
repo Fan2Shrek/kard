@@ -1,0 +1,95 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier mon profil{% endblock %}
+
+{% block body %}
+    <main class="profile bg-card-image">
+        <twig:FloatingBackground />
+        <div class="profile-column">
+            <twig:BlackCard>
+                <twig:ColorsHeader />
+                <h2>Mes informations</h2>
+
+                {{ form_start(profileForm, {attr: {id: 'profile-form', class: 'profile-form'}}) }}
+                <twig:ui:InputField
+                    :field="profileForm.username"
+                    label="Nom d'utilisateur"
+                    icon="lucide:user"
+                    :widget="{attr: {autocomplete: 'username'}}"
+                />
+                {{ form_end(profileForm) }}
+
+                <twig:Button
+                    type="submit"
+                    form="profile-form"
+                    text="Enregistrer"
+                    iconLeft="lucide:save"
+                    variant="success"
+                />
+            </twig:BlackCard>
+
+            <twig:BlackCard>
+                <h2>Mot de passe</h2>
+
+                {{ form_start(passwordForm, {attr: {id: 'password-form', class: 'profile-form'}}) }}
+                <twig:ui:InputField
+                    :field="passwordForm.currentPassword"
+                    label="Mot de passe actuel"
+                    icon="lucide:lock"
+                    :widget="{attr: {placeholder: '••••••••'}}"
+                />
+
+                <twig:ui:InputField
+                    :field="passwordForm.plainPassword.first"
+                    label="Nouveau mot de passe"
+                    icon="lucide:lock"
+                    :widget="{attr: {placeholder: '••••••••'}}"
+                />
+
+                <twig:ui:InputField
+                    :field="passwordForm.plainPassword.second"
+                    label="Confirmation"
+                    icon="lucide:lock"
+                    :widget="{attr: {placeholder: 'Confirmation'}}"
+                />
+                {{ form_end(passwordForm) }}
+
+                <twig:Button
+                    type="submit"
+                    form="password-form"
+                    text="Changer mon mot de passe"
+                    iconLeft="lucide:key-round"
+                    variant="success"
+                />
+            </twig:BlackCard>
+
+                <twig:BlackCard>
+                <h2>Supprimer mon compte</h2>
+                <p>
+                    Ton compte sera anonymisé et tu ne pourras plus t'y connecter.
+                    Les parties déjà jouées restent dans l'historique des autres joueurs.
+                </p>
+                <form
+                    method="post"
+                    action="{{ path('app_profile_delete') }}"
+                    onsubmit="return confirm('Supprimer définitivement ton compte ?')"
+                >
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete-account') }}">
+                    <twig:Button
+                        type="submit"
+                        text="Supprimer mon compte"
+                        iconLeft="lucide:trash-2"
+                        variant="danger"
+                    />
+                </form>
+                </twig:BlackCard>
+            </div>
+        <div class="links-row">
+            <twig:Button
+                    :href="path('app_profile')"
+                    text="Retour au profil"
+                    iconLeft="lucide:arrow-left"
+            />
+        </div>
+    </main>
+{% endblock %}
