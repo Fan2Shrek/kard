@@ -50,7 +50,7 @@ class ResultRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return list<array{date: \DateTime, gameMode: \App\Service\GameManager\GameMode\GameModeEnum|null, result: 'Victoire'|'Défaite'}>
+     * @return list<array{date: \DateTime, gameMode: \App\Game\Mode\GameModeEnum|null, result: 'Victoire'|'Défaite'}>
      */
     public function findRecentGamesByUser(User $user, int $limit = 5): array
     {

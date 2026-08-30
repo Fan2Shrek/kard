@@ -8,11 +8,19 @@
                 <twig:ColorsHeader/>
                 <h1>{{ app.user.username|capitalize }}</h1>
                 <p>Email : {{ app.user.email }}</p>
+                {% for message in app.flashes('success') %}
+                    <p class="flash-success">{{ message }}</p>
+                {% endfor %}
                 <div class="links-row">
                     <twig:Button
                             :href="path('home')"
                             text="Retour à l'accueil"
                             iconLeft="lucide:arrow-left"
+                    />
+                    <twig:Button
+                            :href="path('app_profile_edit')"
+                            text="Modifier mon profil"
+                            iconLeft="lucide:pencil"
                     />
                     <twig:Button
                             :href="path('app_logout')"
