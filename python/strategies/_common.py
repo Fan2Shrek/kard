@@ -1,19 +1,19 @@
 """Helpers shared by every strategy.
 
-The payload PHP sends (see App\\Service\\Bot\\GameAI::buildPayload):
+PHP sends the same redacted view the front gets (App\\Domain\\DTO\\GameStateDTO,
+viewer = the bot): every player's hand is null except ours.
 
     {
-      "hand": ["<cardId>", ...],
-      "cards": {"<cardId>": {"id": ..., "rank": "8", "suit": "h"}, ...},
-      "players": [{"id": ..., "cardsCount": 5, "isBot": false}, ...],
-      "round": {
-        "isNew": true,
-        "turns": [{"playerId": ..., "cardIds": [...], "data": {...}}, ...]
-      }
+      "players": [{"id": ..., "username": ..., "score": 0, "cardsCount": 5,
+                   "hand": [{"id": ..., "rank": "8", "suit": "h"}] or null}, ...],
+      "playerOrder": [...], "currentPlayerId": ...,
+      "rounds": [[{"playerId": ..., "cards": [<card>, ...], "data": {...}}, ...], ...],
+      "discardPile": [<card>, ...], "drawPileCount": 12, "everyoneCanPlay": false
     }
 
-The round's turns are raw on purpose: each strategy derives what its own game
-mode derives from them, rather than PHP guessing per mode.
+Only the last round matters to the strategies; turns carry their cards inline,
+raw, so each mode derives what it needs (the trick to beat, a declared rank, a
+penalty) rather than PHP guessing per mode.
 
 A move is (card_ids, data). An empty list means "I play nothing" - the game mode
 decides what that means (draw, pass, ...) and may well reject it.
@@ -28,26 +28,29 @@ def rank_value(rank):
     return ORDER.index(rank) if rank in ORDER else -1
 
 
-def hand_cards(payload):
-    cards = payload.get("cards") or {}
+def me(payload):
+    """We are the only player whose hand isn't redacted."""
+    for player in payload.get("players") or []:
+        if player.get("hand") is not None:
+            return player
 
-    return [
-        {"id": card_id, **cards.get(card_id, {})}
-        for card_id in payload.get("hand") or []
-    ]
+    return {}
+
+
+def hand_cards(payload):
+    return me(payload).get("hand") or []
 
 
 def turns(payload):
-    return ((payload.get("round") or {}).get("turns")) or []
+    """The current round only - previous rounds are history, nobody reads them."""
+    rounds = payload.get("rounds") or []
+
+    return rounds[-1] if rounds else []
 
 
 def played_turns(payload):
-    """Turns that actually put cards down - a pass carries no cardIds."""
-    return [t for t in turns(payload) if t.get("cardIds")]
-
-
-def card_of(payload, card_id):
-    return (payload.get("cards") or {}).get(card_id) or {}
+    """Turns that actually put cards down - a pass carries no cards."""
+    return [t for t in turns(payload) if t.get("cards")]
 
 
 def group_by_rank(cards):

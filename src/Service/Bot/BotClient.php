@@ -25,11 +25,12 @@ class BotClient
     }
 
     /**
-     * @param array<string, mixed> $body
+     * @param object|array<string, mixed> $body json_encode'd as-is - a DTO's public
+     *                                          properties, backed enums as their value
      *
      * @return BotResponse
      */
-    public function play(GameModeEnum $gameMode, array $body = []): array
+    public function play(GameModeEnum $gameMode, object|array $body = []): array
     {
         // one route per game mode - same container today, trivially splittable
         // into one service per game if a strategy ever needs its own runtime

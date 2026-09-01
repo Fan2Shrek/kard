@@ -1,4 +1,4 @@
-from ._common import card_of, hand_cards, played_turns, turns
+from ._common import hand_cards, played_turns, turns
 
 # ponytail: joue la premiere carte legale, sinon pioche (liste vide).
 
@@ -15,7 +15,7 @@ def active_state(payload):
     """The suit/rank actually in play, and any stacked draw penalty."""
     data = last_data(payload)
     plays = played_turns(payload)
-    top = card_of(payload, plays[-1]["cardIds"][-1]) if plays else {}
+    top = plays[-1]["cards"][-1] if plays else {}
 
     # a wild card overrides the suit of the card physically on top
     return top, data.get("suit") or top.get("suit"), data.get("drawPenalty") or 0

@@ -10,7 +10,7 @@ RANKS = ["3", "4", "5", "6", "7", "8", "9", "10", "j", "q", "k", "1", "2"]
 def expected_rank(payload):
     all_turns = turns(payload)
 
-    if (payload.get("round") or {}).get("isNew") or not all_turns:
+    if not all_turns:
         return RANKS[0]
 
     previous = (all_turns[-1].get("data") or {}).get("rank")

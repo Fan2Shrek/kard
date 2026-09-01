@@ -1,10 +1,10 @@
-from ._common import card_of, group_by_rank, hand_cards, played_turns, rank_value
+from ._common import group_by_rank, hand_cards, played_turns, rank_value
 
 # ponytail: joue le plus petit groupe legal. Pas de bombe, pas de garde de 2.
 # C'est ici qu'une vraie strategie se branche.
 
 
-def card_or_nothing_rank(payload, plays):
+def card_or_nothing_rank(plays):
     """Two same-rank plays in a row lock the round on that rank.
 
     Mirrors PresidentGameMode::getCardOrNothingRank().
@@ -12,8 +12,8 @@ def card_or_nothing_rank(payload, plays):
     if len(plays) < 2:
         return None
 
-    first = card_of(payload, plays[-2]["cardIds"][0]).get("rank")
-    second = card_of(payload, plays[-1]["cardIds"][0]).get("rank")
+    first = plays[-2]["cards"][0].get("rank")
+    second = plays[-1]["cards"][0].get("rank")
 
     return first if first == second else None
 
@@ -35,9 +35,9 @@ def move(payload):
 
         return ([singles[0]["id"]], {}) if singles else ([cards[0]["id"]], {})
 
-    base = card_of(payload, plays[-1]["cardIds"][0])
-    count = len(plays[-1]["cardIds"])
-    locked = card_or_nothing_rank(payload, plays)
+    base = plays[-1]["cards"][0]
+    count = len(plays[-1]["cards"])
+    locked = card_or_nothing_rank(plays)
 
     groups = group_by_rank(cards)
 

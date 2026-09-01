@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 /*
  * Integration test against the real Python bot service.
  *
- * It is the only thing that catches drift between GameAI::buildPayload() and what
+ * It is the only thing that catches drift between GameStateDTO and what
  * the strategies read: a unit test with a stubbed BotClient can't, because the
  * stub never parses the payload. Skipped when the service isn't reachable.
  */
@@ -104,7 +104,7 @@ foreach ($modes as $label => [$enum, $factory]) {
         $botClient = new class('http://bot:5000') extends BotClient {
             public int $turns = 0;
 
-            public function play(GameModeEnum $gameMode, array $body = []): array
+            public function play(GameModeEnum $gameMode, object|array $body = []): array
             {
                 ++$this->turns;
 
