@@ -1,5 +1,6 @@
 <?php
 
+use App\Domain\DTO\GameStateDTO;
 use App\Entity\GameMode;
 use App\Entity\Room;
 use App\Entity\User;
@@ -74,7 +75,7 @@ test("playAs() enchaîne le tour du bot dès que c'est à lui de jouer", functio
     $seenPayloads = [];
     $botClient = $this->createMock(BotClient::class);
     $botClient->method('play')->willReturnCallback(
-        function (GameModeEnum $mode, array $payload) use (&$seenPayloads): array {
+        function (GameModeEnum $mode, GameStateDTO $payload) use (&$seenPayloads): array {
             $seenPayloads[] = $payload;
 
             return ['cards' => ['9s'], 'data' => []];
@@ -123,14 +124,19 @@ test("playAs() enchaîne le tour du bot dès que c'est à lui de jouer", functio
     expect($saved->currentPlayerId)->toBe($userId->toString());
 
     // it only ever saw its own hand, plus the cards already on the table
-    expect($seenPayloads[0]['hand'])->toBe(['9s', '10s']);
-    expect(array_keys($seenPayloads[0]['cards']))->toBe(['9s', '10s', '7s']);
-    expect($seenPayloads[0]['round']['turns'])->toHaveCount(1);
-    expect($seenPayloads[0]['round']['turns'][0]['cardIds'])->toBe(['7s']);
-    expect($seenPayloads[0]['players'])->toBe([
-        ['id' => $userId->toString(), 'cardsCount' => 1, 'isBot' => false],
-        ['id' => 'bot-1', 'cardsCount' => 2, 'isBot' => true],
-    ]);
+    $seen = $seenPayloads[0];
+    $ids = fn (array $cards): array => array_map(fn (Card $card): string => $card->id, $cards);
+
+    expect(array_map(fn ($player): array => [$player->id, $player->cardsCount, null === $player->hand], $seen->players))
+        ->toBe([
+            [$userId->toString(), 1, true],
+            ['bot-1', 2, false],
+        ]);
+    expect($ids($seen->players[1]->hand))->toBe(['9s', '10s']);
+    $lastRound = $seen->rounds[array_key_last($seen->rounds)];
+
+    expect($lastRound)->toHaveCount(1);
+    expect($ids($lastRound[0]->cards))->toBe(['7s']);
 });
 
 test('start() reveille le bot quand la partie ouvre sur son tour', function () {
@@ -155,11 +161,13 @@ test('start() reveille le bot quand la partie ouvre sur son tour', function () {
     $called = 0;
     $botClient = $this->createMock(BotClient::class);
     $botClient->method('play')->willReturnCallback(
-        function (GameModeEnum $mode, array $payload) use (&$called): array {
+        function (GameModeEnum $mode, GameStateDTO $payload) use (&$called): array {
             ++$called;
 
             // play the first card in hand - always legal to open a President round
-            return ['cards' => [$payload['hand'][0]], 'data' => []];
+            $hand = array_values(array_filter($payload->players, fn ($player): bool => null !== $player->hand))[0]->hand;
+
+            return ['cards' => [$hand[0]->id], 'data' => []];
         }
     );
 
