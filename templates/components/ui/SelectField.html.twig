@@ -1,0 +1,16 @@
+{# <twig:ui:SelectField name="skin" label="Skin" icon="lucide:image" :choices="{'Default': 'default'}" value="default" /> #}
+{% props name, label, choices, value = null, icon = null %}
+<label class="field {{ attributes.render('class') }}">
+    <span class="field__label">
+        {% if icon %}<twig:UX:Icon name="{{ icon }}" />{% endif %}
+        {{ label }}
+    </span>
+    <span class="select">
+        <select name="{{ name }}" {{ attributes.without('class') }}>
+            {% for option_label, option_value in choices %}
+                <option value="{{ option_value }}" {{ option_value == value ? 'selected' : '' }}>{{ option_label }}</option>
+            {% endfor %}
+        </select>
+        <twig:UX:Icon name="lucide:chevron-down" />
+    </span>
+</label>

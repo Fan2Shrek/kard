@@ -114,7 +114,7 @@ final class MenteurGameMode extends AbstractGameMode implements SetupGameModeInt
 
         $currentRound = $context->gameState->getCurrentRound();
 
-        if ($currentRound === null) {
+        if (null === $currentRound) {
             throw new \RuntimeException('No round found in game state.');
         }
 
@@ -123,10 +123,7 @@ final class MenteurGameMode extends AbstractGameMode implements SetupGameModeInt
             $expectedRank = $this->getNextRankInCycle(Rank::from($lastTurn->data['rank']));
 
             if ($rank !== $expectedRank) {
-                throw $this->createRuleException('rank.sequence.invalid', [
-                    '%declared_rank%' => $rank->value,
-                    '%expected_rank%' => $expectedRank->value,
-                ]);
+                throw $this->createRuleException('rank.sequence.invalid', ['%declared_rank%' => $rank->value, '%expected_rank%' => $expectedRank->value]);
             }
         }
 
@@ -152,7 +149,7 @@ final class MenteurGameMode extends AbstractGameMode implements SetupGameModeInt
 
         $currentRound = $context->gameState->getCurrentRound();
 
-        if ($currentRound === null) {
+        if (null === $currentRound) {
             throw new \RuntimeException('No round found in game state.');
         }
 

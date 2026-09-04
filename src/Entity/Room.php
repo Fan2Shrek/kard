@@ -4,14 +4,18 @@ namespace App\Entity;
 
 use App\Doctrine\RoomConfigurationType;
 use App\Enum\GameStatusEnum;
+use App\Game\Model\Card\Hand;
 use App\Game\Model\GameConfiguration;
+use App\Game\Model\State\PlayerState;
 use App\Repository\RoomRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidGenerator;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity(repositoryClass: RoomRepository::class)]
 class Room
@@ -31,6 +35,16 @@ class Room
      */
     #[ORM\ManyToMany(targetEntity: User::class)]
     private Collection $participants;
+
+    /**
+     * @var array<string, array{
+     * 	id: string,
+     * 	username: string,
+     * 	isBot: bool
+     * }>
+     */
+    #[ORM\Column(type: Types::JSON)]
+    private array $bots = [];
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -80,6 +94,70 @@ class Room
     public function getParticipants(): Collection
     {
         return $this->participants;
+    }
+
+    public function addBot(string $id, PlayerState $bot): static
+    {
+        $this->bots[$id] = [
+            'id' => $id,
+            'username' => $bot->playerName,
+            'isBot' => true,
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Drops the most recently added bot and returns its id, or null if none left.
+     */
+    public function removeLastBot(): ?string
+    {
+        if ([] === $this->bots) {
+            return null;
+        }
+
+        $id = array_key_last($this->bots);
+        unset($this->bots[$id]);
+
+        return $id;
+    }
+
+    /**
+     * @return array<string, array{
+     * 	id: string,
+     * 	username: string,
+     * 	isBot: bool
+     * }>
+     */
+    #[Ignore]
+    public function getBots(): array
+    {
+        return $this->bots;
+    }
+
+    /**
+     * Participants (real users) and bots, as a single uniform list.
+     *
+     * @return PlayerState[]
+     */
+    #[Ignore]
+    public function getPlayers(): array
+    {
+        $players = array_map(
+            fn (User $user): PlayerState => new PlayerState(
+                $user->getId()->toString(),
+                $user->getUsername(),
+                0,
+                new Hand([]),
+            ),
+            $this->participants->toArray(),
+        );
+
+        foreach ($this->bots as $id => $bot) {
+            $players[] = new PlayerState($id, $bot['username'], 0, new Hand([]), true);
+        }
+
+        return array_values($players);
     }
 
     public function addParticipant(User $player): static

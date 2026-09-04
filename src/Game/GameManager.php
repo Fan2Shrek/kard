@@ -9,6 +9,7 @@ use App\Enum\GameStatusEnum;
 use App\Game\Builder\DeckBuilder;
 use App\Game\Builder\GameConfigurationBuilder;
 use App\Game\Event\GameFinishedEvent;
+use App\Game\Exception\RuleException;
 use App\Game\Mode\GameModeEnum;
 use App\Game\Mode\GameModeInterface;
 use App\Game\Mode\SetupGameModeInterface;
@@ -27,12 +28,24 @@ use App\Game\Service\GameEventApplier;
 use App\Game\StateProvider\GameStateProviderInterface;
 use App\Repository\ResultRepository;
 use App\Repository\UserRepository;
+use App\Service\Bot\GameAI;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 final class GameManager implements ServiceSubscriberInterface
 {
+    /**
+     * A bot legitimately replays several turns in a row (ending a round in
+     * President hands the lead back to the same player), so the ceiling can't be
+     * the player count. It only exists so a mode that never advances the turn
+     * can't spin forever.
+     */
+    private const int MAX_BOT_TURNS = 50;
+
+    private int $botTurnDepth = 0;
+
     /**
      * @param iterable<GameModeInterface> $gameModes
      */
@@ -51,6 +64,9 @@ final class GameManager implements ServiceSubscriberInterface
             'result_repository' => ResultRepository::class,
             'user_repository' => UserRepository::class,
             'event_dispatcher' => EventDispatcherInterface::class,
+            // lazy: GameAI depends on GameManager, so it can't be a constructor arg
+            'game_ai' => GameAI::class,
+            'logger' => LoggerInterface::class,
         ];
     }
 
@@ -74,21 +90,23 @@ final class GameManager implements ServiceSubscriberInterface
         $gameMode = $this->getGameMode($room->getGameMode()->getValue());
         $deck = $this->createDeck($room->getConfiguration());
         $cards = $deck->cards;
-        [$hands, $drawPile] = $this->drawHands($deck, $room->getParticipants()->count(), $gameMode);
+        $roomPlayers = $room->getPlayers();
+        [$hands, $drawPile] = $this->drawHands($deck, count($roomPlayers), $gameMode);
         // DrawPile is keyed by card id with id values too (like Hand/DiscardPile),
         // not the Card objects themselves - array_map preserves the id keys here
         $drawPileIds = array_map(fn (Card $card): string => $card->id, $drawPile);
 
         $players = [];
 
-        foreach ($room->getParticipants() as $k => $player) {
+        foreach ($roomPlayers as $k => $player) {
             $hand = $hands[$k];
 
             $players[] = new PlayerState(
-                $player->getId()->toString(),
-                $player->getUsername(),
+                $player->id,
+                $player->playerName,
                 count($hand),
                 new Hand(array_map(fn (Card $card): string => $card->id, $hand)),
+                $player->isBot,
             );
         }
 
@@ -125,7 +143,10 @@ final class GameManager implements ServiceSubscriberInterface
 
         $this->gameStateProvider->save($room->getId()->toString(), $state);
 
-        return $state;
+        // the game can open on a bot - nothing else would ever wake it up
+        $this->playPendingBotTurns($room, $state);
+
+        return $this->gameStateProvider->get($room->getId()->toString());
     }
 
     /**
@@ -134,8 +155,19 @@ final class GameManager implements ServiceSubscriberInterface
      */
     public function play(Room $room, User $user, array $cards, array $data = []): void
     {
+        $this->playAs($room, $user->getId()->toString(), $cards, $data);
+    }
+
+    /**
+     * Plays for any player, human or bot - $playerId is a GameState player id.
+     *
+     * @param array<string>        $cards
+     * @param array<string, mixed> $data
+     */
+    public function playAs(Room $room, string $playerId, array $cards, array $data = []): void
+    {
         $state = $this->gameStateProvider->get($room->getId()->toString());
-        $player = $this->resolveActingPlayer($state, $user->getId()->toString());
+        $player = $this->resolveActingPlayer($state, $playerId);
 
         $this->assertCanPlay($state, $player);
 
@@ -173,6 +205,51 @@ final class GameManager implements ServiceSubscriberInterface
         $this->gameStateProvider->save($room->getId()->toString(), $state);
 
         $this->publisher->publish($room, $events);
+
+        $this->playPendingBotTurns($room, $state);
+    }
+
+    /**
+     * ponytail: les bots jouent en synchrone dans la requete du joueur precedent.
+     * A passer sur Messenger si le service Python devient lent.
+     */
+    private function playPendingBotTurns(Room $room, GameState $state): void
+    {
+        if (GameStatusEnum::FINISHED === $room->getStatus()) {
+            return;
+        }
+
+        $current = $state->players[$state->currentPlayerId] ?? null;
+
+        if (null === $current || !$current->isBot) {
+            return;
+        }
+
+        // playAs() re-enters here for the next player, so one bot per call is enough
+        if (++$this->botTurnDepth > self::MAX_BOT_TURNS) {
+            --$this->botTurnDepth;
+
+            $this->container->get('logger')->error('Bot turn chain hit its ceiling', [
+                'room' => $room->getId()->toString(),
+                'bot' => $current->id,
+            ]);
+
+            return;
+        }
+
+        try {
+            $this->container->get('game_ai')->playAsBot($room, $current, $state);
+        } catch (RuleException $e) {
+            // the human's move is already saved - a bot picking an illegal card
+            // must not blow up their request. Stop the chain and leave a trace.
+            $this->container->get('logger')->error('Bot played an illegal move', [
+                'room' => $room->getId()->toString(),
+                'bot' => $current->id,
+                'exception' => $e,
+            ]);
+        } finally {
+            --$this->botTurnDepth;
+        }
     }
 
     private function getGameMode(GameModeEnum $gameModeEnum): GameModeInterface
@@ -224,12 +301,17 @@ final class GameManager implements ServiceSubscriberInterface
 
         $room->setStatus(GameStatusEnum::FINISHED);
 
+        // dispatched for bots too - this is what tells the front the game is over
+        $this->container->get('event_dispatcher')->dispatch(new GameFinishedEvent($room, $state, $player));
+
+        if ($player->isBot) {
+            // no User row behind a bot, so nothing to record in the leaderboard
+            return;
+        }
+
         $winner = $this->container->get('user_repository')->find($player->id);
 
-        $result = new Result($winner, $room);
-
-        $this->container->get('event_dispatcher')->dispatch(new GameFinishedEvent($room, $state, $winner));
-        $this->container->get('result_repository')->save($result);
+        $this->container->get('result_repository')->save(new Result($winner, $room));
     }
 
     private function createDeck(GameConfiguration $config): Deck

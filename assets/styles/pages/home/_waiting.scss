@@ -62,51 +62,6 @@
       gap: 1rem;
     }
 
-    &__field {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 1rem;
-      font-size: 0.95rem;
-      color: var(--text-gray);
-
-      span {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
-
-      svg {
-        width: 1.1rem;
-        height: 1.1rem;
-        color: var(--text-gray-accent);
-        flex: none;
-      }
-
-      input[type='checkbox'] {
-        width: 1.25rem;
-        height: 1.25rem;
-        accent-color: var(--text-green);
-        cursor: pointer;
-      }
-
-      input[type='number'] {
-        width: 4rem;
-        color: var(--text-gray);
-        padding: 0.4rem 0.6rem;
-        border: 1px solid rgb(255 255 255 / 0.1);
-        border-radius: 0.5rem;
-        background-color: rgb(0 0 0 / 0.5);
-        font-size: 1rem;
-        text-align: center;
-
-        &:focus {
-          outline: 2px solid var(--text-green);
-          outline-offset: 1px;
-        }
-      }
-    }
-
     &__list {
       list-style: none;
       padding: 0;
@@ -133,6 +88,60 @@
           color: var(--text-gray-accent);
           flex: none;
         }
+      }
+    }
+  }
+
+  // segmented control: [-] (bot) n [+] - matches .button--medium's metrics so it
+  // lines up with its neighbours in .links-row
+  .bot-stepper {
+    display: flex;
+    align-items: stretch;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: #dc2626;
+    color: #fff;
+
+    &__step {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1rem;
+      border: none;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      transition: background-color 0.3s;
+
+      svg {
+        width: 1.25rem;
+        height: 1.25rem;
+      }
+
+      &:hover:not(:disabled) {
+        background: var(--card-red);
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    }
+
+    &__count {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      min-width: 4.5rem;
+      padding: 0.75rem 0.5rem;
+      font-size: 1rem;
+      font-variant-numeric: tabular-nums;
+      background: rgba(0, 0, 0, 0.15);
+
+      svg {
+        width: 1.5rem;
+        height: 1.5rem;
       }
     }
   }

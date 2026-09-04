@@ -173,7 +173,7 @@ describe('Menteur: fin de partie', function () {
 });
 
 describe('Menteur: events', function () {
-    test("Une contestation envoie un événement ChallengeResult avec le bon résultat", function () {
+    test('Une contestation envoie un événement ChallengeResult avec le bon résultat', function () {
         Arrange::setMenteurRound([
             ['cards' => [7], 'rank' => 8],
         ]);
