@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Game\Model\State;
 
+use App\Game\Model\Card\AbstractCardStack;
 use App\Game\Model\Card\Card;
 use App\Game\Model\Card\DiscardPile;
 use App\Game\Model\Card\DrawPile;
@@ -16,10 +17,11 @@ final readonly class GameState
     public array $players;
 
     /**
-     * @param PlayerState[]       $players
-     * @param string[]            $playerOrder
-     * @param array<int, Round>   $rounds
-     * @param array<string, Card> $cards
+     * @param PlayerState[]                    $players
+     * @param string[]                         $playerOrder
+     * @param array<int, Round>                $rounds
+     * @param array<string, Card>              $cards
+     * @param array<string, AbstractCardStack> $piles       extra named stacks (solitaire tableau/foundations)
      */
     public function __construct(
         array $players,
@@ -29,6 +31,7 @@ final readonly class GameState
         public DiscardPile $discardPile,
         public DrawPile $drawPile,
         public array $cards,
+        public array $piles = [],
     ) {
         $this->players = array_combine(array_map(fn (PlayerState $player) => $player->id, $players), $players);
     }
@@ -43,6 +46,7 @@ final readonly class GameState
             $this->discardPile,
             $this->drawPile,
             $this->cards,
+            $this->piles,
         );
     }
 
@@ -59,6 +63,7 @@ final readonly class GameState
             $this->discardPile,
             $this->drawPile,
             $this->cards,
+            $this->piles,
         );
     }
 
@@ -72,6 +77,7 @@ final readonly class GameState
             $this->discardPile,
             $this->drawPile,
             $this->cards,
+            $this->piles,
         );
     }
 
@@ -85,6 +91,7 @@ final readonly class GameState
             $discardPile,
             $this->drawPile,
             $this->cards,
+            $this->piles,
         );
     }
 
@@ -98,6 +105,7 @@ final readonly class GameState
             $this->discardPile,
             $drawPile,
             $this->cards,
+            $this->piles,
         );
     }
 
@@ -114,6 +122,7 @@ final readonly class GameState
             $this->discardPile,
             $this->drawPile,
             $this->cards,
+            $this->piles,
         );
     }
 
@@ -130,6 +139,29 @@ final readonly class GameState
             $this->discardPile,
             $this->drawPile,
             $this->cards,
+            $this->piles,
+        );
+    }
+
+    public function getPile(string $key): AbstractCardStack
+    {
+        return $this->piles[$key] ?? throw new \InvalidArgumentException(\sprintf('Pile "%s" not found.', $key));
+    }
+
+    /**
+     * @param array<string, AbstractCardStack> $piles
+     */
+    public function withPiles(array $piles): self
+    {
+        return new self(
+            $this->players,
+            $this->playerOrder,
+            $this->currentPlayerId,
+            $this->rounds,
+            $this->discardPile,
+            $this->drawPile,
+            $this->cards,
+            $piles,
         );
     }
 
@@ -184,6 +216,7 @@ final readonly class GameState
             $this->discardPile,
             $this->drawPile,
             $this->cards,
+            $this->piles,
         );
     }
 }

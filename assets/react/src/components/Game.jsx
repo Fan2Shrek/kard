@@ -9,6 +9,7 @@ import {
     CrazyEightsBoard,
     MenteurBoard,
     PresidentBoard,
+    SolitaireBoard,
 } from './components.js';
 
 import './game.css';
@@ -127,6 +128,7 @@ export default ({ gameContext, player: userJson, gameMode, roomId }) => {
                 { 'president' === gameMode && <PresidentBoard ctx={ctx} player={player} /> }
                 { 'crazy_eights' === gameMode && <CrazyEightsBoard ctx={ctx} player={player} /> }
                 { 'menteur' === gameMode && <MenteurBoard ctx={ctx} player={player} /> }
+                { 'solitaire' === gameMode && <SolitaireBoard ctx={ctx} /> }
             </Board>
         </GameContext>
     </div>;

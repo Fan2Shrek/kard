@@ -115,6 +115,21 @@ class GameContext
         ]);
     }
 
+    /**
+     * Moves cards between two named stacks (solitaire's tableau columns,
+     * foundations, plus the 'stock' and 'waste' aliases for the draw/discard piles).
+     *
+     * @param string[] $cardIds in destination order (bottom first)
+     */
+    public function moveCards(string $from, string $to, array $cardIds): void
+    {
+        $this->pushEvent(GameEventTypeEnum::CARDS_MOVED, [
+            'from' => $from,
+            'to' => $to,
+            'cards' => $cardIds,
+        ]);
+    }
+
     public function skipNextPlayerTurn(): void
     {
         $this->pushEvent(GameEventTypeEnum::TURN_SKIPPED, [

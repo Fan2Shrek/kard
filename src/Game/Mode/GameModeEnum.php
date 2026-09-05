@@ -9,4 +9,5 @@ enum GameModeEnum: string
     case PRESIDENT = 'president';
     case CRAZY_EIGHTS = 'crazy_eights';
     case MENTEUR = 'menteur';
+    case SOLITAIRE = 'solitaire';
 }

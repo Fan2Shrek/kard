@@ -20,6 +20,12 @@ final class GameModeDescriptionFixtures extends AbstractFixtures implements Depe
             'img' => 'https://www.president.fr/wp-content/uploads/2020/09/23088734_Cam-EF_DAM_2024-copie-540x540.png',
             'description' => 'Un jeu de fou',
         ];
+
+        yield [
+            'gameMode' => $this->getReference('GameMode_4', GameMode::class),
+            'img' => '4ebfc052904724ae7f5df330c494a4d3f9729777.svg',
+            'description' => 'Le classique en solo : remontez les quatre familles de l\'as au roi',
+        ];
     }
 
     public function getDependencies(): array

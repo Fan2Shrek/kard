@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace App\Game\Service;
 
 use App\Enum\GameEventTypeEnum;
+use App\Game\Model\Card\AbstractCardStack;
+use App\Game\Model\Card\DiscardPile;
+use App\Game\Model\Card\DrawPile;
+use App\Game\Model\Card\Pile;
 use App\Game\Model\Event\GameEvent;
 use App\Game\Model\State\GameState;
 use App\Game\Model\State\Round;
@@ -12,6 +16,9 @@ use App\Game\Model\State\Turn;
 
 final class GameEventApplier
 {
+    public const STOCK = 'stock';
+    public const WASTE = 'waste';
+
     public function apply(GameEvent $event, GameState $gameState): GameState
     {
         $newState = match ($event->type) {
@@ -27,6 +34,7 @@ final class GameEventApplier
             GameEventTypeEnum::REVERSE_PLAYERS_ORDER => $this->handleReversePlayersOrder($gameState),
             GameEventTypeEnum::ROUND_RESET => $this->handleRoundReset($gameState),
             GameEventTypeEnum::CURRENT_PLAYER_SET => $this->handleCurrentPlayerSet($gameState, $event),
+            GameEventTypeEnum::CARDS_MOVED => $this->handleCardsMoved($gameState, $event),
 
             GameEventTypeEnum::CARD_OR_NOTHING_CALLED,
             GameEventTypeEnum::SUIT_CHANGED,
@@ -34,6 +42,47 @@ final class GameEventApplier
         };
 
         return $newState;
+    }
+
+    private function handleCardsMoved(GameState $state, GameEvent $event): GameState
+    {
+        $from = $event->payload['from'] ?? null;
+        $to = $event->payload['to'] ?? null;
+        $cardIds = $event->payload['cards'] ?? [];
+
+        if (null === $from || null === $to) {
+            throw new \RuntimeException('No from or to found in event payload.');
+        }
+
+        $source = $this->readStack($state, $from);
+        $target = $this->readStack($state, $to);
+
+        foreach ($cardIds as $cardId) {
+            $source = $source->removeCard($cardId);
+            $target = $target->addCard($cardId);
+        }
+
+        return $this->writeStack($this->writeStack($state, $from, $source), $to, $target);
+    }
+
+    private function readStack(GameState $state, string $key): AbstractCardStack
+    {
+        return match ($key) {
+            self::STOCK => $state->drawPile,
+            self::WASTE => $state->discardPile,
+            default => $state->piles[$key] ?? new Pile(),
+        };
+    }
+
+    private function writeStack(GameState $state, string $key, AbstractCardStack $stack): GameState
+    {
+        // the draw pile is keyed by card id (DrawPile::removeCard unsets by key),
+        // so rebuild that keying instead of letting addCard() append numeric keys
+        return match ($key) {
+            self::STOCK => $state->withDrawPile(new DrawPile(array_combine($stack->cards, $stack->cards))),
+            self::WASTE => $state->withDiscardPile(new DiscardPile(array_values($stack->cards))),
+            default => $state->withPiles([...$state->piles, $key => new Pile(array_values($stack->cards))]),
+        };
     }
 
     private function handleReversePlayersOrder(GameState $state): GameState

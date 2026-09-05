@@ -59,6 +59,11 @@ final class RoomController extends AbstractController
             $this->roomRepository->save($room);
             $this->eventDispatcher->dispatch(new RoomEvent($room), 'room.created');
 
+            // a solo game has nobody to wait for, and nothing to advertise on the home page
+            if (GameModeEnum::SOLITAIRE === $gameModeEnum) {
+                return $this->redirectToRoute('game_start', ['id' => $room->getId()]);
+            }
+
             $this->hub->publish(new Update(
                 'current_games',
                 $this->renderView('components/turbo/game-details.html.twig', ['game' => $room])
