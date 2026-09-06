@@ -5,6 +5,7 @@ namespace App\Controller\Api;
 use App\Domain\DTO\GameStateDTO;
 use App\Entity\Room;
 use App\Entity\User;
+use App\Enum\GameStatusEnum;
 use App\Game\GameManager;
 use App\Game\StateProvider\GameStateProviderInterface;
 use App\Repository\RoomRepository;
@@ -13,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Annotation\Route;
@@ -66,6 +68,7 @@ final class GameController extends AbstractController
         RoomRepository $roomRepository,
     ): Response {
         $this->assertIsOwner($room);
+        $this->assertIsWaiting($room);
 
         $player = GameAI::create();
         $room->addBot($player->id, $player);
@@ -91,6 +94,7 @@ final class GameController extends AbstractController
         RoomRepository $roomRepository,
     ): Response {
         $this->assertIsOwner($room);
+        $this->assertIsWaiting($room);
 
         $botId = $room->removeLastBot();
 
@@ -127,6 +131,13 @@ final class GameController extends AbstractController
     {
         if ($room->getOwner() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
+        }
+    }
+
+    private function assertIsWaiting(Room $room): void
+    {
+        if (GameStatusEnum::WAITING !== $room->getStatus()) {
+            throw new ConflictHttpException('Bots can only be added or removed while the room is waiting for players.');
         }
     }
 

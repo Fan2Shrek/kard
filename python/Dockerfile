@@ -1,9 +1,7 @@
-FROM python:3.10-slim AS base
+FROM python:3.10-slim
 
-FROM base AS main
-
-COPY . /app
 WORKDIR /app
+COPY . /app
 
 RUN pip install -r requirements.txt
 
