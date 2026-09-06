@@ -51,13 +51,13 @@ jobs:
               - 'python/**'
 
       - name: Login to GitHub Container Registry
-        if: steps.filter.outputs.bot == 'true'
+        if: steps.filter.outputs.bot == 'true' || github.event_name == 'workflow_dispatch'
         run: echo "${{ secrets.REGISTRY }}" | docker login ghcr.io -u Fan2Shrek --password-stdin
 
       - name: Build image
-        if: steps.filter.outputs.bot == 'true'
+        if: steps.filter.outputs.bot == 'true' || github.event_name == 'workflow_dispatch'
         run: ${COMPOSE} build bot
 
       - name: Push image
-        if: steps.filter.outputs.bot == 'true'
+        if: steps.filter.outputs.bot == 'true' || github.event_name == 'workflow_dispatch'
         run: ${COMPOSE} push bot
