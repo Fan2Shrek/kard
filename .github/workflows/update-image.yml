@@ -32,3 +32,32 @@ jobs:
 
       - name: Push image
         run: ${COMPOSE} push php
+
+  build-bot:
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ github.ref_name == 'master' && 'latest' || 'dev' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for bot changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            bot:
+              - 'python/**'
+
+      - name: Login to GitHub Container Registry
+        if: steps.filter.outputs.bot == 'true'
+        run: echo "${{ secrets.REGISTRY }}" | docker login ghcr.io -u Fan2Shrek --password-stdin
+
+      - name: Build image
+        if: steps.filter.outputs.bot == 'true'
+        run: ${COMPOSE} build bot
+
+      - name: Push image
+        if: steps.filter.outputs.bot == 'true'
+        run: ${COMPOSE} push bot
