@@ -1,0 +1,26 @@
+{# Republished over Mercure on every add/remove - see GameController::addAi() #}
+<div id="bot-stepper" class="bot-stepper">
+    <button
+        type="button"
+        class="bot-stepper__step"
+        aria-label="Retirer un bot"
+        onclick="removeBot()"
+        {% if room.bots is empty %}disabled{% endif %}
+    >
+        <twig:UX:Icon name="lucide:minus" />
+    </button>
+
+    <span class="bot-stepper__count">
+        <twig:UX:Icon name="lucide:bot" />
+        <span>{{ room.bots|length }}</span>
+    </span>
+
+    <button
+        type="button"
+        class="bot-stepper__step"
+        aria-label="Ajouter un bot"
+        onclick="addBot()"
+    >
+        <twig:UX:Icon name="lucide:plus" />
+    </button>
+</div>

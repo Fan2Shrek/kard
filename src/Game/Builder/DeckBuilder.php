@@ -44,9 +44,9 @@ final class DeckBuilder
         return $this;
     }
 
-	/**
-	 * @return Card[]
-	 */
+    /**
+     * @return Card[]
+     */
     private function getOneDeckCards(): array
     {
         $cards = [];

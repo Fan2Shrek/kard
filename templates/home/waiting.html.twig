@@ -15,7 +15,6 @@
                     {{ include('components/turbo/player-join.html.twig', {player: player}) }}
                 {% endfor %}
             </div>
-
             {{ include('components/room-configuration.html.twig', {room: room, configuration: configuration}) }}
         </div>
 
@@ -33,6 +32,7 @@
                     iconLeft="lucide:circle-play"
                     variant="success"
                 />
+                {{ include('components/bot-stepper.html.twig', {room: room}) }}
             {% endif %}
             <twig:Button
                 text="copier le lien"
@@ -51,5 +51,16 @@
         const copyLink = () => {
             navigator.clipboard.writeText(window.location.href);
         }
+        const post = (url) => fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }).catch(error => {
+            console.error('Erreur:', error);
+        });
+
+        const addBot = () => post("{{ path('add_ai', {id: room.id}) }}");
+        const removeBot = () => post("{{ path('remove_ai', {id: room.id}) }}");
     </script>
 {% endblock %}

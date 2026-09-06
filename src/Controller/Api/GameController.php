@@ -7,10 +7,14 @@ use App\Entity\Room;
 use App\Entity\User;
 use App\Game\GameManager;
 use App\Game\StateProvider\GameStateProviderInterface;
+use App\Repository\RoomRepository;
+use App\Service\Bot\GameAI;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mercure\HubInterface;
+use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/api/game')]
@@ -53,6 +57,77 @@ final class GameController extends AbstractController
         $this->gameManager->play($room, $user, $cards, $data);
 
         return new JsonResponse();
+    }
+
+    #[Route('/{id}/add_ai', name: 'add_ai', methods: ['POST'])]
+    public function addAi(
+        Room $room,
+        HubInterface $hub,
+        RoomRepository $roomRepository,
+    ): Response {
+        $this->assertIsOwner($room);
+
+        $player = GameAI::create();
+        $room->addBot($player->id, $player);
+        $roomRepository->save($room);
+
+        // same topic the waiting screen subscribes to - see home/waiting.html.twig
+        $hub->publish(new Update(
+            \sprintf('game-%s-waiting', $room->getId()),
+            $this->renderView('components/turbo/player-join.html.twig', [
+                'player' => $player,
+            ])
+        ));
+
+        $this->publishBotStepper($hub, $room);
+
+        return new JsonResponse();
+    }
+
+    #[Route('/{id}/remove_ai', name: 'remove_ai', methods: ['POST'])]
+    public function removeAi(
+        Room $room,
+        HubInterface $hub,
+        RoomRepository $roomRepository,
+    ): Response {
+        $this->assertIsOwner($room);
+
+        $botId = $room->removeLastBot();
+
+        if (null === $botId) {
+            return new JsonResponse();
+        }
+
+        $roomRepository->save($room);
+
+        // same target the waiting screen gives each player - see player-join.html.twig
+        $hub->publish(new Update(
+            \sprintf('game-%s-waiting', $room->getId()),
+            \sprintf('<turbo-stream action="remove" target="player-%s"></turbo-stream>', $botId),
+        ));
+
+        $this->publishBotStepper($hub, $room);
+
+        return new JsonResponse();
+    }
+
+    /**
+     * Keeps the counter (and the disabled state of "-") in sync for every viewer.
+     * Turbo ignores the update for non-owners, who never render the stepper.
+     */
+    private function publishBotStepper(HubInterface $hub, Room $room): void
+    {
+        $hub->publish(new Update(
+            \sprintf('game-%s-waiting', $room->getId()),
+            $this->renderView('components/turbo/bot-stepper.html.twig', ['room' => $room]),
+        ));
+    }
+
+    private function assertIsOwner(Room $room): void
+    {
+        if ($room->getOwner() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
     }
 
     protected function getUser(): User

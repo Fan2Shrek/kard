@@ -13,9 +13,9 @@ final class GameConfigurationBuilder
 {
     public const MAX_DECK_COUNT = 4;
 
-	/**
-	* @param array<string, mixed> $rawOptions
-	*/
+    /**
+     * @param array<string, mixed> $rawOptions
+     */
     public function build(GameModeInterface $mode, array $rawOptions): GameConfiguration
     {
         $resolver = new OptionsResolver();
