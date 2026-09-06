@@ -79,3 +79,6 @@ twig-lint:
 
 twig-lint-dry:
 	$(TWIG_FIXER) --report=github
+
+sass:
+	$(CONSOLE) sass:build
