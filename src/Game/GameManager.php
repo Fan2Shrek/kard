@@ -157,7 +157,7 @@ final class GameManager implements ServiceSubscriberInterface
      */
     public function play(Room $room, User $user, array $cards, array $data = []): GameState
     {
-        $this->playAs($room, $user->getId()->toString(), $cards, $data);
+        return $this->playAs($room, $user->getId()->toString(), $cards, $data);
     }
 
     /**
@@ -166,7 +166,7 @@ final class GameManager implements ServiceSubscriberInterface
      * @param array<string>        $cards
      * @param array<string, mixed> $data
      */
-    public function playAs(Room $room, string $playerId, array $cards, array $data = []): void
+    public function playAs(Room $room, string $playerId, array $cards, array $data = []): GameState
     {
         $state = $this->gameStateProvider->get($room->getId()->toString());
         $player = $this->resolveActingPlayer($state, $playerId);
@@ -209,9 +209,9 @@ final class GameManager implements ServiceSubscriberInterface
 
         $this->publisher->publish($room, $events, $player->id);
 
-        return $state;
-
         $this->playPendingBotTurns($room, $state);
+
+        return $state;
     }
 
     /**
