@@ -60,7 +60,7 @@ final class RoomController extends AbstractController
             $this->eventDispatcher->dispatch(new RoomEvent($room), 'room.created');
 
             // a solo game has nobody to wait for, and nothing to advertise on the home page
-            if (GameModeEnum::SOLITAIRE === $gameModeEnum) {
+            if ($gameModeEnum->isSolo()) {
                 return $this->redirectToRoute('game_start', ['id' => $room->getId()]);
             }
 

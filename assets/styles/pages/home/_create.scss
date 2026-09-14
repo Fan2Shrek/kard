@@ -30,16 +30,42 @@
     }
   }
 
+  &__section-title {
+    display: inline-block;
+    margin: 2.5rem auto 0;
+    padding: 0.5rem 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    background: rgb(0 0 0 / 0.4);
+    border-radius: 0.5rem;
+
+    &::before,
+    &::after {
+      content: '';
+      display: inline-block;
+      width: 2.5rem;
+      height: 1px;
+      background: var(--card-red);
+      vertical-align: middle;
+      margin: 0 1rem;
+    }
+  }
+
   .description {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
 
     &__list {
       margin-top: 1.6rem;
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-wrap: wrap;
       gap: 50px;
     }
 

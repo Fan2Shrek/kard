@@ -10,4 +10,9 @@ enum GameModeEnum: string
     case CRAZY_EIGHTS = 'crazy_eights';
     case MENTEUR = 'menteur';
     case SOLITAIRE = 'solitaire';
+
+    public function isSolo(): bool
+    {
+        return self::SOLITAIRE === $this;
+    }
 }

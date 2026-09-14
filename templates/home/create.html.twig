@@ -9,16 +9,36 @@
         <div class="create__content">
             <form method="POST" id="gameModeForm">
                 <input type="hidden" name="gameMode" id="selectedMode" value=""/>
+
+                <h2 class="create__section-title">Multijoueur</h2>
                 <div class="description__list">
                     {% for mode in gameModes %}
-                        {% set description = descriptions[mode.id] %}
-                        <div class="description__container">
-                            <div class="description__before"></div>
-                            <a class="description__card" style="background-image: url('{{ asset('uploads/game_mode/' ~ description.img) }}');"
-                               onClick="handleClick('{{ mode.value.value }}')">
-                                <p class="description__content">{{ mode.value.value|capitalize }}</p>
-                            </a>
-                        </div>
+                        {% if not mode.value.isSolo() %}
+                            {% set description = descriptions[mode.id] %}
+                            <div class="description__container">
+                                <div class="description__before"></div>
+                                <a class="description__card" style="background-image: url('{{ asset('uploads/game_mode/' ~ description.img) }}');"
+                                   onClick="handleClick('{{ mode.value.value }}')">
+                                    <p class="description__content">{{ mode.value.value|capitalize }}</p>
+                                </a>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <h2 class="create__section-title">Solo</h2>
+                <div class="description__list">
+                    {% for mode in gameModes %}
+                        {% if mode.value.isSolo() %}
+                            {% set description = descriptions[mode.id] %}
+                            <div class="description__container">
+                                <div class="description__before"></div>
+                                <a class="description__card" style="background-image: url('{{ asset('uploads/game_mode/' ~ description.img) }}');"
+                                   onClick="handleClick('{{ mode.value.value }}')">
+                                    <p class="description__content">{{ mode.value.value|capitalize }}</p>
+                                </a>
+                            </div>
+                        {% endif %}
                     {% endfor %}
                 </div>
             </form>
