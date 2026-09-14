@@ -6,9 +6,10 @@ export const GameContext = createContext({
     currentPlayer: null,
     player: null,
     isPlayerTurn: () => { },
+    applyState: () => { },
 })
 
-export const GameContextProvider = ({ children, gameContext, player, roomId }) => {
+export const GameContextProvider = ({ children, gameContext, player, roomId, applyState }) => {
     const isPlayerTurn = useCallback(() => {
         return gameContext.currentPlayerId === player.id;
     }, [gameContext, player]);
@@ -24,6 +25,7 @@ export const GameContextProvider = ({ children, gameContext, player, roomId }) =
         currentPlayer,
         player,
         isPlayerTurn,
+        applyState,
     }}>
         {children}
     </GameContext.Provider>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React from 'react';
 import { useSpring, animated } from '@react-spring/web';
 
 import './card.css';
@@ -11,14 +11,16 @@ export default ({
     onClick = () => {},
     angle = 0,
     xOffset = 0,
-    yOffset = 0
+    yOffset = 0,
+    lift = 75
 }) => {
-    const [toggle, setToggle] = useState(selected);
-
+    // The lift follows the `selected` prop alone. It used to also toggle on its
+    // own on every click, which lifted cards the parent had not selected - the
+    // card you clicked to drop onto, for instance.
     const { transform } = useSpring({
         transform: `
             rotate(${angle}deg)
-            translate(${xOffset}px, ${yOffset + (toggle ? -75 : 0)}px)
+            translate(${xOffset}px, ${yOffset + (selected ? -lift : 0)}px)
         `,
         config: { tension: 170, friction: 26 }
     });
@@ -26,13 +28,8 @@ export default ({
     const handleClick = () => {
         if (!clickable) return;
 
-        setToggle(!toggle);
         onClick(card);
     };
-
-    useEffect(() => {
-        setToggle(selected);
-    }, [selected]);
 
     return (
         <animated.div

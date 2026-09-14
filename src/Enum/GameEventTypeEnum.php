@@ -23,6 +23,9 @@ enum GameEventTypeEnum: string
     // CRAZY EIGHTS
     case SUIT_CHANGED = 'suit_changed';
 
+    // SOLITAIRE
+    case CARDS_MOVED = 'cards_moved';
+
     // MENTEUR
     case ROUND_RESET = 'round_reset';
     case CURRENT_PLAYER_SET = 'current_player_set';

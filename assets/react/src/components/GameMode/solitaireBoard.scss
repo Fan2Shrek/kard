@@ -1,0 +1,139 @@
+// Cards are sized from the viewport so the seven columns always fit side by
+// side without scrolling - the global .card size (100px, with a 173px image
+// spilling out of it) is far too big for a full Klondike layout.
+.solitaire {
+    --card-width: clamp(60px, min(12vw, 12vh), 156px);
+    --card-height: calc(var(--card-width) * 1.4);
+    --card-gap: clamp(6px, 1vw, 18px);
+    // how much of a buried card still shows above the one covering it
+    // tight enough that a full column (six face-down plus a king-to-ace run)
+    // still fits in the viewport - .board clips anything taller
+    --stack-peek: calc(var(--card-height) * 0.22);
+    --stack-peek-down: calc(var(--card-height) * 0.1);
+
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--card-gap);
+    padding: var(--card-gap) clamp(8px, 2vw, 32px);
+    min-height: 100vh;
+    max-height: 100vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+
+    .card {
+        width: var(--card-width);
+        padding-left: 0;
+
+        img {
+            width: 100%;
+            height: var(--card-height);
+        }
+    }
+
+    &__top {
+        display: flex;
+        gap: var(--card-gap);
+        align-items: flex-start;
+    }
+
+    &__foundations {
+        display: flex;
+        gap: var(--card-gap);
+        margin-left: auto;
+    }
+
+    &__tableau {
+        flex: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: var(--card-gap);
+    }
+
+    &__column {
+        flex: 0 0 var(--card-width);
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__slot-card {
+        width: var(--card-width);
+        height: var(--card-height);
+
+        + .solitaire__slot-card {
+            margin-top: calc(var(--stack-peek) - var(--card-height));
+        }
+
+        &--down + .solitaire__slot-card--down {
+            margin-top: calc(var(--stack-peek-down) - var(--card-height));
+        }
+    }
+
+    // where the picked-up card is allowed to land: the empty slot itself, or the
+    // bottom card of a column, since that is what it will be dropped onto
+    &__foundation--target &__empty,
+    &__foundation--target .card img,
+    &__column--target &__empty,
+    &__column--target &__slot-card:last-child .card img {
+        border-color: #ffd76a;
+        box-shadow: 0 0 0 3px rgba(255, 215, 106, .85), 0 0 18px rgba(255, 215, 106, .6);
+        animation: solitaire-target 1.2s ease-in-out infinite;
+    }
+
+    &__status {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        color: #fff;
+        font-variant-numeric: tabular-nums;
+    }
+
+    &__actions {
+        position: fixed;
+        right: clamp(8px, 2vw, 32px);
+        bottom: clamp(8px, 2vw, 32px);
+        z-index: 100;
+        display: flex;
+        width: max-content;
+        gap: .75rem;
+    }
+
+    &__empty {
+        width: var(--card-width);
+        height: var(--card-height);
+        border: 2px dashed rgba(255, 255, 255, .35);
+        border-radius: .5rem;
+        box-sizing: border-box;
+    }
+
+    &__stock,
+    &__waste,
+    &__foundation {
+        width: var(--card-width);
+        height: var(--card-height);
+    }
+
+    &__stock {
+        cursor: pointer;
+    }
+
+    .error {
+        position: absolute;
+        top: var(--card-gap);
+        left: 50%;
+        transform: translateX(-50%);
+        padding: .5rem 1.25rem;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, .7);
+        color: #fff;
+    }
+}
+
+@keyframes solitaire-target {
+    50% {
+        box-shadow: 0 0 0 3px rgba(255, 215, 106, 1), 0 0 26px rgba(255, 215, 106, .9);
+    }
+}

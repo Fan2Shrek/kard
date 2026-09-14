@@ -141,6 +141,8 @@ final class GameManager implements ServiceSubscriberInterface
             }
         }
 
+        $state = $state->startedNow();
+
         $this->gameStateProvider->save($room->getId()->toString(), $state);
 
         // the game can open on a bot - nothing else would ever wake it up
@@ -153,9 +155,9 @@ final class GameManager implements ServiceSubscriberInterface
      * @param array<string>        $cards
      * @param array<string, mixed> $data
      */
-    public function play(Room $room, User $user, array $cards, array $data = []): void
+    public function play(Room $room, User $user, array $cards, array $data = []): GameState
     {
-        $this->playAs($room, $user->getId()->toString(), $cards, $data);
+        return $this->playAs($room, $user->getId()->toString(), $cards, $data);
     }
 
     /**
@@ -164,7 +166,7 @@ final class GameManager implements ServiceSubscriberInterface
      * @param array<string>        $cards
      * @param array<string, mixed> $data
      */
-    public function playAs(Room $room, string $playerId, array $cards, array $data = []): void
+    public function playAs(Room $room, string $playerId, array $cards, array $data = []): GameState
     {
         $state = $this->gameStateProvider->get($room->getId()->toString());
         $player = $this->resolveActingPlayer($state, $playerId);
@@ -173,7 +175,7 @@ final class GameManager implements ServiceSubscriberInterface
 
         if ($state->everyoneCanPlay()) {
             if ($state->currentPlayerId !== $player->id && [] === $cards) {
-                return;
+                return $state;
             }
 
             $state = $this->applyEveryoneCanPlayOverride($state, $player);
@@ -198,15 +200,18 @@ final class GameManager implements ServiceSubscriberInterface
         }
 
         $events = array_merge($events, $scoreEvents);
+        $state = $state->withMoves($state->moves + 1);
 
         $this->dispatchEvents($events);
         $this->finishGameIfNeeded($room, $player, $state, $gameMode);
 
         $this->gameStateProvider->save($room->getId()->toString(), $state);
 
-        $this->publisher->publish($room, $events);
+        $this->publisher->publish($room, $events, $player->id);
 
         $this->playPendingBotTurns($room, $state);
+
+        return $state;
     }
 
     /**
@@ -311,7 +316,14 @@ final class GameManager implements ServiceSubscriberInterface
 
         $winner = $this->container->get('user_repository')->find($player->id);
 
-        $this->container->get('result_repository')->save(new Result($winner, $room));
+        $duration = null === $state->startedAt
+            ? null
+            : (new \DateTimeImmutable())->getTimestamp() - $state->startedAt->getTimestamp();
+
+        $result = new Result($winner, $room, $state->moves, $duration);
+
+        $this->container->get('event_dispatcher')->dispatch(new GameFinishedEvent($room, $state, $winner));
+        $this->container->get('result_repository')->save($result);
     }
 
     private function createDeck(GameConfiguration $config): Deck

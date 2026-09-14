@@ -19,10 +19,11 @@ use App\Game\Model\State\Turn;
 final readonly class GameStateDTO
 {
     /**
-     * @param PlayerStateDTO[] $players
-     * @param string[]         $playerOrder
-     * @param TurnDTO[][]      $rounds
-     * @param Card[]           $discardPile
+     * @param PlayerStateDTO[]               $players
+     * @param string[]                       $playerOrder
+     * @param TurnDTO[][]                    $rounds
+     * @param Card[]                         $discardPile
+     * @param array<string, list<Card|null>> $piles       named stacks, layout modes only (solitaire); null is a face-down card
      */
     public function __construct(
         public array $players,
@@ -32,6 +33,9 @@ final readonly class GameStateDTO
         public array $discardPile,
         public int $drawPileCount,
         public bool $everyoneCanPlay,
+        public array $piles = [],
+        public int $moves = 0,
+        public ?string $startedAt = null,
     ) {
     }
 
@@ -59,6 +63,16 @@ final readonly class GameStateDTO
             $state->discardPile->cards,
         ));
 
+        // face-down halves stay counted, never enumerated - same reason the draw
+        // pile is exposed as a count only
+        $piles = [];
+
+        foreach ($state->piles as $key => $pile) {
+            $piles[$key] = str_ends_with($key, '_down')
+                ? array_fill(0, $pile->count(), null)
+                : array_values(array_map(fn (string $cardId): Card => $state->cards[$cardId], $pile->cards));
+        }
+
         return new self(
             $players,
             $state->playerOrder,
@@ -67,6 +81,9 @@ final readonly class GameStateDTO
             $discardPile,
             $state->drawPile->count(),
             $state->everyoneCanPlay(),
+            $piles,
+            $state->moves,
+            $state->startedAt?->format(\DateTimeInterface::ATOM),
         );
     }
 }

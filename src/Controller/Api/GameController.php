@@ -56,9 +56,11 @@ final class GameController extends AbstractController
         $cards = $request->toArray()['cards'];
         $data = $request->toArray()['data'];
 
-        $this->gameManager->play($room, $user, $cards, $data);
+        $state = $this->gameManager->play($room, $user, $cards, $data);
 
-        return new JsonResponse();
+        // hand back the resulting state so the caller renders straight away
+        // instead of waiting for its own Mercure echo to trigger a refetch
+        return $this->json(GameStateDTO::fromState($state, $user->getId()->toString()));
     }
 
     #[Route('/{id}/add_ai', name: 'add_ai', methods: ['POST'])]

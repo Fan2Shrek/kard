@@ -30,5 +30,10 @@ class GameModeFixtures extends AbstractFixtures
             'value' => GameModeEnum::MENTEUR,
             'active' => false,
         ];
+
+        yield [
+            'name' => 'Solitaire',
+            'value' => GameModeEnum::SOLITAIRE,
+        ];
     }
 }

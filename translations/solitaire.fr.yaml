@@ -1,0 +1,26 @@
+destination:
+  missing: "Aucune destination indiquée."
+  invalid: "Les cartes ne peuvent pas être déposées ici."
+
+move:
+  no_card: "Aucune carte sélectionnée."
+  single_card_only: "Une seule carte à la fois peut quitter cette pile."
+  not_on_top: "Ces cartes ne sont pas au sommet de leur pile."
+  run_invalid: "Seule une suite descendante de couleurs alternées peut être déplacée."
+  card_not_in_play: "Cette carte n'est pas en jeu."
+
+foundation:
+  no_suit: "Cette carte n'a pas d'enseigne."
+  single_card_only: "Les fondations reçoivent une carte à la fois."
+  wrong_suit: "Ce n'est pas la fondation de cette enseigne."
+  sequence: "Les fondations se montent de l'as au roi."
+
+column:
+  king_only: "Seul un roi peut ouvrir une colonne vide."
+  sequence: "Les colonnes descendent en alternant les couleurs."
+
+draw:
+  empty: "Il n'y a plus rien à piocher."
+
+auto:
+  face_down_remaining: "Il reste des cartes face cachée : la partie n'est pas encore gagnée."

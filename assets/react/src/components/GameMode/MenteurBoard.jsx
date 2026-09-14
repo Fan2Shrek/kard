@@ -24,7 +24,7 @@ const nextRankInCycle = (rank) => RANK_CYCLE[(RANK_CYCLE.indexOf(rank) + 1) % RA
 const defaultSort = (cards) => sortByRank(cards, RANK_CYCLE);
 
 export default ({ ctx, player }) => {
-    const { roomId, currentPlayer } = useContext(GameContext);
+    const { roomId, currentPlayer, applyState } = useContext(GameContext);
     const { getCardAsset } = useContext(AssetsContext);
 
     const [selectedCards, setSelectedCards] = useState([]);
@@ -82,6 +82,7 @@ export default ({ ctx, player }) => {
             return;
         }
 
+        applyState(await response.json());
         setSelectedCards([]);
         setDeclaredRank('');
     };

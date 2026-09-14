@@ -11,6 +11,7 @@ export { default as Board } from './GameMode/Board.js';
 export { default as PresidentBoard } from './GameMode/PresidentBoard.js';
 export { default as CrazyEightsBoard } from './GameMode/CrazyEightsBoard.js';
 export { default as MenteurBoard } from './GameMode/MenteurBoard.js';
+export { default as SolitaireBoard } from './GameMode/SolitaireBoard.js';
 
 // Hand
 export { default as Hand } from './Hand/Hand.js';

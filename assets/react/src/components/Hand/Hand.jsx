@@ -14,7 +14,7 @@ import './hand.css';
 const DEFAULT_RANK_ORDER = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'j', 'q', 'k', '1'];
 
 export default forwardRef(({ hand, canPlay, order = null, gameActions = null }, ref) => {
-	const { roomId, currentPlayer } = useContext(GameContext);
+	const { roomId, currentPlayer, applyState } = useContext(GameContext);
 	const { getCardAsset } = useContext(AssetsContext);
 	const rankOrder = order ?? DEFAULT_RANK_ORDER;
 	const [selectedCards, setSelectedCards] = useState([]);
@@ -44,6 +44,8 @@ export default forwardRef(({ hand, canPlay, order = null, gameActions = null }, 
 		if (!response.ok) {
 			const errorData = await response.json();
 			setError(errorData.error);
+		} else {
+			applyState(await response.json());
 		}
 
 		setSelectedCards([]);
