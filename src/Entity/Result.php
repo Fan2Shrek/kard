@@ -32,11 +32,20 @@ class Result
     #[ORM\Column(type: 'datetime')]
     private \DateTimeInterface $date;
 
-    public function __construct(User $winner, Room $room)
+    // solitaire records how the game was won; null for modes that don't track it
+    #[ORM\Column(nullable: true)]
+    private ?int $moves = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $durationSeconds = null;
+
+    public function __construct(User $winner, Room $room, ?int $moves = null, ?int $durationSeconds = null)
     {
         $this->winner = $winner;
         $this->room = $room;
         $this->date = new \DateTimeImmutable();
+        $this->moves = $moves;
+        $this->durationSeconds = $durationSeconds;
     }
 
     public function getId(): ?UuidInterface
@@ -57,5 +66,15 @@ class Result
     public function getDate(): \DateTimeInterface
     {
         return $this->date;
+    }
+
+    public function getMoves(): ?int
+    {
+        return $this->moves;
+    }
+
+    public function getDurationSeconds(): ?int
+    {
+        return $this->durationSeconds;
     }
 }

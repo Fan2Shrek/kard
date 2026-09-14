@@ -83,6 +83,23 @@
         animation: solitaire-target 1.2s ease-in-out infinite;
     }
 
+    &__status {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        color: #fff;
+        font-variant-numeric: tabular-nums;
+    }
+
+    &__actions {
+        position: fixed;
+        right: clamp(8px, 2vw, 32px);
+        bottom: clamp(8px, 2vw, 32px);
+        z-index: 100;
+        display: flex;
+        gap: .75rem;
+    }
+
     &__empty {
         width: var(--card-width);
         height: var(--card-height);

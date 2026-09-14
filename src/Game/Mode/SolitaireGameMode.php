@@ -24,6 +24,13 @@ final class SolitaireGameMode extends AbstractGameMode implements SetupGameModeI
 {
     public const COLUMNS = 7;
 
+    /**
+     * Destination key asking the mode to play the game out on its own. Only
+     * legal once nothing is face down - past that point the game is decided and
+     * finishing it by hand is just clicking, not playing.
+     */
+    public const AUTO_FINISH = 'auto';
+
     private const RANK_ORDER = [
         Rank::ACE->value => 1,
         Rank::TWO->value => 2,
@@ -86,7 +93,7 @@ final class SolitaireGameMode extends AbstractGameMode implements SetupGameModeI
 
     protected function doPlay(array $cards, GameContext $context, array $data): void
     {
-        $to = $data['to'] ?? throw $this->createRuleException('No destination given');
+        $to = $data['to'] ?? throw $this->createRuleException('destination.missing');
 
         if (GameEventApplier::STOCK === $to) {
             $this->drawOrRecycle($context);
@@ -94,8 +101,14 @@ final class SolitaireGameMode extends AbstractGameMode implements SetupGameModeI
             return;
         }
 
+        if (self::AUTO_FINISH === $to) {
+            $this->autoFinish($context);
+
+            return;
+        }
+
         if ([] === $cards) {
-            throw $this->createRuleException('No card given');
+            throw $this->createRuleException('move.no_card');
         }
 
         $from = $this->locate($context->gameState, $cards[0]);
@@ -136,6 +149,14 @@ final class SolitaireGameMode extends AbstractGameMode implements SetupGameModeI
     }
 
     /**
+     * @return string[]
+     */
+    private static function columnKeys(): array
+    {
+        return array_map(self::upKey(...), range(0, self::COLUMNS - 1));
+    }
+
+    /**
      * Turns the top stock card face up on the waste, or puts the whole waste
      * back under the stock once it has run out.
      */
@@ -145,7 +166,7 @@ final class SolitaireGameMode extends AbstractGameMode implements SetupGameModeI
 
         if (0 === $state->drawPile->count()) {
             if (0 === $state->discardPile->count()) {
-                throw $this->createRuleException('Nothing left to draw');
+                throw $this->createRuleException('draw.empty');
             }
 
             $context->moveCards(GameEventApplier::WASTE, GameEventApplier::STOCK, array_reverse(array_values($state->discardPile->cards)));
@@ -154,6 +175,103 @@ final class SolitaireGameMode extends AbstractGameMode implements SetupGameModeI
         }
 
         $context->moveCards(GameEventApplier::STOCK, GameEventApplier::WASTE, [$state->drawPile->getNext()]);
+    }
+
+    /**
+     * Plays every remaining card onto the foundations, drawing and recycling the
+     * stock as needed. Mirrors the applier's own bookkeeping locally because the
+     * events pushed here are only applied to the state after doPlay() returns.
+     */
+    private function autoFinish(GameContext $context): void
+    {
+        $state = $context->gameState;
+
+        for ($column = 0; $column < self::COLUMNS; ++$column) {
+            if (0 !== $this->stack($state, self::downKey($column))->count()) {
+                throw $this->createRuleException('auto.face_down_remaining');
+            }
+        }
+
+        $foundations = [];
+        foreach (Suit::cases() as $suit) {
+            $pile = $this->stack($state, self::foundationKey($suit));
+            $foundations[$suit->value] = $pile->count();
+        }
+
+        $columns = [];
+        for ($column = 0; $column < self::COLUMNS; ++$column) {
+            $columns[$column] = array_values($this->stack($state, self::upKey($column))->cards);
+        }
+
+        $waste = array_values($state->discardPile->cards);
+        $stock = array_values($state->drawPile->cards);
+        $barrenDraws = 0;
+
+        // every card ends on a foundation, so 52 placements plus the draws needed
+        // to reach them bounds this comfortably
+        for ($step = 0; $step < 1000; ++$step) {
+            if (52 === array_sum($foundations)) {
+                return;
+            }
+
+            $moved = false;
+
+            foreach ($columns as $column => $ids) {
+                if ([] === $ids) {
+                    continue;
+                }
+
+                $card = $state->getCardById($ids[\count($ids) - 1]);
+
+                if (null === $card->suit || $foundations[$card->suit->value] + 1 !== self::rank($card)) {
+                    continue;
+                }
+
+                array_pop($columns[$column]);
+                ++$foundations[$card->suit->value];
+                $context->moveCards(self::upKey($column), self::foundationKey($card->suit), [$card->id]);
+                $moved = true;
+            }
+
+            if ([] !== $waste) {
+                $card = $state->getCardById($waste[\count($waste) - 1]);
+
+                if (null !== $card->suit && $foundations[$card->suit->value] + 1 === self::rank($card)) {
+                    array_pop($waste);
+                    ++$foundations[$card->suit->value];
+                    $context->moveCards(GameEventApplier::WASTE, self::foundationKey($card->suit), [$card->id]);
+                    $moved = true;
+                }
+            }
+
+            if ($moved) {
+                $barrenDraws = 0;
+
+                continue;
+            }
+
+            if ([] === $stock) {
+                if ([] === $waste) {
+                    return;
+                }
+
+                $stock = array_reverse($waste);
+                $context->moveCards(GameEventApplier::WASTE, GameEventApplier::STOCK, $stock);
+                $waste = [];
+
+                continue;
+            }
+
+            // a whole pass of the stock without a single placement means the rest
+            // is unreachable - stop rather than cycle forever
+            if (++$barrenDraws > \count($stock) + \count($waste)) {
+                return;
+            }
+
+            $drawn = array_shift($stock);
+            $waste[] = $drawn;
+            $context->moveCards(GameEventApplier::STOCK, GameEventApplier::WASTE, [$drawn]);
+        }
     }
 
     /**
@@ -167,11 +285,11 @@ final class SolitaireGameMode extends AbstractGameMode implements SetupGameModeI
         // only the top card of the stock, the waste or a foundation can leave it;
         // a tableau column also gives away any face-up run below that card
         if (!str_starts_with($from, 'tableau_') && 1 !== \count($ids)) {
-            throw $this->createRuleException('Only one card can be moved from there');
+            throw $this->createRuleException('move.single_card_only');
         }
 
         if ($ids !== \array_slice($source, -\count($ids))) {
-            throw $this->createRuleException('These cards are not on top of their pile');
+            throw $this->createRuleException('move.not_on_top');
         }
 
         $this->assertSequence($cards);
@@ -190,42 +308,42 @@ final class SolitaireGameMode extends AbstractGameMode implements SetupGameModeI
             $card = $cards[0];
 
             if (null === $card->suit) {
-                throw $this->createRuleException('This card has no suit');
+                throw $this->createRuleException('foundation.no_suit');
             }
 
             if (1 !== \count($cards)) {
-                throw $this->createRuleException('Foundations take one card at a time');
+                throw $this->createRuleException('foundation.single_card_only');
             }
 
             if (self::foundationKey($card->suit) !== $to) {
-                throw $this->createRuleException('Wrong foundation for this suit');
+                throw $this->createRuleException('foundation.wrong_suit');
             }
 
             $expected = null === $top ? 1 : self::RANK_ORDER[$top->rank->value] + 1;
 
             if (self::rank($card) !== $expected) {
-                throw $this->createRuleException('Foundations go up from ace to king');
+                throw $this->createRuleException('foundation.sequence');
             }
 
             return;
         }
 
-        if (!str_ends_with($to, '_up')) {
-            throw $this->createRuleException('Cards cannot be moved there');
+        if (!\in_array($to, self::columnKeys(), true)) {
+            throw $this->createRuleException('destination.invalid');
         }
 
         $card = $cards[0];
 
         if (null === $top) {
             if (Rank::KING !== $card->rank) {
-                throw $this->createRuleException('Only a king can start an empty column');
+                throw $this->createRuleException('column.king_only');
             }
 
             return;
         }
 
         if (self::rank($card) !== self::rank($top) - 1 || self::isRed($card) === self::isRed($top)) {
-            throw $this->createRuleException('Columns go down in alternating colours');
+            throw $this->createRuleException('column.sequence');
         }
     }
 
@@ -239,7 +357,7 @@ final class SolitaireGameMode extends AbstractGameMode implements SetupGameModeI
             $card = $cards[$i];
 
             if (self::rank($card) !== self::rank($previous) - 1 || self::isRed($card) === self::isRed($previous)) {
-                throw $this->createRuleException('Only a descending alternating run can be moved');
+                throw $this->createRuleException('move.run_invalid');
             }
         }
     }
@@ -278,7 +396,7 @@ final class SolitaireGameMode extends AbstractGameMode implements SetupGameModeI
             }
         }
 
-        throw $this->createRuleException('This card is not in play');
+        throw $this->createRuleException('move.card_not_in_play');
     }
 
     private function stack(GameState $state, string $key): AbstractCardStack

@@ -163,9 +163,13 @@ final class RoomController extends AbstractController
     }
 
     #[Route('/leave/{id}', name: 'game_leave')]
-    public function leave(Room $room): Response
+    public function leave(Room $room, GameStateProviderInterface $gameStateProvider): Response
     {
-        if (GameStatusEnum::PLAYING === $room->getStatus()) {
+        // leaving mid-game would strand the other players, but a solo game has
+        // nobody to strand - quitting it is just abandoning it
+        $isSolo = 1 === $room->getParticipants()->count();
+
+        if (GameStatusEnum::PLAYING === $room->getStatus() && !$isSolo) {
             return $this->redirectToRoute('game', ['id' => $room->getId()]);
         }
 
@@ -188,6 +192,7 @@ final class RoomController extends AbstractController
                 ));
 
                 $id = $room->getId()->toString();
+                $gameStateProvider->clear($id);
                 $this->roomRepository->remove($room);
 
                 $this->hub->publish(new Update(

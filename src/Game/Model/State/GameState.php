@@ -32,6 +32,8 @@ final readonly class GameState
         public DrawPile $drawPile,
         public array $cards,
         public array $piles = [],
+        public int $moves = 0,
+        public ?\DateTimeImmutable $startedAt = null,
     ) {
         $this->players = array_combine(array_map(fn (PlayerState $player) => $player->id, $players), $players);
     }
@@ -47,6 +49,8 @@ final readonly class GameState
             $this->drawPile,
             $this->cards,
             $this->piles,
+            $this->moves,
+            $this->startedAt,
         );
     }
 
@@ -64,6 +68,8 @@ final readonly class GameState
             $this->drawPile,
             $this->cards,
             $this->piles,
+            $this->moves,
+            $this->startedAt,
         );
     }
 
@@ -78,6 +84,8 @@ final readonly class GameState
             $this->drawPile,
             $this->cards,
             $this->piles,
+            $this->moves,
+            $this->startedAt,
         );
     }
 
@@ -92,6 +100,8 @@ final readonly class GameState
             $this->drawPile,
             $this->cards,
             $this->piles,
+            $this->moves,
+            $this->startedAt,
         );
     }
 
@@ -106,6 +116,8 @@ final readonly class GameState
             $drawPile,
             $this->cards,
             $this->piles,
+            $this->moves,
+            $this->startedAt,
         );
     }
 
@@ -123,6 +135,8 @@ final readonly class GameState
             $this->drawPile,
             $this->cards,
             $this->piles,
+            $this->moves,
+            $this->startedAt,
         );
     }
 
@@ -140,6 +154,8 @@ final readonly class GameState
             $this->drawPile,
             $this->cards,
             $this->piles,
+            $this->moves,
+            $this->startedAt,
         );
     }
 
@@ -162,6 +178,40 @@ final readonly class GameState
             $this->drawPile,
             $this->cards,
             $piles,
+            $this->moves,
+            $this->startedAt,
+        );
+    }
+
+    public function withMoves(int $moves): self
+    {
+        return new self(
+            $this->players,
+            $this->playerOrder,
+            $this->currentPlayerId,
+            $this->rounds,
+            $this->discardPile,
+            $this->drawPile,
+            $this->cards,
+            $this->piles,
+            $moves,
+            $this->startedAt,
+        );
+    }
+
+    public function startedNow(): self
+    {
+        return new self(
+            $this->players,
+            $this->playerOrder,
+            $this->currentPlayerId,
+            $this->rounds,
+            $this->discardPile,
+            $this->drawPile,
+            $this->cards,
+            $this->piles,
+            $this->moves,
+            new \DateTimeImmutable(),
         );
     }
 
@@ -217,6 +267,8 @@ final readonly class GameState
             $this->drawPile,
             $this->cards,
             $this->piles,
+            $this->moves,
+            $this->startedAt,
         );
     }
 }

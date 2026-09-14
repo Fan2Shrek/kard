@@ -34,6 +34,8 @@ final readonly class GameStateDTO
         public int $drawPileCount,
         public bool $everyoneCanPlay,
         public array $piles = [],
+        public int $moves = 0,
+        public ?string $startedAt = null,
     ) {
     }
 
@@ -80,6 +82,8 @@ final readonly class GameStateDTO
             $state->drawPile->count(),
             $state->everyoneCanPlay(),
             $piles,
+            $state->moves,
+            $state->startedAt?->format(\DateTimeInterface::ATOM),
         );
     }
 }

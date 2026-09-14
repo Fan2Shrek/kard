@@ -113,13 +113,13 @@ describe('Solitaire: fondations', function () {
         $state = solitaireState(['tableau_0_up' => ['3h'], 'foundation_h' => ['1h']]);
 
         solitairePlay($state, ['3h'], 'foundation_h');
-    })->throws('Foundations go up from ace to king');
+    })->throws('foundation.sequence');
 
     test('Une carte ne peut pas aller sur la fondation d\'une autre couleur', function () {
         $state = solitaireState(['tableau_0_up' => ['1h']]);
 
         solitairePlay($state, ['1h'], 'foundation_s');
-    })->throws('Wrong foundation for this suit');
+    })->throws('foundation.wrong_suit');
 });
 
 describe('Solitaire: colonnes', function () {
@@ -135,19 +135,19 @@ describe('Solitaire: colonnes', function () {
         $state = solitaireState(['tableau_0_up' => ['9h'], 'tableau_1_up' => ['10d']]);
 
         solitairePlay($state, ['9h'], 'tableau_1_up');
-    })->throws('Columns go down in alternating colours');
+    })->throws('column.sequence');
 
     test('Un rang qui ne décroît pas est refusé', function () {
         $state = solitaireState(['tableau_0_up' => ['8h'], 'tableau_1_up' => ['10s']]);
 
         solitairePlay($state, ['8h'], 'tableau_1_up');
-    })->throws('Columns go down in alternating colours');
+    })->throws('column.sequence');
 
     test('Seul un roi démarre une colonne vide', function () {
         $state = solitaireState(['tableau_0_up' => ['9h'], 'tableau_1_up' => []]);
 
         solitairePlay($state, ['9h'], 'tableau_1_up');
-    })->throws('Only a king can start an empty column');
+    })->throws('column.king_only');
 
     test('Une suite alternée se déplace en bloc', function () {
         $state = solitaireState([
@@ -168,7 +168,7 @@ describe('Solitaire: colonnes', function () {
         ]);
 
         solitairePlay($state, ['qh', 'jh'], 'tableau_1_up');
-    })->throws('Only a descending alternating run can be moved');
+    })->throws('move.run_invalid');
 
     test('Vider une colonne retourne la carte cachée du dessus', function () {
         $state = solitaireState([
@@ -205,7 +205,66 @@ describe('Solitaire: pioche', function () {
 
     test('Sans pioche ni défausse il n\'y a plus rien à tirer', function () {
         solitairePlay(solitaireState(), [], 'stock');
-    })->throws('Nothing left to draw');
+    })->throws('draw.empty');
+});
+
+describe('Solitaire: terminer', function () {
+    test('Terminer est refusé tant qu\'une carte est face cachée', function () {
+        $state = solitaireState([
+            'tableau_0_down' => ['2c'],
+            'tableau_0_up' => ['1h'],
+        ]);
+
+        solitairePlay($state, [], 'auto');
+    })->throws('auto.face_down_remaining');
+
+    test('Terminer déroule tout le plateau sur les fondations', function () {
+        $piles = [];
+        $column = 0;
+
+        // deal every card face up across the columns, highest rank at the bottom
+        // so each column is emptied from the top down
+        foreach (Suit::cases() as $suit) {
+            $piles["tableau_{$column}_up"] = array_map(
+                fn (Rank $rank): string => Act::card($rank->value, $suit->value)->id,
+                array_reverse(Rank::valueCases()),
+            );
+            ++$column;
+        }
+
+        $state = solitairePlay(solitaireState($piles), [], 'auto');
+
+        foreach (Suit::cases() as $suit) {
+            expect($state->getPile("foundation_{$suit->value}")->count())->toBe(13);
+        }
+
+        expect((new SolitaireGameMode())->isGameFinished($state))->toBeTrue();
+    });
+
+    test('Terminer va chercher les cartes restées dans la pioche', function () {
+        $stock = [];
+        $piles = [];
+        $column = 0;
+
+        foreach (Suit::cases() as $suit) {
+            $ranks = Rank::valueCases();
+            // leave the aces in the stock: they can only come out by drawing
+            $ace = array_shift($ranks);
+            $stock[] = Act::card($ace->value, $suit->value)->id;
+
+            $piles["tableau_{$column}_up"] = array_map(
+                fn (Rank $rank): string => Act::card($rank->value, $suit->value)->id,
+                array_reverse($ranks),
+            );
+            ++$column;
+        }
+
+        $state = solitairePlay(solitaireState($piles, $stock), [], 'auto');
+
+        expect((new SolitaireGameMode())->isGameFinished($state))->toBeTrue();
+        expect($state->drawPile->count())->toBe(0);
+        expect($state->discardPile->count())->toBe(0);
+    });
 });
 
 describe('Solitaire: fin de partie', function () {

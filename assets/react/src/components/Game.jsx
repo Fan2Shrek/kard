@@ -90,6 +90,11 @@ export default ({ gameContext, player: userJson, gameMode, roomId }) => {
         ctxRef.current = ctx;
     }, [ctx]);
 
+    const playerRef = useRef(player);
+    useEffect(() => {
+        playerRef.current = player;
+    }, [player]);
+
     // The topic carries two different message shapes: ContinueRoomSubscriber's
     // { action: 'end', data: { context, winner, url } } when the game is over, and
     // EventPublisher's { events } on every play (state is deliberately not
@@ -114,6 +119,12 @@ export default ({ gameContext, player: userJson, gameMode, roomId }) => {
                 displayText(message);
             }
 
+            // our own play already came back with the resulting state in its
+            // POST response - refetching it would just be a second round trip
+            if (data.playerId && data.playerId === playerRef.current?.id) {
+                return;
+            }
+
             fetch(`/api/game/${roomId}`, { credentials: 'same-origin' })
                 .then((response) => response.json())
                 .then(setCtx);
@@ -123,7 +134,7 @@ export default ({ gameContext, player: userJson, gameMode, roomId }) => {
     useMercure(gameUrl, onGameEvent);
 
     return <div class={`board${animate ? ' bordel': ''}`}>
-        <GameContext gameContext={ctx} player={player} roomId={roomId}>
+        <GameContext gameContext={ctx} player={player} roomId={roomId} applyState={setCtx}>
             <Board players={ctx.players.filter((gamePlayer) => player?.id !== gamePlayer.id)}>
                 { 'president' === gameMode && <PresidentBoard ctx={ctx} player={player} /> }
                 { 'crazy_eights' === gameMode && <CrazyEightsBoard ctx={ctx} player={player} /> }
