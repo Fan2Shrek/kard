@@ -169,7 +169,8 @@ final class SolitaireGameMode extends AbstractGameMode implements SetupGameModeI
                 throw $this->createRuleException('draw.empty');
             }
 
-            $context->moveCards(GameEventApplier::WASTE, GameEventApplier::STOCK, array_reverse(array_values($state->discardPile->cards)));
+            // keep draw order stable across cycles, rather than flipping it each time the stock runs out
+            $context->moveCards(GameEventApplier::WASTE, GameEventApplier::STOCK, array_values($state->discardPile->cards));
 
             return;
         }

@@ -165,6 +165,7 @@ export default ({ ctx }) => {
         {error && <div className="error">{error}</div>}
 
         <div className="solitaire__actions">
+            {canFinish && <a className="button button--medium" onClick={() => send([], 'auto')}>Terminer</a>}
             <a
                 className="button button--medium"
                 href={`/room/start/${roomId}`}
@@ -178,7 +179,6 @@ export default ({ ctx }) => {
         <div className="solitaire__status">
             <span>{formatDuration(elapsed)}</span>
             <span>{ctx.moves} coup{1 < ctx.moves ? 's' : ''}</span>
-            {canFinish && <a className="button button--medium" onClick={() => send([], 'auto')}>Terminer</a>}
         </div>
 
         <div className="solitaire__top">

@@ -194,13 +194,13 @@ describe('Solitaire: pioche', function () {
         expect($state->drawPile->count())->toBe(1);
     });
 
-    test('Une pioche vide recycle la défausse dans l\'ordre inverse', function () {
+    test('Une pioche vide recycle la défausse en gardant le même ordre de tirage', function () {
         $state = solitaireState([], [], ['1h', '2h', '3h']);
 
         $state = solitairePlay($state, [], 'stock');
 
         expect($state->discardPile->count())->toBe(0);
-        expect(array_values($state->drawPile->cards))->toBe(['3h', '2h', '1h']);
+        expect(array_values($state->drawPile->cards))->toBe(['1h', '2h', '3h']);
     });
 
     test('Sans pioche ni défausse il n\'y a plus rien à tirer', function () {
